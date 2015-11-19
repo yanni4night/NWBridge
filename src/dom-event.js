@@ -10,9 +10,9 @@
  * @since 0.1.0
  */
 
-import extend from './extend';
+import {extend} from './extend';
 
-var DomEvent = {
+export var DomEvent = {
     trigger: function (evtName, evtPayload) {
         var evt = document.createEvent('Events');
         evt.initEvent(evtName);
@@ -20,5 +20,3 @@ var DomEvent = {
         document.dispatchEvent(evt);
     }
 };
-
-export DomEvent;

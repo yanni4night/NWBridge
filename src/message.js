@@ -10,10 +10,10 @@
  * @since 0.1.0
  */
 
-import Api from './api';
-import extend from './extend';
-import Callback from './callback';
-import Event from './event';
+import {Api} from './api';
+import {extend} from './extend';
+import {Callback} from './callback';
+import {Event} from './event';
 
 var MESSAGE_TYPE = {
     REQUEST: 0x1,
@@ -21,7 +21,7 @@ var MESSAGE_TYPE = {
     HANDSHAKE: 0x3
 };
 
-function Message(metaData) {
+export function Message(metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
         cmd: '',
@@ -109,7 +109,7 @@ Message.fromMetaString = function(metaString) {
     return new Message(metaData);
 };
 
-function RequestMessage(metaData, timeout) {
+export function RequestMessage(metaData, timeout) {
     var self = this;
 
     var defaultTimeout = 3e3;
@@ -144,10 +144,8 @@ function RequestMessage(metaData, timeout) {
     }));
 }
 
-function ResponseMessage(metaData) {
+export function ResponseMessage(metaData) {
     return new Message(extend(metaData, {
         messageType: MESSAGE_TYPE.RESPONSE
     }));
 }
-
-export Message, RequestMessage, ResponseMessage

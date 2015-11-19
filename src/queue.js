@@ -9,10 +9,10 @@
  * @version 0.1.0
  * @since 0.1.0
  */
-import Event from './event';
-import extend from './extend';
+import {Event} from './event';
+import {extend} from './extend';
 
-function Queue() {
+export function Queue() {
     var queue = [];
     this.pop = function() {
         var ret = queue.shift();
@@ -46,5 +46,3 @@ function Queue() {
 
     extend(this, new Event());
 }
-
-export Queue

@@ -42,7 +42,7 @@ var isPlainObject = function isPlainObject(obj) {
     return typeof key === 'undefined' || hasOwn.call(obj, key);
 };
 
-function extend() {
+export function extend() {
     var options, name, src, copy, copyIsArray, clone,
         target = arguments[0],
         i = 1,
@@ -94,5 +94,3 @@ function extend() {
     // Return the modified object
     return target;
 }
-
-export extend;

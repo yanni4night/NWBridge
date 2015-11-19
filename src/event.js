@@ -10,7 +10,7 @@
  * @since 0.1.0
  */
 
-var EventEmitter = function() {
+export var EventEmitter = function() {
 
     var listeners = {};
 
@@ -102,5 +102,3 @@ var EventEmitter = function() {
         return this;
     };
 };
-
-export EventEmitter;

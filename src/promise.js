@@ -9,4 +9,6 @@
   * @version 0.1.0
   * @since 0.1.0
   */
-export Promise;
+export function Promise(func){
+  return new window.Promise(func);
+};

@@ -28,7 +28,7 @@ function AndroidBridge() {
     };
 }
 
-function Native(platform) {
+export function Native(platform) {
     switch (String(platform).toLowerCase()) {
     case 'ios':
         return new IOSBridge();
@@ -38,5 +38,3 @@ function Native(platform) {
         throw new Error(platform + ' not supported');
     }
 };
-
-export Native;

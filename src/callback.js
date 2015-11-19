@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2015 tieba.baidu.com
- * callbacks.js
+ * callback.js
  *
  * changelog
  * 2015-11-18[23:56:57]:revised
@@ -14,7 +14,7 @@ var callbacks = {};
 
 var index = 0;
 
-function Callback(func) {
+export function Callback(func) {
     var id = 'cb_' + (++index) + '_' + (Math.random() * 1e7 | 0);
 
     this.getId = function() {
@@ -36,6 +36,3 @@ function Callback(func) {
 Callback.findById = function(id) {
     return callbacks[id];
 };
-
-
-export Callback;

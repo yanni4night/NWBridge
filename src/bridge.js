@@ -9,17 +9,14 @@
  * @version 0.1.0
  * @since 0.1.0
  */
-import DomEvent from './dom-event';
-import extend from './extend';
-import Queue from './queue';
-import {
-    Message, RequestMessage
-}
-from './message';
-import Native from './native';
-import Api from './api';
-import Callback from './callback';
-import Promise from './promise';
+import {DomEvent} from './dom-event';
+import {extend} from './extend';
+import {Queue} from './queue';
+import {Message, RequestMessage} from './message';
+import {Native} from './native';
+import {Api} from './api';
+import {Callback} from './callback';
+import {Promise} from './promise';
 
 var READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -50,34 +47,34 @@ function upload(message) {
 
 // native -> webview
 messageQueueFromNative.on('push', function() {
-        if (READY_STATE_ENUM.COMPLETE === readyState) {
-            // Release native thread
-            setTimeout(function() {
-                    var message = messageQueueFromNative.pop();
+    if (READY_STATE_ENUM.COMPLETE === readyState) {
+        // Release native thread
+        setTimeout(function() {
+            var message = messageQueueFromNative.pop();
 
-                    if (message) {
-                        message.on('response', function(evt) {
-                                var respMsg = evt.data;
-                                upload(respMsg);
-                            }
-                        }).on('handshake', function() {
+            if (message) {
+                message.on('response', function(evt) {
+                    var respMsg = evt.data;
+                    upload(respMsg);
 
-                        clearTimeout(handshakeTimeout);
-                        if (READY_STATE_ENUM.PENDING === readyState) {
-                            // Receiving a handshake indicates ready
-                            readyState = READY_STATE_ENUM.COMPLETE;
+                }).on('handshake', function() {
 
-                            try {
-                                nativeInterface = new Native((this.inputData || {}).platform);
-                            } catch (e) {
-                                readyState = READY_STATE_ENUM.ERROR;
-                            }
-                            // Notify ready
-                            domReady();
+                    clearTimeout(handshakeTimeout);
+                    if (READY_STATE_ENUM.PENDING === readyState) {
+                        // Receiving a handshake indicates ready
+                        readyState = READY_STATE_ENUM.COMPLETE;
+
+                        try {
+                            nativeInterface = new Native((this.inputData || {}).platform);
+                        } catch (e) {
+                            readyState = READY_STATE_ENUM.ERROR;
                         }
-                    }).flow();
-                }
-            });
+                        // Notify ready
+                        domReady();
+                    }
+                }).flow();
+            }
+        });
     }
 });
 

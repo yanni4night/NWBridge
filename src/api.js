@@ -14,19 +14,19 @@ var apis = {
     location: {},
     localStorage: {},
     navigator: {
-        getUserAgent: function () {
+        getUserAgent: function() {
             return navigator.userAgent;
         }
     }
 };
 
-function Api(cmd, method, data) {
+export function Api(cmd, method, data) {
 
-    this.exists = function () {
+    this.exists = function() {
         return apis[cmd] && 'function' === typeof apis[cmd][method];
     };
 
-    this.invoke = function () {
+    this.invoke = function() {
         if (!this.exists()) {
             throw new Error('"' + cmd + '.' + method + '" does not exist');
         }
@@ -36,13 +36,10 @@ function Api(cmd, method, data) {
 
 }
 
-Api.register = function (cmd, method, func) {
-        apis[cmd] = apis[cmd] || {};
-        if (apis[cmd][method]) {
-            throw new Error('Duplicated "' + cmd + '.' + method + '"')
-        }
-        apis[cmd][method] = func;
-    };
-
-
-export Api;
+Api.register = function(cmd, method, func) {
+    apis[cmd] = apis[cmd] || {};
+    if (apis[cmd][method]) {
+        throw new Error('Duplicated "' + cmd + '.' + method + '"')
+    }
+    apis[cmd][method] = func;
+};
