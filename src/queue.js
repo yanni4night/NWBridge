@@ -9,25 +9,42 @@
  * @version 0.1.0
  * @since 0.1.0
  */
+import Event from './event';
+import extend from './extend';
 
-export function Queue() {
+function Queue() {
     var queue = [];
-    this.pop = function () {
-        return queue.shift();
+    this.pop = function() {
+        var ret = queue.shift();
+        if (ret) {
+            this.emit('pop', ret);
+        }
+        return ret;
     };
-    this.push = function (element) {
-        queue.push(element);
+    this.push = function(element) {
+        if (element) {
+            queue.push(element);
+            this.emit('push', element);
+        }
     };
-    this.empty = function () {
+    this.empty = function() {
         return !!queue.length;
     };
-    this.size = function () {
+    this.size = function() {
         return queue.length;
     };
-    this.truncate = function (start, end) {
+    this.truncate = function(start, end) {
         queue.splice(start, end);
     };
-    this.serialize = function () {
+    this.serialize = function() {
         return JSON.stringify(queue);
     }
-};
+    this.clear = function() {
+        queue = [];
+        this.emit('clear');
+    };
+
+    extend(this, new Event());
+}
+
+export Queue

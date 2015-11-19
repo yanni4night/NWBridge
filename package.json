@@ -1,0 +1,20 @@
+{
+  "name": "tbjsbridge",
+  "version": "1.0.0",
+  "description": "bridge for tieba app",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://g@gitlab.baidu.com:8022/tieba-bravo/TbJsBridge.git"
+  },
+  "keywords": [
+    "tieba",
+    "bridge",
+    "hybrid"
+  ],
+  "author": "yinyong02@baidu.com",
+  "license": "MIT"
+}

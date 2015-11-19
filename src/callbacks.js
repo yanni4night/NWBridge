@@ -17,19 +17,23 @@ var index = 0;
 function Callback(func) {
     var id = 'cb_' + (++index) + '_' + (Math.random() * 1e7 | 0);
 
-    this.getId = function () {
+    this.getId = function() {
         return id;
     };
 
-    this.invoke = function(){
-        func.apply(null,arguments);
+    this.invoke = function(outputData) {
+        var err = null;
+        if (0 !== +outputData.errNo) {
+            err = new Error(outputData.errMsg || 'Unknown error');
+        }
+        func.call(null, err, outputData.data);
         delete callbacks[id];
     };
 
     callbacks[id] = this;
 };
 
-Callback.findById = function(id){
+Callback.findById = function(id) {
     return callbacks[id];
 };
 

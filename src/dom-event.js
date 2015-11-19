@@ -12,13 +12,13 @@
 
 import extend from './extend';
 
-var Event = {
-    trigger: function (eventName, payload) {
-        var readyEvent = document.createEvent('Events');
-        readyEvent.initEvent(eventName);
-        extend(readyEvent, payload);
-        document.dispatchEvent(readyEvent);
+var DomEvent = {
+    trigger: function (evtName, evtPayload) {
+        var evt = document.createEvent('Events');
+        evt.initEvent(evtName);
+        extend(evt, evtPayload);
+        document.dispatchEvent(evt);
     }
 };
 
-export default Event;
+export DomEvent;
