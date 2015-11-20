@@ -34,7 +34,9 @@ var nativeInterface;
 var handshakeTimeout;
 
 function domReady() {
-    DomEvent.trigger('TiebaJsBridgeReady');
+    DomEvent.trigger('TiebaJsBridgeReady', {
+        tiebaJsBridge: TiebaJsBridge
+    });
 }
 
 /**
@@ -46,41 +48,45 @@ function upload(message) {
 }
 
 // native -> webview
-messageQueueFromNative.on('push', function() {
-    if (READY_STATE_ENUM.COMPLETE === readyState) {
+messageQueueFromNative.on('push', function () {
+    if (READY_STATE_ENUM.PENDING === readyState) {
+        setTimeout(function () {
+            var message = messageQueueFromNative.pop();
+            if (message) {
+                message.on('handshake', function () {
+                    clearTimeout(handshakeTimeout);
+                    // Receiving a handshake indicates ready
+                    window.TiebaJsBridge.readyState = readyState = READY_STATE_ENUM.COMPLETE;
+
+                    try {
+                        nativeInterface = new Native((message.inputData || {}).platform);
+                    } catch (e) {
+                        window.TiebaJsBridge.readyState = readyState = READY_STATE_ENUM.ERROR;
+                    }
+                    // Notify ready
+                    domReady();
+
+                }).on('response', function (evt, respMsg) {
+                    upload(respMsg);
+                }).flow();
+            }
+        });
+    } else if (READY_STATE_ENUM.COMPLETE === readyState) {
         // Release native thread
-        setTimeout(function() {
+        setTimeout(function () {
             var message = messageQueueFromNative.pop();
 
             if (message) {
-                message.on('response', function(evt) {
-                    var respMsg = evt.data;
+                message.on('response', function (evt, respMsg) {
                     upload(respMsg);
-
-                }).on('handshake', function() {
-
-                    clearTimeout(handshakeTimeout);
-                    if (READY_STATE_ENUM.PENDING === readyState) {
-                        // Receiving a handshake indicates ready
-                        readyState = READY_STATE_ENUM.COMPLETE;
-
-                        try {
-                            nativeInterface = new Native((this.inputData || {}).platform);
-                        } catch (e) {
-                            readyState = READY_STATE_ENUM.ERROR;
-                        }
-                        // Notify ready
-                        domReady();
-                    }
                 }).flow();
             }
         });
     }
 });
 
-
 handshakeTimeout = setTimeout(function() {
-    readyState = READY_STATE_ENUM.ERROR;
+    window.TiebaJsBridge.readyState = readyState = READY_STATE_ENUM.ERROR;
     domReady();
 }, 2e3);
 
@@ -99,7 +105,7 @@ messageQueueToNative.on('push', function() {
 extend(window, {
     '__tb_js_bridge': {
         send: function(messageStr) {
-            // TODO[IMPORTANT]:Highest priority for handshake
+            // TODO[IMPORTANT]: Highest priority for handshake
             messageQueueFromNative.push(Message.fromMetaString(messageStr));
         },
         fetch: function() {
@@ -115,15 +121,14 @@ extend(window, {
             return window.TiebaJsBridge;
         },
         widgets: {
-            confirm: function() {
+            confirm: function(confirmMessage) {
                 return new Promise(function(resolve, reject) {
-
                     var msg = new RequestMessage({
                         cmd: 'widgets',
                         method: 'confirm',
-                        callbackId: cb.getId()
+                        inputData: confirmMessage
                     }).on('data', function(evt) {
-                        resolve(!evt.data.err && /^(yes|true|1|comfirmed)$/i.test(evt.data.data));
+                        resolve(/^(yes|true|1|comfirmed)$/i.test(evt.data));
                     }).on('error', function(evt) {
                         reject(evt.data);
                     });

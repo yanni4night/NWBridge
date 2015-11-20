@@ -9,7 +9,7 @@
  * @version 0.1.0
  * @since 0.1.0
  */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
@@ -30,9 +30,13 @@ module.exports = function(grunt) {
             }
         },
         browserify: {
-            all: {
+            dist: {
                 src: ['dist/bridge.js'],
                 dest: 'bridge.dist.js'
+            },
+            test: {
+                src: ['test/test.js'],
+                dest: 'test.dist.js'
             }
         },
         uglify: {
@@ -40,6 +44,12 @@ module.exports = function(grunt) {
                 files: {
                     'bridge.dist.min.js': 'bridge.dist.js'
                 }
+            }
+        },
+        watch: {
+            all: {
+                files: ['src/*.js', 'test/*.js'],
+                tasks: ['default']
             }
         }
     });

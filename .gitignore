@@ -9,3 +9,4 @@ bower_components
 bridge.dist.js
 bridge.dist.min.js
 dist
+test.dist.js

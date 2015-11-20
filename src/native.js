@@ -37,4 +37,4 @@ export function Native(platform) {
     default:
         throw new Error(platform + ' not supported');
     }
-};
+}

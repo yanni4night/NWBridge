@@ -15,7 +15,7 @@ import {extend} from './extend';
 import {Callback} from './callback';
 import {Event} from './event';
 
-var MESSAGE_TYPE = {
+const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     REQUEST: 0x1,
     RESPONSE: 0x2,
     HANDSHAKE: 0x3
@@ -24,19 +24,15 @@ var MESSAGE_TYPE = {
 export function Message(metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
-        cmd: '',
-        method: '',
-        callbackId: '',
-        inputData: {},
-        outputData: {
-            errNo: 0,
-            errMsg: '',
-            data: {}
-        }
+        cmd: undefined,
+        method: undefined,
+        callbackId: undefined,
+        inputData: undefined,
+        outputData: undefined
     }, metaData, new Event());
 }
 
-Message.prototype.assemble = function() {
+Message.prototype.assemble = function () {
     return {
         messageType: this.messageType,
         cmd: this.cmd,
@@ -47,55 +43,64 @@ Message.prototype.assemble = function() {
     };
 };
 
-Message.prototype.serialize = function() {
+Message.prototype.serialize = function () {
     return JSON.stringify(this.assemble());
 };
 
-Message.prototype.flow = function() {
+Message.prototype.flow = function () {
     var respMsg;
+    var isHandShake = false;
+
     switch (this.messageType) {
-        case MESSAGE_TYPE.HANDSHAKE:
+    case MESSAGE_TYPE.HANDSHAKE:
+        respMsg = new ResponseMessage(extend(this.assemble(), {
+            outputData: {
+                errNo: 0,
+                errMsg: 'success',
+                data: {
+                    // TODO
+                }
+            }
+        }));
+        isHandShake = true;
+        break;
+    case MESSAGE_TYPE.REQUEST:
+        var api = new Api(this.cmd, this.method, this.inputData);
+        var ret;
+
+        try {
+            ret = api.invoke();
+        } catch (e) {
+            ret = null;
+        } finally {
             respMsg = new ResponseMessage(extend(this.assemble(), {
                 outputData: {
-                    errNo: 0,
-                    errMsg: 'success',
-                    data: {
-                        // TODO
-                    }
+                    errNo: ret ? 0 : -1,
+                    errMsg: ret ? 'success' : 'failed',
+                    data: ret
                 }
             }));
-            this.emit('handshake', this);
-            break;
-        case MESSAGE_TYPE.REQUEST:
-            var api = new Api(this.cmd, this.method, this.inputData);
-            var ret;
+        }
+        break;
+    case MESSAGE_TYPE.RESPONSE:
 
-            try {
-                ret = api.invoke();
-            } catch (e) {
-                ret = null;
-            } finally {
-                respMsg = new ResponseMessage(extend(this.assemble(), {
-                    outputData: {
-                        errNo: ret ? 0 : -1,
-                        errMsg: ret ? 'success' : 'failed',
-                        data: ret
-                    }
-                }));
-            }
-            break;
-        case MESSAGE_TYPE.RESPONSE:
-            var callback = Callback.findById(this.callbackId);
+        var callback = Callback.findById(this.callbackId);
 
-            try {
-                callback.invoke(this.outputData);
-            } catch (e) {}
+        try {
+            callback.invoke(this.outputData);
+        } catch (e) {
+            console.log('FINDCALL', e);
+        }
 
-            // Should response have a callback?
-            break;
-        default:
-            //TODO
-            ;
+        // Should response have a callback?
+        break;
+    default:
+        //TODO
+        ;
+    }
+
+    if (isHandShake) {
+        this.emit('handshake', this);
     }
 
     if (respMsg) {
@@ -104,13 +109,13 @@ Message.prototype.flow = function() {
     return this;
 };
 
-Message.fromMetaString = function(metaString) {
+Message.fromMetaString = function (metaString) {
     var metaData = JSON.parse(metaString);
     return new Message(metaData);
 };
 
 export function RequestMessage(metaData, timeout) {
-    var self = this;
+    var self;
 
     var defaultTimeout = 3e3;
 
@@ -121,12 +126,12 @@ export function RequestMessage(metaData, timeout) {
 
     var hasTimeout = false;
 
-    var timeoutBundler = setTimeout(function() {
+    var timeoutBundler = setTimeout(function () {
         hasTimeout = true;
         self.emit('error', new Error('Timeout'));
     }, timeout);
 
-    var callback = new Callback(function(err, data) {
+    var callback = new Callback(function (err, data) {
         clearTimeout(timeoutBundler);
         if (!hasTimeout) {
             if (err) {
@@ -138,10 +143,10 @@ export function RequestMessage(metaData, timeout) {
 
     });
 
-    return new Message(extend(metaData, {
+    return (self = new Message(extend(metaData, {
         messageType: MESSAGE_TYPE.REQUEST,
         callbackId: callback.getId()
-    }));
+    })));
 }
 
 export function ResponseMessage(metaData) {
