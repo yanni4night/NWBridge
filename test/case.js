@@ -11,6 +11,7 @@
  */
 
 var assert = require('assert');
+var PriorityQueue = require('../dist/queue').PriorityQueue;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -19,20 +20,34 @@ var ready = new Promise(function (resolve, reject) {
 });
 
 describe('TiebaJsBridge', function () {
-    describe('widgets', function () {
+    describe('API', function () {
         this.timeout(5e3);
-        it('#confirm', function (done) {
+        it('#widgets.confirm()', function (done) {
             ready.then(function () {
                 assert.ok('undefined' !== typeof TiebaJsBridge);
                 assert.deepEqual(TiebaJsBridge.readyState, 'complete');
                 TiebaJsBridge.widgets.confirm('yes?').then(function () {
                     done();
-                }).catch(function(){
+                }).catch(function () {
                     done();
                 });
-            }).catch(function(e){
+            }).catch(function (e) {
                 console.error(e);
             });
         })
+    });
+
+    describe('PriorityQueue', function () {
+        it('#push()',function(){
+            var queue = new PriorityQueue('priority');
+            queue.push({
+                name: 'Peter',
+                priority: 0
+            }).push({
+                name: 'Jim',
+                priority: 1
+            });
+            assert.deepEqual(queue.pop().name, 'Jim');
+        });
     });
 });
