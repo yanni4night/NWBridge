@@ -77,8 +77,18 @@ describe('Queue', function () {
         it('should remove some elements of queue', function () {
             var queue = new Queue();
             queue.push(1).push(2).push(3);
-            queue.truncate(0 ,2);
+            queue.truncate(0, 2);
             assert.deepEqual(queue.pop(), 3);
+        });
+    });
+
+    describe('#serialize()', function () {
+        it('should remove json string of queue', function () {
+            var queue = new Queue();
+            queue.push(1).push(2);
+            var ret = JSON.parse(queue.serialize());
+            assert.deepEqual(ret[0], 1);
+            assert.deepEqual(ret[1], 2);
         });
     });
 });
