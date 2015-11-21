@@ -47,8 +47,8 @@ export function Queue(config) {
         return queue.length;
     };
 
-    this.truncate = function(start, end) {
-        queue.splice(start, end);
+    this.truncate = function(start, length) {
+        queue.splice(start, length);
         return this;
     };
 

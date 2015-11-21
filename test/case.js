@@ -72,6 +72,15 @@ describe('Queue', function () {
             assert.deepEqual(queue.size(), 2);
         });
     });
+
+    describe('#truncate()', function () {
+        it('should remove some elements of queue', function () {
+            var queue = new Queue();
+            queue.push(1).push(2).push(3);
+            queue.truncate(0 ,2);
+            assert.deepEqual(queue.pop(), 3);
+        });
+    });
 });
 
 describe('PriorityQueue', function () {
