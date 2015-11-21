@@ -40,31 +40,35 @@ describe('TiebaJsBridge', function () {
 });
 
 describe('Queue', function () {
-    it('#limit', function () {
-        var queue = new Queue({
-            limit: 1
-        });
-        queue.push({
-            name: 'Peter'
-        });
-        assert.throws(function () {
-            queue.push(1);
+    describe('#push()', function () {
+        it('should throw Error if pushing overflow "limit"', function () {
+            var queue = new Queue({
+                limit: 1
+            });
+            queue.push({
+                name: 'Peter'
+            });
+            assert.throws(function () {
+                queue.push(1);
+            });
         });
     });
 });
 
 describe('PriorityQueue', function () {
-    it('#push()', function () {
-        var queue = new PriorityQueue({
-            priorityKey: 'priority'
+    describe('#push()', function () {
+        it('should get the highest priority element', function () {
+            var queue = new PriorityQueue({
+                priorityKey: 'priority'
+            });
+            queue.push({
+                name: 'Peter',
+                priority: 0
+            }).push({
+                name: 'Jim',
+                priority: 1
+            });
+            assert.deepEqual(queue.pop().name, 'Jim');
         });
-        queue.push({
-            name: 'Peter',
-            priority: 0
-        }).push({
-            name: 'Jim',
-            priority: 1
-        });
-        assert.deepEqual(queue.pop().name, 'Jim');
     });
 });
