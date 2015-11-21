@@ -53,6 +53,15 @@ describe('Queue', function () {
             });
         });
     });
+    describe('#size()', function () {
+        it('should return length of queue', function () {
+            var queue = new Queue();
+            queue.push(1).push(2).push(3);
+            assert.deepEqual(queue.size(), 3);
+            queue.pop();
+            assert.deepEqual(queue.size(), 2);
+        });
+    });
 });
 
 describe('PriorityQueue', function () {
