@@ -12,6 +12,7 @@
 
 var assert = require('assert');
 var PriorityQueue = require('../dist/queue').PriorityQueue;
+var Queue = require('../dist/queue').Queue;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -36,18 +37,34 @@ describe('TiebaJsBridge', function () {
             });
         })
     });
+});
 
-    describe('PriorityQueue', function () {
-        it('#push()',function(){
-            var queue = new PriorityQueue('priority');
-            queue.push({
-                name: 'Peter',
-                priority: 0
-            }).push({
-                name: 'Jim',
-                priority: 1
-            });
-            assert.deepEqual(queue.pop().name, 'Jim');
+describe('Queue', function () {
+    it('#limit', function () {
+        var queue = new Queue({
+            limit: 1
         });
+        queue.push({
+            name: 'Peter'
+        });
+        assert.throws(function () {
+            queue.push(1);
+        });
+    });
+});
+
+describe('PriorityQueue', function () {
+    it('#push()', function () {
+        var queue = new PriorityQueue({
+            priorityKey: 'priority'
+        });
+        queue.push({
+            name: 'Peter',
+            priority: 0
+        }).push({
+            name: 'Jim',
+            priority: 1
+        });
+        assert.deepEqual(queue.pop().name, 'Jim');
     });
 });

@@ -12,8 +12,12 @@
 import {Event} from './event';
 import {extend} from './extend';
 
-export function Queue() {
+export function Queue(config) {
     var queue = [];
+
+    config = extend({
+        limit: 0
+    }, config);
 
     this.pop = function() {
         var ret = queue.shift();
@@ -24,6 +28,10 @@ export function Queue() {
     };
 
     this.push = function(element) {
+        if (config.limit > 0 && this.size() >= config.limit) {
+            throw new Error('Overflow');
+        }
+
         if (element) {
             queue.push(element);
             this.emit('push', element);
@@ -73,12 +81,12 @@ export function Queue() {
     extend(this, new Event());
 }
 
-export function PriorityQueue(priorityKey) {
-    var queue = new Queue();
+export function PriorityQueue(config) {
+    var queue = new Queue(config = extend({}, config));
     var _push = queue.push;
 
     queue.push = function() {
-        return _push.apply(queue, arguments).sortBy(priorityKey);
+        return _push.apply(queue, arguments).sortBy(config.priorityKey);
     };
 
     return queue;

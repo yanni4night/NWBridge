@@ -24,8 +24,13 @@ var READY_STATE_ENUM = {
     ERROR: 'error'
 };
 
-var messageQueueFromNative = new PriorityQueue('priority');
-var messageQueueToNative = new Queue();
+var messageQueueFromNative = new PriorityQueue({
+    priorityKey: 'priority'
+});
+
+var messageQueueToNative = new Queue({
+    limit: 5
+});
 
 var readyState = READY_STATE_ENUM.PENDING;
 
