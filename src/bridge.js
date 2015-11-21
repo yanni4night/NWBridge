@@ -11,7 +11,7 @@
  */
 import {DomEvent} from './dom-event';
 import {extend} from './extend';
-import {Queue} from './queue';
+import {Queue, PriorityQueue} from './queue';
 import {Message, RequestMessage} from './message';
 import {Native} from './native';
 import {Api} from './api';
@@ -24,7 +24,7 @@ var READY_STATE_ENUM = {
     ERROR: 'error'
 };
 
-var messageQueueFromNative = new Queue();
+var messageQueueFromNative = new PriorityQueue();
 var messageQueueToNative = new Queue();
 
 var readyState = READY_STATE_ENUM.PENDING;
@@ -106,7 +106,10 @@ extend(window, {
     '__tb_js_bridge': {
         send: function(messageStr) {
             // TODO[IMPORTANT]: Highest priority for handshake
-            messageQueueFromNative.push(Message.fromMetaString(messageStr));
+            var message = Message.fromMetaString(messageStr);
+            if (!message.isInvalid()) {
+                messageQueueFromNative.push(message);
+            }
         },
         fetch: function() {
             var ret = messageQueueToNative.serialize();

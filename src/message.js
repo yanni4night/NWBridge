@@ -29,7 +29,13 @@ export function Message(metaData) {
         callbackId: undefined,
         inputData: undefined,
         outputData: undefined
+    }, {
+        priority: 0
     }, metaData, new Event());
+
+    if(MESSAGE_TYPE.HANDSHAKE === this.messageType) {
+        ++this.priority;
+    }
 }
 
 Message.prototype.assemble = function () {
@@ -45,6 +51,12 @@ Message.prototype.assemble = function () {
 
 Message.prototype.serialize = function () {
     return JSON.stringify(this.assemble());
+};
+
+Message.prototype.isInvalid = function () {
+    return (this.messageType !== MESSAGE_TYPE.REQUEST && this.messageType !== MESSAGE_TYPE.RESPONSE && this.messageType !==
+        MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) || (
+        MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || this.method));
 };
 
 Message.prototype.flow = function () {
