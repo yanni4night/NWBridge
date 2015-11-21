@@ -40,7 +40,7 @@ export function Queue(config) {
     };
 
     this.empty = function() {
-        return !!queue.length;
+        return !queue.length;
     };
 
     this.size = function() {

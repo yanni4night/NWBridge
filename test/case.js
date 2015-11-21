@@ -53,6 +53,16 @@ describe('Queue', function () {
             });
         });
     });
+    describe('#empty()', function () {
+        it('should return if empty of queue', function () {
+            var queue = new Queue();
+            queue.push(1);
+            assert.ok(!queue.empty());
+            queue.pop();
+            assert.ok(queue.empty());
+        });
+    });
+
     describe('#size()', function () {
         it('should return length of queue', function () {
             var queue = new Queue();
