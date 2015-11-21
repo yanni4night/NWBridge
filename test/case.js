@@ -45,9 +45,7 @@ describe('Queue', function () {
             var queue = new Queue({
                 limit: 1
             });
-            queue.push({
-                name: 'Peter'
-            });
+            assert.deepEqual(queue.push(1), queue);
             assert.throws(function () {
                 queue.push(1);
             });
@@ -77,7 +75,7 @@ describe('Queue', function () {
         it('should remove some elements of queue', function () {
             var queue = new Queue();
             queue.push(1).push(2).push(3);
-            queue.truncate(0, 2);
+            assert.deepEqual(queue.truncate(0, 2), queue);
             assert.deepEqual(queue.pop(), 3);
         });
     });
@@ -86,9 +84,19 @@ describe('Queue', function () {
         it('should remove json string of queue', function () {
             var queue = new Queue();
             queue.push(1).push(2);
-            var ret = JSON.parse(queue.serialize());
+            var str = queue.serialize();
+            assert.ok('string' === typeof str);
+            var ret = JSON.parse(str);
             assert.deepEqual(ret[0], 1);
             assert.deepEqual(ret[1], 2);
+        });
+    });
+    describe('#clear()', function () {
+        it('should clear all elements of queue', function () {
+            var queue = new Queue();
+            queue.push(1).push(2)
+            assert.deepEqual(queue.clear(), queue);
+            assert.ok(queue.empty());
         });
     });
 });
