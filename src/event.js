@@ -20,9 +20,9 @@ export function Event() {
      * @param  {String} event
      * @param  {Function} func
      * @param  {Object} thisArg
-     * @return {EventEmitter}      This event emitter
-     * @class EventEmitter
-     * @since 0.0.8
+     * @return {Event}      This event
+     * @class Event
+     * @since 1.0.0
      */
     this.on = function(event, func, thisArg) {
         var evtArr;
@@ -48,9 +48,9 @@ export function Event() {
      *
      * @param  {String} event
      * @param  {Function} func
-     * @return {EventEmitter}     This event emitter
-     * @class EventEmitter
-     * @since 0.0.8
+     * @return {Event}     This event
+     * @class Event
+     * @since 1.0.0
      */
     this.off = function(event, func) {
         var evtArr, objs;
@@ -79,9 +79,9 @@ export function Event() {
      *
      * @param  {String} event
      * @param  {Object} data
-     * @return {EventEmitter} This event emitter
-     * @class EventEmitter
-     * @since 0.0.8
+     * @return {Event} This event
+     * @class Event
+     * @since 1.0.0
      */
     this.emit = function(event, data) {
         var evtArr, objs;
@@ -92,7 +92,7 @@ export function Event() {
             objs = listeners[evt];
             if (Array.isArray(objs)) {
                 objs.forEach(function(obj) {
-                    //add timestamp
+                    // add timestamp
                     obj.timestamp = +new Date();
                     obj.func.call(obj.thisArg || null, obj, data);
                 });
