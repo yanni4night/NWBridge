@@ -33,7 +33,7 @@ export function Message(metaData) {
         priority: 0
     }, metaData, new Event());
 
-    if(MESSAGE_TYPE.HANDSHAKE === this.messageType) {
+    if (MESSAGE_TYPE.HANDSHAKE === this.messageType) {
         ++this.priority;
     }
 }
@@ -70,7 +70,10 @@ Message.prototype.flow = function () {
                 errNo: 0,
                 errMsg: 'success',
                 data: {
-                    // TODO
+                    cookieEnabled: new Api('cookie', 'enabled').invoke(),
+                    url: new Api('location', 'href').invoke(),
+                    localStorageEnabled: new Api('localStorage', 'enabled').invoke(),
+                    ua: new Api('navigator', 'getUserAgent').invoke()
                 }
             }
         }));
