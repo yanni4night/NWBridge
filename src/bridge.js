@@ -13,7 +13,7 @@ import {DomEvent} from './dom-event';
 import {extend} from './extend';
 import {Queue, PriorityQueue} from './queue';
 import {Message, RequestMessage} from './message';
-import {Native} from './native';
+import {Radio} from './radio';
 import {Api} from './api';
 import {Callback} from './callback';
 import {Promise} from './promise';
@@ -38,7 +38,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var readyState = READY_STATE_ENUM.PENDING;
 
-    var native;
+    var radio;
 
     var handshakeTimeout;
 
@@ -71,8 +71,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                         clearTimeout(handshakeTimeout);
                         
                         try {
-                            native = new Native((message.inputData || {}).platform, scheme);
+                            radio = new Radio((message.inputData || {}).platform, scheme);
                             newState = READY_STATE_ENUM.COMPLETE;
+                            extend(window[nativeExport], radio.extension);
                         } catch (e) {
                             newState = READY_STATE_ENUM.ERROR;
                         } finally {
@@ -107,11 +108,11 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     messageQueueToNative.on('push', function () {
         if (READY_STATE_ENUM.COMPLETE === readyState) {
             // "pop" MUST be out of "setTimeout"
-            const msg = messageQueueToNative.pop();
+            const message = messageQueueToNative.pop();
             // Release webview thread
-            if (msg) {
+            if (message) {
                 setTimeout(function () {
-                    native.send(msg.serialize() /*Just for Android*/ );
+                    radio.send(message);
                 });
             }
         }
@@ -124,12 +125,12 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             }
-        },
+        }/*,
         fetch: function () {
             const ret = messageQueueToNative.serialize();
             messageQueueToNative.clear();
             return ret;
-        }
+        }*/
     };
 
     var oldWvExport = window[webviewExport];
@@ -189,11 +190,21 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         changeState: function (state) {
             window[webviewExport].readyState = readyState = state;
         },
+        /**
+         * flush2Native
+         * @since 1.0.0
+         */
         flush2Native: function () {
             while (!messageQueueToNative.empty()) {
                 messageQueueToNative.emit('push');
             }
         },
+        /**
+         * flush2Webview
+         *
+         * @since 1.0.0
+         * @deprecated May lead to long loop on iOS
+         */
         flush2Webview: function () {
             while (!messageQueueFromNative.empty()) {
                 messageQueueFromNative.emit('push');

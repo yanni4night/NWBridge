@@ -15,7 +15,7 @@ var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
 var Callback = require('../dist/callback').Callback;
 var DomEvent = require('../dist/dom-event').DomEvent;
-var Native = require('../dist/native').Native;
+var Radio = require('../dist/radio').Radio;
 var Promise = require('../dist/promise').Promise;
 var Event = require('../dist/event').Event;
 var Message = require('../dist/message').Message;
@@ -160,7 +160,7 @@ describe('DomEvent', function () {
     });
 });
 
-describe('Native', function () {
+describe('Radio', function () {
     describe('android', function () {
         it('should call window.prompt()', function (done) {
             var prompt = window.prompt;
@@ -171,22 +171,32 @@ describe('Native', function () {
                     data = JSON.parse(msgStr.replace(/^http:\/\//i, ''));
                 });
                 assert.ok(!!data);
-                assert.deepEqual(data.name, 'Jim');
+                assert.deepEqual(data.cmd, 'Jim');
                 window.prompt = prompt;
                 done();
             };
-            var native = new Native('android' ,'http://');
-            native.send(JSON.stringify({
-                name: 'Jim'
+            var radio = new Radio('android', 'http://');
+            radio.send(new Message({
+                cmd: 'Jim'
             }));
 
         });
     });
     describe('ios', function () {
         it('should add an iframe', function () {
-            var native = new Native('ios', 'http://');
-            native.send();
+            var receivedStr;
+            var received;
+            var radio = new Radio('ios', 'http://');
+            radio.send(new Message({
+                cmd: 'Jim'
+            }));
             assert.ok(!!document.querySelector('iframe[src^="http://"]'));
+            assert.deepEqual(typeof (receivedStr = radio.extension.fetch()), 'string');
+            assert.doesNotThrow(function () {
+                received = JSON.parse(receivedStr);
+            });
+            assert.ok(Array.isArray(received) && received.length);
+            assert.deepEqual(received[0].cmd, 'Jim');
         });
     });
 });
