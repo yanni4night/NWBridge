@@ -14,6 +14,7 @@ var assert = require('assert');
 var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
 var Callback = require('../dist/callback').Callback;
+var DomEvent = require('../dist/dom-event').DomEvent;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -139,6 +140,18 @@ describe('Callback', function () {
                     errNo: -1
                 });
             });
+        });
+    });
+});
+
+describe('DomEvent',function(){
+    describe('#trigger()',function(){
+        it('should trigger event on document',function(done){
+            var evtName = '__test_evt_name';
+            document.addEventListener(evtName,function(){
+                done();
+            },false);
+            DomEvent.trigger(evtName);
         });
     });
 });
