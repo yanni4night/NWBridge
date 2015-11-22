@@ -23,11 +23,14 @@ export function Callback(func) {
 
     this.invoke = function(outputData) {
         var err = null;
+        var ret;
+
         if (0 !== +outputData.errNo) {
             err = new Error(outputData.errMsg || 'Unknown error');
         }
-        func.call(null, err, outputData.data);
+        ret = func.call(null, err, outputData.data);
         delete callbacks[id];
+        return ret;
     };
 
     callbacks[id] = this;

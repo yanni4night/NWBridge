@@ -116,8 +116,29 @@ describe('PriorityQueue', function () {
 describe('Callback', function () {
     describe('#findById()', function () {
         it('should get the callback by its id', function () {
-            var callback = new Callback(function(){});
+            var callback = new Callback(function () {});
             assert.deepEqual(Callback.findById(callback.getId()), callback)
+        });
+    });
+
+    describe('#invoke()', function () {
+        it('should call function when invoke', function () {
+            var callback = new Callback(function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                return ret;
+            });
+            assert.deepEqual(callback.invoke({
+                errNo: 0,
+                data: 0x0810
+            }), 0x0810);
+
+            assert.throws(function () {
+                callback.invoke({
+                    errNo: -1
+                });
+            });
         });
     });
 });
