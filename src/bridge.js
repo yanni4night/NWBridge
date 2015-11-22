@@ -15,6 +15,7 @@ import {Queue, PriorityQueue} from './queue';
 import {Message, RequestMessage} from './message';
 import {Radio} from './radio';
 import {Api} from './api';
+import {Event} from './event';
 import {Callback} from './callback';
 import {Promise} from './promise';
 
@@ -42,12 +43,20 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var handshakeTimeout;
 
+    var domReadyTriggered = false;
+
     const domReady = function () {
         const evtData = {};
+
+        if(domReadyTriggered) {
+            return;
+        }
+
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
         })] = window[webviewExport];
         DomEvent.trigger(webviewExport + 'Ready', evtData);
+        domReadyTriggered = true;
     };
     /**
      * send data from bridge to native
@@ -73,12 +82,10 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                         try {
                             radio = new Radio((message.inputData || {}).platform, scheme);
                             newState = READY_STATE_ENUM.COMPLETE;
-                            extend(window[nativeExport], radio.extension);
                         } catch (e) {
                             newState = READY_STATE_ENUM.ERROR;
                         } finally {
                             self.changeState(newState);
-                            domReady();
                         }
                     }).on('response', function (evt, respMsg) {
                         upload(respMsg);
@@ -100,8 +107,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     });
 
     handshakeTimeout = setTimeout(function () {
-        self.changeState(READY_STATE_ENUM.COMPLETE);
-        domReady();
+        self.changeState(READY_STATE_ENUM.ERROR);
     }, 2e3);
 
     // webview -> native
@@ -120,17 +126,21 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     // Export to native
     window[nativeExport] = {
+        /**
+         * Native send string data to bridge.
+         *
+         * This function must exist immediately because
+         * native talks to bridge first.
+         * 
+         * @param  {string} messageStr string data
+         * @since 1.0.0
+         */
         send: function (messageStr) {
             const message = Message.fromMetaString(messageStr);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             }
-        }/*,
-        fetch: function () {
-            const ret = messageQueueToNative.serialize();
-            messageQueueToNative.clear();
-            return ret;
-        }*/
+        }
     };
 
     var oldWvExport = window[webviewExport];
@@ -186,9 +196,23 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         };
     }
     
+    extend(this, new Event());
+
+    this.on('statechange', function (evt, state) {
+        if (state === READY_STATE_ENUM.COMPLETE) {
+            extend(window[nativeExport], radio.extension);
+        }
+
+        domReady();
+    });
+
     extend(Bridge.prototype, {
         changeState: function (state) {
+            if(READY_STATE_ENUM.PENDING!==readyState){
+                throw new Error('State error');
+            }
             window[webviewExport].readyState = readyState = state;
+            this.emit('statechange', state);
         },
         /**
          * flush2Native
