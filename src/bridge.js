@@ -54,10 +54,14 @@ function upload(message) {
 
 // native -> webview
 messageQueueFromNative.on('push', function () {
+    var message;
+
     if (READY_STATE_ENUM.PENDING === readyState) {
-        setTimeout(function () {
-            var message = messageQueueFromNative.pop();
-            if (message) {
+        // "pop" MUST be out of "setTimeout"
+        message = messageQueueFromNative.pop();
+        if (message) {
+            // Release native thread
+            setTimeout(function () {
                 message.on('handshake', function () {
                     clearTimeout(handshakeTimeout);
                     // Receiving a handshake indicates ready
@@ -74,19 +78,19 @@ messageQueueFromNative.on('push', function () {
                 }).on('response', function (evt, respMsg) {
                     upload(respMsg);
                 }).flow();
-            }
-        });
+            });
+        }
     } else if (READY_STATE_ENUM.COMPLETE === readyState) {
-        // Release native thread
-        setTimeout(function () {
-            var message = messageQueueFromNative.pop();
-
-            if (message) {
+        // "pop" MUST be out of "setTimeout"
+        message = messageQueueFromNative.pop();
+        if (message) {
+            // Release native thread
+            setTimeout(function () {
                 message.on('response', function (evt, respMsg) {
                     upload(respMsg);
                 }).flow();
-            }
-        });
+            });
+        }
     }
 });
 
