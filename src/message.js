@@ -37,97 +37,96 @@ export function Message(metaData) {
         ++this.priority;
     }
 }
+extend(Message.prototype, {
+    isHandShake: function () {
+        return this.messageType === MESSAGE_TYPE.HANDSHAKE;
+    },
+    assemble: function () {
+        return {
+            messageType: this.messageType,
+            cmd: this.cmd,
+            method: this.method,
+            inputData: this.inputData,
+            outputData: this.outputData,
+            callbackId: this.callbackId
+        };
+    },
+    serialize: function () {
+        return JSON.stringify(this.assemble());
+    },
+    isInvalid: function () {
+        return (this.messageType !== MESSAGE_TYPE.REQUEST && this.messageType !== MESSAGE_TYPE.RESPONSE &&
+                this.messageType !==
+                MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) ||
+            (
+                MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || this.method));
+    },
+    flow: function () {
+        var respMsg;
+        var isHandShake = false;
 
-Message.prototype.isHandShake = function() {
-    return this.messageType === MESSAGE_TYPE.HANDSHAKE;
-};
-
-Message.prototype.assemble = function () {
-    return {
-        messageType: this.messageType,
-        cmd: this.cmd,
-        method: this.method,
-        inputData: this.inputData,
-        outputData: this.outputData,
-        callbackId: this.callbackId
-    };
-};
-
-Message.prototype.serialize = function () {
-    return JSON.stringify(this.assemble());
-};
-
-Message.prototype.isInvalid = function () {
-    return (this.messageType !== MESSAGE_TYPE.REQUEST && this.messageType !== MESSAGE_TYPE.RESPONSE && this.messageType !==
-        MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) || (
-        MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || this.method));
-};
-
-Message.prototype.flow = function () {
-    var respMsg;
-    var isHandShake = false;
-
-    switch (this.messageType) {
-    case MESSAGE_TYPE.HANDSHAKE:
-        respMsg = new ResponseMessage(extend(this.assemble(), {
-            outputData: {
-                errNo: 0,
-                errMsg: 'success',
-                data: {
-                    cookieEnabled: new Api('cookie', 'enabled').invoke(),
-                    url: new Api('location', 'href').invoke(),
-                    localStorageEnabled: new Api('localStorage', 'enabled').invoke(),
-                    ua: new Api('navigator', 'getUserAgent').invoke()
-                }
-            }
-        }));
-        isHandShake = true;
-        break;
-    case MESSAGE_TYPE.REQUEST:
-        var api = new Api(this.cmd, this.method, this.inputData);
-        var ret;
-        var success = false;
-
-        try {
-            ret = api.invoke();
-            success = true;
-        } catch (e) {
-            // TODO:log
-        } finally {
+        switch (this.messageType) {
+        case MESSAGE_TYPE.HANDSHAKE:
             respMsg = new ResponseMessage(extend(this.assemble(), {
                 outputData: {
-                    errNo: success ? 0 : -1,
-                    errMsg: success ? 'success' : 'failed',
-                    data: ret || {}
+                    errNo: 0,
+                    errMsg: 'success',
+                    data: {
+                        cookieEnabled: new Api('cookie', 'enabled').invoke(),
+                        url: new Api('location', 'href').invoke(),
+                        localStorageEnabled: new Api('localStorage', 'enabled').invoke(),
+                        ua: new Api('navigator', 'getUserAgent').invoke()
+                    }
                 }
             }));
+            isHandShake = true;
+            break;
+        case MESSAGE_TYPE.REQUEST:
+            var api = new Api(this.cmd, this.method, this.inputData);
+            var ret;
+            var success = false;
+
+            try {
+                ret = api.invoke();
+                success = true;
+            } catch (e) {
+                // TODO:log
+            } finally {
+                respMsg = new ResponseMessage(extend(this.assemble(), {
+                    outputData: {
+                        errNo: success ? 0 : -1,
+                        errMsg: success ? 'success' : 'failed',
+                        data: ret || {}
+                    }
+                }));
+            }
+            break;
+        case MESSAGE_TYPE.RESPONSE:
+            var callback = Callback.findById(this.callbackId);
+
+            try {
+                callback.invoke(this.outputData);
+            } catch (e) {
+                console.log('FINDCALL', e);
+            }
+
+            // Should response have a callback?
+            break;
+        default:
+            //TODO
+            ;
         }
-        break;
-    case MESSAGE_TYPE.RESPONSE:
-        var callback = Callback.findById(this.callbackId);
 
-        try {
-            callback.invoke(this.outputData);
-        } catch (e) {
-            console.log('FINDCALL', e);
+        if (isHandShake) {
+            this.emit('handshake', this);
         }
 
-        // Should response have a callback?
-        break;
-    default:
-        //TODO
-        ;
+        if (respMsg) {
+            this.emit('response', respMsg);
+        }
+        return this;
     }
-
-    if (isHandShake) {
-        this.emit('handshake', this);
-    }
-
-    if (respMsg) {
-        this.emit('response', respMsg);
-    }
-    return this;
-};
+});
 
 Message.fromMetaString = function (metaString) {
     var metaData = JSON.parse(metaString);
