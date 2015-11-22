@@ -22,7 +22,7 @@ var isArray = function isArray(arr) {
     return toStr.call(arr) === '[object Array]';
 };
 
-var isPlainObject = function isPlainObject(obj) {
+export var isPlainObject = function isPlainObject(obj) {
     if (!obj || toStr.call(obj) !== '[object Object]') {
         return false;
     }
