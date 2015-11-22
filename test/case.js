@@ -314,7 +314,28 @@ describe('Message', function () {
             var keys = 'messageType,cmd,method,inputData,outputData,callbackId'.split(',');
             var msg = new Message().assemble();
             assert.ok(!keys.some(function (key) {
-                return !key in msg;
+                return !(key in msg);
+            }));
+        });
+    });
+
+    describe('#serialize()', function () {
+        it('should return json string', function () {
+            var keys = 'messageType,cmd,method,inputData,callbackId'.split(',');
+            var msg = new Message({
+                cmd: 1,
+                method: 2,
+                inputData: {
+                    name: 'Jim'
+                },
+                callbackId: 0
+            }).serialize();
+            assert.deepEqual(typeof msg, 'string');
+            assert.doesNotThrow(function () {
+                msg = JSON.parse(msg);
+            });
+            assert.ok(!keys.some(function (key) {
+                return !(key in msg);
             }));
         });
     });
