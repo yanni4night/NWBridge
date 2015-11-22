@@ -25,6 +25,15 @@ const READY_STATE_ENUM = {
     ERROR: 'error'
 };
 
+/**
+ * The JSBridge class.
+ * 
+ * @param {string} nativeExport
+ * @param {string} webviewExport
+ * @param {string} scheme
+ * @since 1.0.0
+ * @version 1.0.0
+ */
 const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     const self = this;
@@ -45,6 +54,14 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var domReadyTriggered = false;
 
+    /**
+     * Notify document that bridge is ready.
+     *
+     * This operation will be triggered only ONCE.
+     * 
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     const domReady = function () {
         const evtData = {};
 
@@ -59,8 +76,11 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         domReadyTriggered = true;
     };
     /**
-     * send data from bridge to native
-     * @param  {Message} message [description]
+     * Send message from bridge to native.
+     * 
+     * @param  {Message} message
+     * @version 1.0.0
+     * @since 1.0.0
      */
     const upload = function (message) {
         messageQueueToNative.push(message);
@@ -98,6 +118,8 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     newState = READY_STATE_ENUM.COMPLETE;
                 } catch (e) {
+                    // Hey,native,you have only one chance,
+                    // or I will never echo.
                     newState = READY_STATE_ENUM.ERROR;
                 } finally {
                     self.changeState(newState);
@@ -106,42 +128,6 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                 upload(respMsg);
             }).flow();
         });
-
-        /*if (READY_STATE_ENUM.PENDING === readyState) {
-            // "pop" MUST be out of "setTimeout"
-            message = messageQueueFromNative.pop();
-            if (message) {
-                // Release native thread
-                setTimeout(function () {
-                    message.on('handshake', function () {
-                        var newState;
-                        clearTimeout(handshakeTimeout);
-                        
-                        try {
-                            radio = new Radio((message.inputData || {}).platform, scheme);
-                            newState = READY_STATE_ENUM.COMPLETE;
-                        } catch (e) {
-                            newState = READY_STATE_ENUM.ERROR;
-                        } finally {
-                            self.changeState(newState);
-                        }
-                    }).on('response', function (evt, respMsg) {
-                        upload(respMsg);
-                    }).flow();
-                });
-            }
-        } else if (READY_STATE_ENUM.COMPLETE === readyState) {
-            // "pop" MUST be out of "setTimeout"
-            message = messageQueueFromNative.pop();
-            if (message) {
-                // Release native thread
-                setTimeout(function () {
-                    message.on('response', function (evt, respMsg) {
-                        upload(respMsg);
-                    }).flow();
-                });
-            }
-        }*/
     });
 
     // webview -> native
@@ -149,8 +135,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         if (READY_STATE_ENUM.COMPLETE === readyState) {
             // "pop" MUST be out of "setTimeout"
             const message = messageQueueToNative.pop();
-            // Release webview thread
+            
             if (message) {
+                // Release webview thread
                 setTimeout(function () {
                     radio.send(message);
                 });
@@ -164,11 +151,13 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         if (state === READY_STATE_ENUM.COMPLETE) {
             extend(window[nativeExport], radio.extension);
             this.flush2Native();
+            this.flush2Webview();
         }
 
         domReady();
     }, this);
 
+    // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(function () {
         self.changeState(READY_STATE_ENUM.ERROR);
     }, 2e3);
@@ -182,6 +171,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * native talks to bridge first.
          * 
          * @param  {string} messageStr string data
+         * @version 1.0.0
          * @since 1.0.0
          */
         send: function (messageStr) {
@@ -196,6 +186,12 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     // Export to webview
     window[webviewExport] = {
         readyState: readyState,
+        /**
+         * Register API for native.
+         *
+         * @todo test
+         * @return {this}
+         */
         register: function () {
             Api.register.apply(Api, arguments);
             return window[webviewExport];
@@ -239,13 +235,27 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         }
     };
 
-    if (undefined !== oldWvExport) {
-        window[webviewExport].noConflict = function () {
+
+    /**
+     * Similar to jQuery.noConflict
+     *
+     * @version 1.0.0
+     * @since 1.0.0
+     */
+    window[webviewExport].noConflict = function () {
+        if (undefined !== oldWvExport) {
             window[webviewExport] = oldWvExport;
-        };
-    }
+        }
+    };
 
     extend(Bridge.prototype, {
+        /**
+         * Change readyState.
+         * 
+         * @param  {number} state
+         * @version 1.0.0
+         * @since 1.0.0
+         */
         changeState: function (state) {
             if(READY_STATE_ENUM.PENDING!==readyState){
                 throw new Error('State error');
@@ -254,7 +264,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             this.emit('statechange', state);
         },
         /**
-         * flush2Native
+         * flush2Native.
+         *
+         * @version 1.0.0
          * @since 1.0.0
          */
         flush2Native: function () {
@@ -265,8 +277,8 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         /**
          * flush2Webview
          *
+         * @version 1.0.0
          * @since 1.0.0
-         * @deprecated May lead to long loop on iOS
          */
         flush2Webview: function () {
             while (!messageQueueFromNative.empty()) {
