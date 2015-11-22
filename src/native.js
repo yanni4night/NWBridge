@@ -10,32 +10,30 @@
  * @since 0.1.0
  */
 
-const SCHEME = 'tieba://';
-
-function IOSBridge() {
+function IOSBridge(scheme) {
     var iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;left:-10000px;display:none;height:0;width:0';
     iframe.src = 'about:blank';
     document.documentElement.appendChild(iframe);
 
     this.send = function () {
-        iframe.src = SCHEME + 'trigger-message-fetch';
+        iframe.src = scheme + 'trigger-message-fetch';
     };
 }
 
-function AndroidBridge() {
+function AndroidBridge(scheme) {
 
     this.send = function (msg) {
-        window.prompt(SCHEME + msg);
+        window.prompt(scheme + msg);
     };
 }
 
-export function Native(platform) {
+export function Native(platform, scheme) {
     switch (String(platform).toLowerCase()) {
     case 'ios':
-        return new IOSBridge();
+        return new IOSBridge(scheme);
     case 'android':
-        return new AndroidBridge();
+        return new AndroidBridge(scheme);
     default:
         throw new Error(platform + ' not supported');
     }

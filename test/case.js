@@ -166,16 +166,16 @@ describe('Native', function () {
             var prompt = window.prompt;
             window.prompt = function (msgStr) {
                 var data;
-                assert.ok(/^tieba:\/\//i.test(msgStr));
+                assert.ok(/^http:\/\//i.test(msgStr));
                 assert.doesNotThrow(function () {
-                    data = JSON.parse(msgStr.replace(/^tieba:\/\//i, ''));
+                    data = JSON.parse(msgStr.replace(/^http:\/\//i, ''));
                 });
                 assert.ok(!!data);
                 assert.deepEqual(data.name, 'Jim');
                 window.prompt = prompt;
                 done();
             };
-            var native = new Native('android');
+            var native = new Native('android' ,'http://');
             native.send(JSON.stringify({
                 name: 'Jim'
             }));
@@ -184,9 +184,9 @@ describe('Native', function () {
     });
     describe('ios', function () {
         it('should add an iframe', function () {
-            var native = new Native('ios');
+            var native = new Native('ios', 'http://');
             native.send();
-            assert.ok(!!document.querySelector('iframe[src^="tieba://"]'));
+            assert.ok(!!document.querySelector('iframe[src^="http://"]'));
         });
     });
 });
