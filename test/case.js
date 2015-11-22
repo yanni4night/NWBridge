@@ -18,6 +18,7 @@ var DomEvent = require('../dist/dom-event').DomEvent;
 var Native = require('../dist/native').Native;
 var Promise = require('../dist/promise').Promise;
 var Event = require('../dist/event').Event;
+var Message = require('../dist/message').Message;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -281,6 +282,33 @@ describe('Event', function () {
             assert.deepEqual(foo, 0);
         });
     });;
+});
+
+describe('Message', function () {
+    describe('#construct', function () {
+        it('should inject variables from metaData', function () {
+            var msg = new Message({
+                cmd: 'foo',
+                method: 'say'
+            });
+            assert.deepEqual(msg.cmd, 'foo');
+            assert.deepEqual(msg.method, 'say');
+        });
+        it('should has a priority', function () {
+            assert.deepEqual(new Message().priority, 0);
+        });
+
+        it('should be an event', function () {
+            var msg = new Message();
+            assert.ok('function' === typeof msg.on);
+            assert.ok('function' === typeof msg.off);
+            assert.ok('function' === typeof msg.emit);
+        });
+
+        it('should has a default messageType', function () {
+            assert.deepEqual(new Message().messageType, Message.MESSAGE_TYPE.REQUEST);
+        });
+    });
 });
 
 describe('TiebaJsBridge', function () {
