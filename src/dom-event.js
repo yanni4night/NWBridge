@@ -13,6 +13,14 @@
 import {extend} from './extend';
 
 export var DomEvent = {
+    /**
+     * Trigger an event on window.document.
+     * 
+     * @param  {string} evtName    Event name
+     * @param  {mixin} evtPayload  Event payload
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     trigger: function (evtName, evtPayload) {
         var evt = document.createEvent('Events');
         evt.initEvent(evtName);

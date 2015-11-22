@@ -17,12 +17,12 @@ export function Event() {
     /**
      * Bind event,multiple events split by space supported.
      *
-     * @param  {String} event
-     * @param  {Function} func
-     * @param  {Object} thisArg
-     * @return {Event}      This event
-     * @class Event
+     * @param  {string} event
+     * @param  {function} func
+     * @param  {mixin} thisArg
+     * @return {this}
      * @since 1.0.0
+     * @version 1.0.0
      */
     this.on = function(event, func, thisArg) {
         var evtArr;
@@ -46,11 +46,11 @@ export function Event() {
      *
      * Empty 'func' means remove all listeners named 'event'.
      *
-     * @param  {String} event
-     * @param  {Function} func
-     * @return {Event}     This event
-     * @class Event
+     * @param  {string} event
+     * @param  {function} func
+     * @return {this}
      * @since 1.0.0
+     * @version 1.0.0
      */
     this.off = function(event, func) {
         var evtArr, objs;
@@ -77,11 +77,11 @@ export function Event() {
     /**
      * Emit event(s),multiple events split by space supported.
      *
-     * @param  {String} event
-     * @param  {Object} data
-     * @return {Event} This event
-     * @class Event
+     * @param  {string} event
+     * @param  {mixin} data
+     * @return {this}
      * @since 1.0.0
+     * @version 1.0.0
      */
     this.emit = function(event, data) {
         var evtArr, objs;
