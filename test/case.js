@@ -17,6 +17,7 @@ var Callback = require('../dist/callback').Callback;
 var DomEvent = require('../dist/dom-event').DomEvent;
 var Native = require('../dist/native').Native;
 var Promise = require('../dist/promise').Promise;
+var Event = require('../dist/event').Event;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -234,6 +235,22 @@ describe('Promise', function () {
             ]).then(function () {
                 done();
             });
+        });
+    });
+});
+
+describe('Event', function () {
+    describe('#on()#emit()', function () {
+        it('should call listener if "emit" after "on"', function (done) {
+            var evt = new Event();
+            evt.on('test', function (evt, data) {
+                assert.ok(!!data);
+                assert.deepEqual(data.name, 'Peter');
+                done();
+            });
+            evt.emit('test', {
+                name: 'Peter'
+            })
         });
     });
 });
