@@ -82,23 +82,24 @@ Message.prototype.flow = function () {
     case MESSAGE_TYPE.REQUEST:
         var api = new Api(this.cmd, this.method, this.inputData);
         var ret;
+        var success = false;
 
         try {
             ret = api.invoke();
+            success = true;
         } catch (e) {
-            ret = null;
+            // TODO:log
         } finally {
             respMsg = new ResponseMessage(extend(this.assemble(), {
                 outputData: {
-                    errNo: ret ? 0 : -1,
-                    errMsg: ret ? 'success' : 'failed',
-                    data: ret
+                    errNo: success ? 0 : -1,
+                    errMsg: success ? 'success' : 'failed',
+                    data: ret || {}
                 }
             }));
         }
         break;
     case MESSAGE_TYPE.RESPONSE:
-
         var callback = Callback.findById(this.callbackId);
 
         try {
