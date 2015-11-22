@@ -253,6 +253,34 @@ describe('Event', function () {
             })
         });
     });
+    describe('#off', function () {
+        it('should remove listener when "off"', function () {
+            var evt = new Event();
+            var foo = 0;
+
+            var callOne = function () {
+                foo = 1;
+            };
+
+            var callTwo = function () {
+                foo = 2;
+            };
+
+            var callThree = function () {
+                foo = 3;
+            };
+
+            evt.on('test', callOne);
+            evt.off('test', callOne);
+            evt.emit('test');
+            assert.deepEqual(foo, 0);
+
+            evt.on('test', callTwo);
+            evt.on('test', callThree);
+            evt.off('test');
+            assert.deepEqual(foo, 0);
+        });
+    });;
 });
 
 describe('TiebaJsBridge', function () {
