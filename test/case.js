@@ -180,7 +180,11 @@ describe('Native', function () {
         });
     });
     describe('ios', function () {
-        it('should add an iframe', function () {});
+        it('should add an iframe', function () {
+            var native = new Native('ios');
+            native.send();
+            assert.ok(!!document.querySelector('iframe[src^="tieba://"]'));
+        });
     });
 });
 
