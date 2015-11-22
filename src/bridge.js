@@ -18,7 +18,7 @@ import {Api} from './api';
 import {Callback} from './callback';
 import {Promise} from './promise';
 
-var READY_STATE_ENUM = {
+const READY_STATE_ENUM = {
     PENDING: 'pending',
     COMPLETE: 'complete',
     ERROR: 'error'

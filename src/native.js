@@ -10,6 +10,8 @@
  * @since 0.1.0
  */
 
+const SCHEME = 'tieba://';
+
 function IOSBridge() {
     var iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;left:-10000px;display:none;height:0;width:0';
@@ -17,14 +19,14 @@ function IOSBridge() {
     document.documentElement.appendChild(iframe);
 
     this.send = function () {
-        iframe.src = 'tieba://trigger-message-fetch';
+        iframe.src = SCHEME + 'trigger-message-fetch';
     };
 }
 
 function AndroidBridge() {
 
     this.send = function (msg) {
-        window.prompt('tieba://' + msg);
+        window.prompt(SCHEME + msg);
     };
 }
 
