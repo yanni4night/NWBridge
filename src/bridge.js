@@ -67,18 +67,18 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                 // Release native thread
                 setTimeout(function () {
                     message.on('handshake', function () {
+                        var newState;
                         clearTimeout(handshakeTimeout);
-
+                        
                         try {
                             native = new Native((message.inputData || {}).platform, scheme);
-
-                            self.changeState(READY_STATE_ENUM.COMPLETE);
+                            newState = READY_STATE_ENUM.COMPLETE;
                         } catch (e) {
-                            self.changeState(READY_STATE_ENUM.ERROR);
+                            newState = READY_STATE_ENUM.ERROR;
                         } finally {
+                            self.changeState(newState);
                             domReady();
                         }
-
                     }).on('response', function (evt, respMsg) {
                         upload(respMsg);
                     }).flow();
@@ -129,6 +129,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         }
     };
 
+    var oldWvExport = window[webviewExport];
     // Export to webview
     window[webviewExport] = {
         readyState: readyState,
@@ -175,6 +176,12 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         }
     };
 
+    if (undefined !== oldWvExport) {
+        window[webviewExport].noConflict = function () {
+            window[webviewExport] = oldWvExport;
+        };
+    }
+    
     extend(Bridge.prototype, {
         changeState: function (state) {
             window[webviewExport].readyState = readyState = state;
