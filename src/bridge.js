@@ -43,20 +43,20 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     var handshakeTimeout;
 
     const domReady = function () {
-            var evtData = {};
-            evtData[webviewExport.replace(/^([A-Z])/, function (n) {
-                return n.toLowerCase();
-            })] = window.TiebaJsBridge;
-            DomEvent.trigger(webviewExport + 'Ready', evtData);
-        }
-        /**
-         * send data from bridge to native
-         * @param  {Message} message [description]
-         */
+        const evtData = {};
+        evtData[webviewExport.replace(/^([A-Z])/, function (n) {
+            return n.toLowerCase();
+        })] = window[webviewExport];
+        DomEvent.trigger(webviewExport + 'Ready', evtData);
+    };
+    /**
+     * send data from bridge to native
+     * @param  {Message} message [description]
+     */
     const upload = function (message) {
-            messageQueueToNative.push(message);
-        }
-        // native -> webview
+        messageQueueToNative.push(message);
+    };
+    // native -> webview
     messageQueueFromNative.on('push', function () {
         var message;
 
@@ -108,23 +108,22 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         if (READY_STATE_ENUM.COMPLETE === readyState) {
             // Release webview thread
             setTimeout(function () {
-                var msg = messageQueueToNative.pop();
+                const msg = messageQueueToNative.pop();
                 native.send(msg.serialize() /*Just for Android*/ );
             });
         }
     });
 
-
     // Export to native
     window[nativeExport] = {
         send: function (messageStr) {
-            var message = Message.fromMetaString(messageStr);
+            const message = Message.fromMetaString(messageStr);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             }
         },
         fetch: function () {
-            var ret = messageQueueToNative.serialize();
+            const ret = messageQueueToNative.serialize();
             messageQueueToNative.clear();
             return ret;
         }
@@ -135,12 +134,12 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         readyState: readyState,
         register: function () {
             Api.register.apply(Api, arguments);
-            return window.TiebaJsBridge;
+            return window[webviewExport];
         },
         widgets: {
             confirm: function (confirmMessage) {
                 return new Promise(function (resolve, reject) {
-                    var msg = new RequestMessage({
+                    const msg = new RequestMessage({
                         cmd: 'widgets',
                         method: 'confirm',
                         inputData: confirmMessage
@@ -157,7 +156,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         http: {
             get: function (url, cookies) {
                 return new Promise(function (resolve) {
-                    var msg = new RequestMessage({
+                    const msg = new RequestMessage({
                         cmd: 'http',
                         method: 'get',
                         inputData: {
