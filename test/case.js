@@ -309,6 +309,15 @@ describe('Message', function () {
             assert.deepEqual(new Message().messageType, Message.MESSAGE_TYPE.REQUEST);
         });
     });
+    describe('#assemble()', function () {
+        it('should return plain object', function () {
+            var keys = 'messageType,cmd,method,inputData,outputData,callbackId'.split(',');
+            var msg = new Message().assemble();
+            assert.ok(!keys.some(function (key) {
+                return !key in msg;
+            }));
+        });
+    });
 });
 
 describe('TiebaJsBridge', function () {
