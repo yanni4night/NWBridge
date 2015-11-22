@@ -13,30 +13,12 @@
 var assert = require('assert');
 var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
+var Callback = require('../dist/callback').Callback;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
         resolve(evt.tiebaJsBridgeReady);
     }, false);
-});
-
-describe('TiebaJsBridge', function () {
-    describe('API', function () {
-        this.timeout(5e3);
-        it('#widgets.confirm()', function (done) {
-            ready.then(function () {
-                assert.ok('undefined' !== typeof TiebaJsBridge);
-                assert.deepEqual(TiebaJsBridge.readyState, 'complete');
-                TiebaJsBridge.widgets.confirm('yes?').then(function () {
-                    done();
-                }).catch(function () {
-                    done();
-                });
-            }).catch(function (e) {
-                console.error(e);
-            });
-        })
-    });
 });
 
 describe('Queue', function () {
@@ -128,5 +110,33 @@ describe('PriorityQueue', function () {
             });
             assert.deepEqual(queue.pop().name, 'Jim');
         });
+    });
+});
+
+describe('Callback', function () {
+    describe('#findById()', function () {
+        it('should get the callback by its id', function () {
+            var callback = new Callback(function(){});
+            assert.deepEqual(Callback.findById(callback.getId()), callback)
+        });
+    });
+});
+
+describe('TiebaJsBridge', function () {
+    describe('API', function () {
+        this.timeout(5e3);
+        it('#widgets.confirm()', function (done) {
+            ready.then(function () {
+                assert.ok('undefined' !== typeof TiebaJsBridge);
+                assert.deepEqual(TiebaJsBridge.readyState, 'complete');
+                TiebaJsBridge.widgets.confirm('yes?').then(function () {
+                    done();
+                }).catch(function () {
+                    done();
+                });
+            }).catch(function (e) {
+                console.error(e);
+            });
+        })
     });
 });
