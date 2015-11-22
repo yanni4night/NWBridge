@@ -82,7 +82,9 @@ export function Queue(config) {
 }
 
 export function PriorityQueue(config) {
-    var queue = new Queue(config = extend({}, config));
+    var queue = new Queue(config = extend({
+        priorityKey: 'priority'
+    }, config));
     var _push = queue.push;
 
     queue.push = function() {
