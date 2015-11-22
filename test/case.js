@@ -235,19 +235,6 @@ describe('Promise', function () {
             });
         });
     });
-    describe('#all()', function () {
-        it('should call "then" when all resolved', function (done) {
-            Promise.all([
-                new Promise(function (resolve) {
-                    resolve();
-                }), new Promise(function (resolve) {
-                    resolve();
-                })
-            ]).then(function () {
-                done();
-            });
-        });
-    });
 });
 
 describe('Event', function () {
