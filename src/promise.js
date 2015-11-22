@@ -9,6 +9,4 @@
   * @version 0.1.0
   * @since 0.1.0
   */
-export function Promise(func){
-  return new window.Promise(func);
-};
+export var Promise = window.Promise;

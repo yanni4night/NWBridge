@@ -16,6 +16,7 @@ var Queue = require('../dist/queue').Queue;
 var Callback = require('../dist/callback').Callback;
 var DomEvent = require('../dist/dom-event').DomEvent;
 var Native = require('../dist/native').Native;
+var Promise = require('../dist/promise').Promise;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -184,6 +185,55 @@ describe('Native', function () {
             var native = new Native('ios');
             native.send();
             assert.ok(!!document.querySelector('iframe[src^="tieba://"]'));
+        });
+    });
+});
+
+describe('Promise', function () {
+    describe('#then()', function () {
+        it('should call first callback of "then" when resolved', function (done) {
+            var promise = new Promise(function (resolve) {
+                resolve();
+            });
+            promise.then(function () {
+                done();
+            });
+        });
+    });
+
+    describe('#then()', function () {
+        it('should call second callback of "then" when rejected', function (done) {
+            var promise = new Promise(function (resolve, reject) {
+                reject();
+            });
+            promise.then(function () {
+
+            }, function () {
+                done();
+            });
+        });
+    });
+    describe('#catch()', function () {
+        it('should call "catch" when rejected', function (done) {
+            var promise = new Promise(function (resolve, reject) {
+                reject();
+            });
+            promise.catch(function () {
+                done();
+            });
+        });
+    });
+    describe('#all()', function () {
+        it('should call "then" when all resolved', function (done) {
+            Promise.all([
+                new Promise(function (resolve) {
+                    resolve();
+                }), new Promise(function (resolve) {
+                    resolve();
+                })
+            ]).then(function () {
+                done();
+            });
         });
     });
 });
