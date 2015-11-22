@@ -129,10 +129,15 @@ extend(Message.prototype, {
 });
 
 Message.fromMetaString = function (metaString) {
-    var metaData = JSON.parse(metaString);
+    var metaData;
+    // Ignore invalid
+    try {
+        metaData = JSON.parse(metaString);
+    } catch (e) {
+        metaData = {}
+    }
     return new Message(metaData);
 };
-
 export function RequestMessage(metaData, timeout) {
     var self;
 
