@@ -20,6 +20,7 @@ module.exports = function (grunt) {
         },
         babel: {
             options: {
+                comments: false,
                 presets: ['babel-preset-es2015']
             },
             es2015: {
