@@ -185,6 +185,16 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     extend(Bridge.prototype, {
         changeState: function (state) {
             window[webviewExport].readyState = readyState = state;
+        },
+        flush2Native: function () {
+            while (!messageQueueToNative.empty()) {
+                messageQueueToNative.emit('push');
+            }
+        },
+        flush2Webview: function () {
+            while (!messageQueueFromNative.empty()) {
+                messageQueueFromNative.emit('push');
+            }
         }
     });
 }; // Bridge
