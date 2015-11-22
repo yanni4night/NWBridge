@@ -19,6 +19,10 @@ export function Queue(config) {
         limit: 0
     }, config);
 
+    this.top = function() {
+        return queue[0];
+    };
+
     this.pop = function() {
         var ret = queue.shift();
         if (ret) {
@@ -66,7 +70,7 @@ export function Queue(config) {
         if (!key) {
             return this;
         }
-
+        // MUST be stable
         queue.sort(function (prev, next) {
             if (prev[key] > next[key]) {
                 return -1;

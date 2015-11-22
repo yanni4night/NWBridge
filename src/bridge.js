@@ -67,9 +67,47 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     };
     // native -> webview
     messageQueueFromNative.on('push', function () {
-        var message;
+        var message = messageQueueFromNative.top();
+        var shouldFlow = true;
 
-        if (READY_STATE_ENUM.PENDING === readyState) {
+        if(undefined === message || READY_STATE_ENUM.ERROR === readyState) {
+            shouldFlow = false;
+        // Handshake is always on the top;
+        } else if(message.isHandShake()) {
+            if(READY_STATE_ENUM.PENDING === readyState) {
+                shouldFlow = true;
+            } else {
+                // Ignore duplicated handshakes
+                messageQueueFromNative.pop();
+                shouldFlow = false;
+            }
+        } else if (READY_STATE_ENUM.PENDING === readyState) {
+            shouldFlow = true;
+        }
+
+        if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
+            return;
+        }
+
+        setTimeout(function () {
+            message.on('handshake', function () {
+                var newState;
+                clearTimeout(handshakeTimeout);
+
+                try {
+                    radio = new Radio((message.inputData || {}).platform, scheme);
+                    newState = READY_STATE_ENUM.COMPLETE;
+                } catch (e) {
+                    newState = READY_STATE_ENUM.ERROR;
+                } finally {
+                    self.changeState(newState);
+                }
+            }).on('response', function (evt, respMsg) {
+                upload(respMsg);
+            }).flow();
+        });
+
+        /*if (READY_STATE_ENUM.PENDING === readyState) {
             // "pop" MUST be out of "setTimeout"
             message = messageQueueFromNative.pop();
             if (message) {
@@ -103,7 +141,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     }).flow();
                 });
             }
-        }
+        }*/
     });
 
     // webview -> native

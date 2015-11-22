@@ -38,6 +38,10 @@ export function Message(metaData) {
     }
 }
 
+Message.prototype.isHandShake = function() {
+    return this.messageType === MESSAGE_TYPE.HANDSHAKE;
+};
+
 Message.prototype.assemble = function () {
     return {
         messageType: this.messageType,
