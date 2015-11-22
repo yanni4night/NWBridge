@@ -106,10 +106,6 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         }
     });
 
-    handshakeTimeout = setTimeout(function () {
-        self.changeState(READY_STATE_ENUM.ERROR);
-    }, 2e3);
-
     // webview -> native
     messageQueueToNative.on('push', function () {
         if (READY_STATE_ENUM.COMPLETE === readyState) {
@@ -123,6 +119,21 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             }
         }
     });
+
+    extend(this, new Event());
+
+    this.on('statechange', function (evt, state) {
+        if (state === READY_STATE_ENUM.COMPLETE) {
+            extend(window[nativeExport], radio.extension);
+            this.flush2Native();
+        }
+
+        domReady();
+    }, this);
+
+    handshakeTimeout = setTimeout(function () {
+        self.changeState(READY_STATE_ENUM.ERROR);
+    }, 2e3);
 
     // Export to native
     window[nativeExport] = {
@@ -195,16 +206,6 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             window[webviewExport] = oldWvExport;
         };
     }
-    
-    extend(this, new Event());
-
-    this.on('statechange', function (evt, state) {
-        if (state === READY_STATE_ENUM.COMPLETE) {
-            extend(window[nativeExport], radio.extension);
-        }
-
-        domReady();
-    });
 
     extend(Bridge.prototype, {
         changeState: function (state) {
