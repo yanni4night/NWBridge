@@ -15,6 +15,7 @@ var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
 var Callback = require('../dist/callback').Callback;
 var DomEvent = require('../dist/dom-event').DomEvent;
+var Native = require('../dist/native').Native;
 
 var ready = new Promise(function (resolve, reject) {
     document.addEventListener('TiebaJsBridgeReady', function (evt) {
@@ -144,15 +145,42 @@ describe('Callback', function () {
     });
 });
 
-describe('DomEvent',function(){
-    describe('#trigger()',function(){
-        it('should trigger event on document',function(done){
+describe('DomEvent', function () {
+    describe('#trigger()', function () {
+        it('should trigger event on document', function (done) {
             var evtName = '__test_evt_name';
-            document.addEventListener(evtName,function(){
+            document.addEventListener(evtName, function () {
                 done();
-            },false);
+            }, false);
             DomEvent.trigger(evtName);
         });
+    });
+});
+
+describe('Native', function () {
+    describe('android', function () {
+        it('should call window.prompt()', function (done) {
+            var prompt = window.prompt;
+            window.prompt = function (msgStr) {
+                var data;
+                assert.ok(/^tieba:\/\//i.test(msgStr));
+                assert.doesNotThrow(function () {
+                    data = JSON.parse(msgStr.replace(/^tieba:\/\//i, ''));
+                });
+                assert.ok(!!data);
+                assert.deepEqual(data.name, 'Jim');
+                window.prompt = prompt;
+                done();
+            };
+            var native = new Native('android');
+            native.send(JSON.stringify({
+                name: 'Jim'
+            }));
+
+        });
+    });
+    describe('ios', function () {
+        it('should add an iframe', function () {});
     });
 });
 
