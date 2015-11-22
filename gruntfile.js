@@ -6,8 +6,8 @@
  * 2015-11-19[18:55:28]:revised
  *
  * @author yanni4night@gmail.com
- * @version 0.1.0
- * @since 0.1.0
+ * @version 1.0.0
+ * @since 1.0.0
  */
 module.exports = function (grunt) {
 

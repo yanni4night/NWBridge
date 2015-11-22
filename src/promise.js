@@ -6,7 +6,7 @@
   * 2015-11-19[14:17:36]:revised
   *
   * @author yinyong02@baidu.com
-  * @version 0.1.0
-  * @since 0.1.0
+  * @version 1.0.0
+  * @since 1.0.0
   */
 export var Promise = window.Promise;
