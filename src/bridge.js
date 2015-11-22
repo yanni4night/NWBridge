@@ -109,9 +109,11 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             // "pop" MUST be out of "setTimeout"
             const msg = messageQueueToNative.pop();
             // Release webview thread
-            setTimeout(function () {
-                native.send(msg.serialize() /*Just for Android*/ );
-            });
+            if (msg) {
+                setTimeout(function () {
+                    native.send(msg.serialize() /*Just for Android*/ );
+                });
+            }
         }
     });
 
