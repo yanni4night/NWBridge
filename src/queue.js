@@ -37,7 +37,7 @@ export function Queue(config) {
         }
 
         if (element) {
-            queue.push(element);
+            queue[queue.length] = element;
             this.emit('push', element);
         }
         return this;
