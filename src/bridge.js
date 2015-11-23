@@ -18,6 +18,7 @@ import {Api} from './api';
 import {Event} from './event';
 import {Callback} from './callback';
 import {Promise} from './promise';
+import {Logger} from './logger';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -102,6 +103,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     // Ignore duplicated handshakes
                     messageQueueFromNative.pop();
                     shouldFlow = false;
+                    Logger.info('Duplicated handshake received');
                 }
             } else if (READY_STATE_ENUM.PENDING === readyState) {
                 shouldFlow = true;
@@ -121,6 +123,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     // Hey,native,you have only one chance,
                     // or I will never echo.
                     newState = READY_STATE_ENUM.ERROR;
+                    Logger.error(e.message);
                 } finally {
                     self.changeState(newState);
                 }
