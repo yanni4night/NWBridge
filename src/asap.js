@@ -5,7 +5,7 @@
   * changelog
   * 2015-11-22[22:08:44]:revised
   *
-  * @author yinyong02@baidu.com
+  * @author yanni4night@gmail.com
   * @version 1.0.0
   * @since 1.0.0
   * @see https://github.com/kriskowal/asap/blob/master/raw.js

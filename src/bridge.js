@@ -87,29 +87,29 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     };
     // native -> webview
     messageQueueFromNative.on('push', function () {
-        var message = messageQueueFromNative.top();
-        var shouldFlow = true;
-
-        if(undefined === message || READY_STATE_ENUM.ERROR === readyState) {
-            shouldFlow = false;
-        // Handshake is always on the top;
-        } else if(message.isHandShake()) {
-            if(READY_STATE_ENUM.PENDING === readyState) {
-                shouldFlow = true;
-            } else {
-                // Ignore duplicated handshakes
-                messageQueueFromNative.pop();
-                shouldFlow = false;
-            }
-        } else if (READY_STATE_ENUM.PENDING === readyState) {
-            shouldFlow = true;
-        }
-
-        if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
-            return;
-        }
-
         setTimeout(function () {
+            // Make sure messgae flows in the right order as pushed
+            var message = messageQueueFromNative.top();
+            var shouldFlow = true;
+
+            if (undefined === message || READY_STATE_ENUM.ERROR === readyState) {
+                shouldFlow = false;
+                // Handshake is always on the top;
+            } else if (message.isHandShake()) {
+                if (READY_STATE_ENUM.PENDING === readyState) {
+                    shouldFlow = true;
+                } else {
+                    // Ignore duplicated handshakes
+                    messageQueueFromNative.pop();
+                    shouldFlow = false;
+                }
+            } else if (READY_STATE_ENUM.PENDING === readyState) {
+                shouldFlow = true;
+            }
+
+            if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
+                return;
+            }
             message.on('handshake', function () {
                 var newState;
                 clearTimeout(handshakeTimeout);
@@ -132,17 +132,16 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     // webview -> native
     messageQueueToNative.on('push', function () {
-        if (READY_STATE_ENUM.COMPLETE === readyState) {
-            // "pop" MUST be out of "setTimeout"
-            const message = messageQueueToNative.pop();
-            
-            if (message) {
-                // Release webview thread
-                setTimeout(function () {
+        setTimeout(function () {
+            if (READY_STATE_ENUM.COMPLETE === readyState) {
+                const message = messageQueueToNative.pop();
+
+                if (message) {
+                    // Release webview thread
                     radio.send(message);
-                });
+                }
             }
-        }
+        });
     });
 
     extend(this, new Event());
