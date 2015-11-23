@@ -51,11 +51,6 @@ export function Queue(config) {
         return queue.length;
     };
 
-    this.truncate = function(start, length) {
-        queue.splice(start, length);
-        return this;
-    };
-
     this.serialize = function() {
         return JSON.stringify(queue);
     };
