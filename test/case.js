@@ -58,15 +58,6 @@ describe('Queue', function () {
         });
     });
 
-    describe('#truncate()', function () {
-        it('should remove some elements of queue', function () {
-            var queue = new Queue();
-            queue.push(1).push(2).push(3);
-            assert.deepEqual(queue.truncate(0, 2), queue);
-            assert.deepEqual(queue.pop(), 3);
-        });
-    });
-
     describe('#serialize()', function () {
         it('should remove json string of queue', function () {
             var queue = new Queue();
