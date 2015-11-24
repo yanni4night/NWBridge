@@ -107,7 +107,7 @@ extend(Message.prototype, {
             try {
                 callback.invoke(this.outputData);
             } catch (e) {
-                console.log('FINDCALL', e);
+                console.log('FINDCALL', e.message);
             }
 
             // Should response have a callback?
@@ -152,6 +152,7 @@ export function RequestMessage(metaData, timeout) {
 
     var timeoutBundler = setTimeout(() => {
         hasTimeout = true;
+        callback.remove();
         self.emit('error', new Error('Timeout'));
     }, timeout);
 

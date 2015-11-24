@@ -21,7 +21,7 @@ export function Callback(func) {
         return id;
     };
 
-    this.invoke = (outputData) => {
+    this.invoke = function (outputData) {
         var err = null;
         var ret;
 
@@ -29,8 +29,12 @@ export function Callback(func) {
             err = new Error(outputData.errMsg || 'Unknown error');
         }
         ret = func.call(null, err, outputData.data);
-        delete callbacks[id];
+        this.remove();
         return ret;
+    };
+
+    this.remove = () => {
+        delete callbacks[id];
     };
 
     callbacks[id] = this;
