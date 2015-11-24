@@ -105,7 +105,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     // Ignore duplicated handshakes
                     messageQueueFromNative.pop();
                     shouldFlow = false;
-                    Logger.info('Duplicated handshake received');
+                    Logger.warn('Duplicated handshake received');
                 }
             } else if (READY_STATE_ENUM.PENDING === readyState) {
                 shouldFlow = true;
@@ -123,7 +123,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     newState = READY_STATE_ENUM.COMPLETE;
                 } catch (e) {
                     // Hey,native,you have only one chance,
-                    // or I will never echo.
+                    // I will never echo if you missed.
                     newState = READY_STATE_ENUM.ERROR;
                     Logger.error(e.message);
                 } finally {

@@ -13,13 +13,20 @@
 import {Queue} from './queue';
 
 function IOSRadio(scheme) {
-    var iframe = document.createElement('iframe');
+    const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;left:-10000px;display:none;height:0;width:0';
     iframe.src = 'about:blank';
     document.documentElement.appendChild(iframe);
 
     const queue = new Queue();
 
+    /**
+     * Send primitive string message to native on iOS.
+     * 
+     * @param  {string} message
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     this.send = function (message) {
         queue.push(message);
         iframe.src = scheme + 'trigger-message-fetch';
@@ -36,13 +43,25 @@ function IOSRadio(scheme) {
 }
 
 function AndroidRadio(scheme) {
-
+    /**
+     * Send primitive string message to native on Android.
+     * 
+     * @param  {string} message
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     this.send = function (message) {
         window.prompt(scheme + message.serialize());
     };
     this.extension = {};
 }
 
+/**
+ * A radio that connects native.
+ * 
+ * @param {string} platform iOS/Android
+ * @param {string} scheme   Protocol scheme
+ */
 export function Radio(platform, scheme) {
     switch (String(platform).toLowerCase()) {
     case 'ios':
