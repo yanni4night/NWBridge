@@ -66,8 +66,6 @@ extend(Message.prototype, {
         var respMsg;
         var isHandShake = false;
 
-        Logger.log('FLOW:' + this.serialize());
-
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
             respMsg = new ResponseMessage(extend(this.assemble(), {
@@ -93,7 +91,7 @@ extend(Message.prototype, {
                 ret = api.invoke();
                 success = true;
             } catch (e) {
-                // TODO:log
+                Logger.error('FLOW REQUEST:' + e.message);
             } finally {
                 respMsg = new ResponseMessage(extend(this.assemble(), {
                     outputData: {
@@ -110,14 +108,12 @@ extend(Message.prototype, {
             try {
                 callback.invoke(this.outputData);
             } catch (e) {
-                console.log('FINDCALL', e.message);
+                console.error('FLOW RESPONSE:', e.message);
             }
 
-            // Should response have a callback?
             break;
         default:
-            //TODO
-            ;
+            Logger.warn('UNKNOWN TYPE:' + this.messageType);
         }
 
         if (isHandShake) {
