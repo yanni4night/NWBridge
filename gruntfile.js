@@ -47,6 +47,17 @@ module.exports = function (grunt) {
             test: {
                 src: ['test/test.js'],
                 dest: 'test.dist.js'
+            },
+            test: {
+                src: ['test/mock.js'],
+                dest: 'browser.dist.js'
+            }
+        },
+        copy: {
+            logger: {
+                files: {
+                    'dist/logger.js': 'test/logger.js'
+                }
             }
         },
         uglify: {
@@ -70,6 +81,6 @@ module.exports = function (grunt) {
             }
         }
     });
-
-    grunt.registerTask('default', ['clean', 'babel:es2015', 'browserify', 'uglify']);
+    var tasks = ['clean', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
+    grunt.registerTask('default', tasks);
 };

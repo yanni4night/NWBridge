@@ -10,4 +10,5 @@
   * @since 1.0.0
   */
 
+require('./case');
 require('./mock');

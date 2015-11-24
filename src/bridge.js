@@ -57,7 +57,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var domReadyTriggered = false;
 
-    const HANDSHAKE_TIMEOUT = 500;
+    const HANDSHAKE_TIMEOUT = 6e4;
 
     /**
      * Notify document that bridge is ready.
@@ -74,6 +74,8 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             return;
         }
 
+        Logger.log('DOMREADY:' + readyState);
+
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
         })] = window[webviewExport];
@@ -88,13 +90,14 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @since 1.0.0
      */
     const upload = (message) => {
+        Logger.log('UPLOAD:' + message.serialize());
         messageQueueToNative.push(message);
     };
     // native -> webview
     messageQueueFromNative.on('push', () => {
         // Release native thread
         asap(() => {
-            // Make sure messgae flows in the right order as pushed
+            // Make sure message flows in the right order as pushed
             var message = messageQueueFromNative.top();
             var shouldFlow = true;
 
@@ -124,7 +127,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             message.on('handshake', () => {
                 var newState;
                 clearTimeout(handshakeTimeout);
-
+                
+                Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
+                
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     newState = READY_STATE_ENUM.COMPLETE;
@@ -171,6 +176,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
         self.changeState(READY_STATE_ENUM.ERROR);
+        Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
     }, HANDSHAKE_TIMEOUT);
 
     // Export to native
@@ -186,10 +192,14 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * @since 1.0.0
          */
         send: function (messageStr) {
+            Logger.log('RECEIVE FROM NATIVE:' + messageStr);
             const message = Message.fromMetaString(messageStr);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
+            } else {
+                Logger.warn('RECEIVE FROM NATIVE[INVALID]:' + messageStr);
             }
+            return messageStr || '[DEFAULT]';
         }
     };
 

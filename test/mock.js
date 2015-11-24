@@ -10,7 +10,6 @@
  * @since 1.0.0
  */
 
-require('./case');
 require('../dist/bridge');
 var Message = require('../dist/message').Message;
 var ResponseMessage = require('../dist/message').ResponseMessage;
@@ -66,5 +65,5 @@ var handShakeMessage = new Message({
         platform: 'android'
     }
 }).on('response', function () {});
-
+console.info('mock send handShakeMessage');
 send(handShakeMessage);

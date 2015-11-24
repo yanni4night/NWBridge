@@ -14,6 +14,7 @@ import {Api} from './api';
 import {extend} from './extend';
 import {Callback} from './callback';
 import {Event} from './event';
+import {Logger} from './logger';
 
 const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     REQUEST: 'request',
@@ -64,6 +65,8 @@ extend(Message.prototype, {
     flow: function () {
         var respMsg;
         var isHandShake = false;
+
+        Logger.log('FLOW:' + this.serialize());
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
