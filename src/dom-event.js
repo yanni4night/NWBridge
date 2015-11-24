@@ -21,7 +21,7 @@ export var DomEvent = {
      * @version 1.0.0
      * @since 1.0.0
      */
-    trigger: function (evtName, evtPayload) {
+    trigger: (evtName, evtPayload) => {
         var evt = document.createEvent('Events');
         evt.initEvent(evtName);
         extend(evt, evtPayload);

@@ -29,7 +29,7 @@ export function Event() {
 
         evtArr = event.trim().split(/\s+/);
 
-        evtArr.forEach(function(evt) {
+        evtArr.forEach((evt) => {
             listeners[evt] = listeners[evt] || [];
             listeners[evt].push({
                 type: evt,
@@ -52,18 +52,18 @@ export function Event() {
      * @since 1.0.0
      * @version 1.0.0
      */
-    this.off = function(event, func) {
+    this.off = (event, func) => {
         var evtArr, objs;
 
         evtArr = event.trim().split(/\s+/);
-        evtArr.forEach(function(evt) {
+        evtArr.forEach((evt) => {
             if (!func) {
                 delete listeners[evt];
                 return this;
             } else {
                 objs = listeners[evt];
                 if (Array.isArray(objs)) {
-                    listeners[evt] = objs.filter(function(obj) {
+                    listeners[evt] = objs.filter((obj) => {
                         return obj.func !== func;
                     });
                 }
@@ -83,15 +83,15 @@ export function Event() {
      * @since 1.0.0
      * @version 1.0.0
      */
-    this.emit = function(event, data) {
+    this.emit = (event, data) => {
         var evtArr, objs;
 
         evtArr = event.trim().split(/\s+/);
 
-        evtArr.forEach(function(evt) {
+        evtArr.forEach((evt) => {
             objs = listeners[evt];
             if (Array.isArray(objs)) {
-                objs.forEach(function(obj) {
+                objs.forEach((obj) => {
                     // add timestamp
                     obj.timestamp = +new Date();
                     obj.func.call(obj.thisArg || null, obj, data);

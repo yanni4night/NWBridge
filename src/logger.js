@@ -12,12 +12,12 @@
 
 var keys = 'info,log,debug,warn,error'.split(',');
 
-var defaultLog = console.log || function () {};
+var defaultLog = console.log || (() => {});
 
 export var Logger = {};
 
-keys.forEach(function (key) {
-    Logger[key] = function () {
+keys.forEach((key) => {
+    Logger[key] = () => {
         (console[key] || defaultLog).apply(console, arguments);
     };
 });

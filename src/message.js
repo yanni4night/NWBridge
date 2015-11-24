@@ -150,12 +150,12 @@ export function RequestMessage(metaData, timeout) {
 
     var hasTimeout = false;
 
-    var timeoutBundler = setTimeout(function () {
+    var timeoutBundler = setTimeout(() => {
         hasTimeout = true;
         self.emit('error', new Error('Timeout'));
     }, timeout);
 
-    var callback = new Callback(function (err, data) {
+    var callback = new Callback((err, data) => {
         clearTimeout(timeoutBundler);
         if (!hasTimeout) {
             if (err) {

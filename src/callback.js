@@ -17,11 +17,11 @@ var index = 0;
 export function Callback(func) {
     var id = 'cb_' + (++index) + '_' + (Math.random() * 1e7 | 0);
 
-    this.getId = function() {
+    this.getId = () => {
         return id;
     };
 
-    this.invoke = function(outputData) {
+    this.invoke = (outputData) => {
         var err = null;
         var ret;
 
@@ -36,6 +36,6 @@ export function Callback(func) {
     callbacks[id] = this;
 };
 
-Callback.findById = function(id) {
+Callback.findById = (id) => {
     return callbacks[id];
 };

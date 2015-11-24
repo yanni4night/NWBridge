@@ -19,11 +19,11 @@ export function Queue(config) {
         limit: 0
     }, config);
 
-    this.top = function() {
+    this.top = () => {
         return queue[0];
     };
 
-    this.pop = function() {
+    this.pop = function () {
         var ret = queue.shift();
         if (ret) {
             this.emit('pop', ret);
@@ -31,7 +31,7 @@ export function Queue(config) {
         return ret;
     };
 
-    this.push = function(element) {
+    this.push = function (element) {
         if (config.limit > 0 && this.size() >= config.limit) {
             throw new Error('Overflow');
         }
@@ -43,19 +43,19 @@ export function Queue(config) {
         return this;
     };
 
-    this.empty = function() {
+    this.empty = () => {
         return !queue.length;
     };
 
-    this.size = function() {
+    this.size = () => {
         return queue.length;
     };
 
-    this.serialize = function() {
+    this.serialize = () => {
         return JSON.stringify(queue);
     };
 
-    this.clear = function() {
+    this.clear = function () {
         queue = [];
         this.emit('clear');
         return this;
@@ -66,7 +66,7 @@ export function Queue(config) {
             return this;
         }
         // MUST be stable
-        queue.sort(function (prev, next) {
+        queue.sort((prev, next) => {
             if (prev[key] > next[key]) {
                 return -1;
             } else if (prev[key] < next[key]) {

@@ -27,13 +27,13 @@ function IOSRadio(scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    this.send = function (message) {
+    this.send = (message) => {
         queue.push(message);
         iframe.src = scheme + 'trigger-message-fetch';
     };
 
     this.extension = {
-        fetch: function () {
+        fetch: () => {
             const ret = queue.serialize();
             queue.clear();
             return ret;
@@ -50,7 +50,7 @@ function AndroidRadio(scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    this.send = function (message) {
+    this.send = (message) => {
         window.prompt(scheme + message.serialize());
     };
     this.extension = {};

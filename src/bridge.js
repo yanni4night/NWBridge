@@ -64,10 +64,10 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    const domReady = function () {
+    const domReady = () => {
         const evtData = {};
 
-        if(domReadyTriggered) {
+        if (domReadyTriggered) {
             return;
         }
 
@@ -88,9 +88,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         messageQueueToNative.push(message);
     };
     // native -> webview
-    messageQueueFromNative.on('push', function () {
+    messageQueueFromNative.on('push', () => {
         // Release native thread
-        asap(function () {
+        asap(() => {
             // Make sure messgae flows in the right order as pushed
             var message = messageQueueFromNative.top();
             var shouldFlow = true;
@@ -114,7 +114,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
                 return;
             }
-            message.on('handshake', function () {
+            message.on('handshake', () => {
                 var newState;
                 clearTimeout(handshakeTimeout);
 
@@ -136,9 +136,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     });
 
     // webview -> native
-    messageQueueToNative.on('push', function () {
+    messageQueueToNative.on('push', () => {
         // Release webview thread
-        asap(function () {
+        asap(() => {
             if (READY_STATE_ENUM.COMPLETE === readyState) {
                 const message = messageQueueToNative.pop();
 
@@ -162,7 +162,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     }, this);
 
     // Wait only few seconds for the handshake from native
-    handshakeTimeout = setTimeout(function () {
+    handshakeTimeout = setTimeout(() => {
         self.changeState(READY_STATE_ENUM.ERROR);
     }, 2e3);
 
@@ -196,7 +196,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * @todo test
          * @return {this}
          */
-        register: function () {
+        register: () => {
             Api.register.apply(Api, arguments);
             return window[webviewExport];
         },
@@ -246,7 +246,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    window[webviewExport].noConflict = function () {
+    window[webviewExport].noConflict = () => {
         if (undefined !== oldWvExport) {
             window[webviewExport] = oldWvExport;
         }
@@ -273,7 +273,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * @version 1.0.0
          * @since 1.0.0
          */
-        flush2Native: function () {
+        flush2Native: () => {
             while (!messageQueueToNative.empty()) {
                 messageQueueToNative.emit('push');
             }
@@ -284,7 +284,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * @version 1.0.0
          * @since 1.0.0
          */
-        flush2Webview: function () {
+        flush2Webview: () => {
             while (!messageQueueFromNative.empty()) {
                 messageQueueFromNative.emit('push');
             }

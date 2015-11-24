@@ -12,28 +12,28 @@
 
 var apis = {
     location: {
-        href: function () {
+        href: () => {
             return location.href;
         },
-        host: function () {
+        host: () => {
             return location.host;
         },
-        hostname: function () {
+        hostname: () => {
             return location.hostname;
         },
-        pathname: function () {
+        pathname: () => {
             return location.pathname;
         },
-        port: function () {
+        port: () => {
             return location.port;
         },
-        origin: function () {
+        origin: () => {
             return location.origin;
         },
-        search: function () {
+        search: () => {
             return location.search;
         },
-        hash: function () {
+        hash: () => {
             return location.hash;
         },
         reload: function (newUrl) {
@@ -47,7 +47,7 @@ var apis = {
         }
     },
     localStorage: {
-        enabled: function () {
+        enabled: () => {
             if ('undefined' === typeof localStorage) {
                 return false;
             }
@@ -65,15 +65,15 @@ var apis = {
         }
     },
     cookie: {
-        enabled: function () {
+        enabled: () => {
             return navigator.cookieEnabled;
         },
-        setItem: function () {},
-        getItem: function () {},
-        removeItem: function () {}
+        setItem: () => {},
+        getItem: () => {},
+        removeItem: () => {}
     },
     navigator: {
-        getUserAgent: function () {
+        getUserAgent: () => {
             return navigator.userAgent;
         }
     }
@@ -81,11 +81,11 @@ var apis = {
 
 export function Api(cmd, method, data) {
 
-    this.exists = function () {
+    this.exists = () => {
         return apis[cmd] && 'function' === typeof apis[cmd][method];
     };
 
-    this.invoke = function () {
+    this.invoke = () => {
         if (!this.exists()) {
             throw new Error('"' + cmd + '.' + method + '" does not exist');
         }
