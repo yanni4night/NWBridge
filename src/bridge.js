@@ -87,7 +87,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    const upload = function (message) {
+    const upload = (message) => {
         messageQueueToNative.push(message);
     };
     // native -> webview
@@ -98,7 +98,11 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             var message = messageQueueFromNative.top();
             var shouldFlow = true;
 
-            if (undefined === message || READY_STATE_ENUM.ERROR === readyState) {
+            if (READY_STATE_ENUM.ERROR === readyState) {
+                shouldFlow = false;
+                // Prevent from queu overflow
+                messageQueueFromNative.pop();
+            } else if (undefined === message) {
                 shouldFlow = false;
                 // Handshake is always on the top;
             } else if (message.isHandShake()) {
