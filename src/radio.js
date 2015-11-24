@@ -30,7 +30,7 @@ function IOSRadio(scheme) {
      */
     this.send = (message) => {
         Logger.log('RADIO send:' + message.serialize());
-        queue.push(message);
+        queue.push(message.assemble());
         iframe.src = scheme + 'trigger-message-fetch';
     };
 
