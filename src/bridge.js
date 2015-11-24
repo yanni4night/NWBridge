@@ -212,17 +212,20 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             let args = method.arguments.split(',');
             (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = () => {
                 const inputData = {};
+                const timeout = arguments[arguments.length - 1];
+
                 args.forEach((arg, idx) => {
                     inputData[arg] = arguments[idx];
                 });
-                return new Promise(function (resolve, reject) {
+
+                return new Promise((resolve, reject) => {
                     const msg = new RequestMessage({
                         cmd: cmdKey,
                         method: methodKey,
                         inputData: inputData
-                    }).on('data', function (evt) {
+                    }, timeout).on('data', (evt) => {
                         resolve(evt.data);
-                    }).on('error', function (evt) {
+                    }).on('error', (evt) => {
                         reject(evt.data);
                     });
 
