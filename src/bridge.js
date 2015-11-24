@@ -128,6 +128,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                 
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
+                    extend(window[nativeExport], radio.extension);
                     newState = READY_STATE_ENUM.COMPLETE;
                     radio.send(respMsg);// send to radio immediately,not upload
                 } catch (e) {
@@ -162,7 +163,6 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     this.on('statechange', function (evt, state) {
         if (state === READY_STATE_ENUM.COMPLETE) {
-            extend(window[nativeExport], radio.extension);
             this.flush2Native();
             this.flush2Webview();
         }
