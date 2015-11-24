@@ -19,6 +19,7 @@ import {Event} from './event';
 import {Callback} from './callback';
 import {Promise} from './promise';
 import {Logger} from './logger';
+import {rawAsap as asap} from './asap';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -88,7 +89,8 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     };
     // native -> webview
     messageQueueFromNative.on('push', function () {
-        setTimeout(function () {
+        // Release native thread
+        asap(function () {
             // Make sure messgae flows in the right order as pushed
             var message = messageQueueFromNative.top();
             var shouldFlow = true;
@@ -135,12 +137,12 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     // webview -> native
     messageQueueToNative.on('push', function () {
-        setTimeout(function () {
+        // Release webview thread
+        asap(function () {
             if (READY_STATE_ENUM.COMPLETE === readyState) {
                 const message = messageQueueToNative.pop();
 
                 if (message) {
-                    // Release webview thread
                     radio.send(message);
                 }
             }
