@@ -90,7 +90,6 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @since 1.0.0
      */
     const upload = (message) => {
-        Logger.log('UPLOAD:' + message.serialize());
         messageQueueToNative.push(message);
     };
     // native -> webview
@@ -121,7 +120,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
                 return;
             }
-            message.on('handshake', () => {
+            message.on('handshake', (evt, respMsg) => {
                 var newState;
                 clearTimeout(handshakeTimeout);
                 
@@ -130,6 +129,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     newState = READY_STATE_ENUM.COMPLETE;
+                    radio.send(respMsg);// send to radio immediately,not upload
                 } catch (e) {
                     // Hey,native,you have only one chance,
                     // I will never echo if you missed.

@@ -29,9 +29,9 @@ function IOSRadio(scheme) {
      * @since 1.0.0
      */
     this.send = (message) => {
+        Logger.log('RADIO send:' + message.serialize());
         queue.push(message);
-        iframe.src = scheme + 'trigger-message-fetch'
-        Logger.log('REAL iframe src=' + iframe.src);
+        iframe.src = scheme + 'trigger-message-fetch';
     };
 
     this.extension = {
@@ -53,6 +53,7 @@ function AndroidRadio(scheme) {
      * @since 1.0.0
      */
     this.send = (message) => {
+        Logger.log('RADIO send:' + message.serialize());
         window.prompt(scheme + message.serialize());
     };
     this.extension = {};

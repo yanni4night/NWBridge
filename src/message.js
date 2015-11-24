@@ -121,7 +121,7 @@ extend(Message.prototype, {
         }
 
         if (isHandShake) {
-            this.emit('handshake', this);
+            return this.emit('handshake', respMsg);
         }
 
         if (respMsg) {
