@@ -16,7 +16,7 @@ import {Logger} from './logger';
 function IOSRadio(scheme) {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;left:-10000px;display:none;height:0;width:0';
-    iframe.src = 'about:blank';
+    iframe.src = scheme;
     document.documentElement.appendChild(iframe);
 
     const queue = new Queue();
