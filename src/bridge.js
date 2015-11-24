@@ -20,6 +20,7 @@ import {Callback} from './callback';
 import {Promise} from './promise';
 import {Logger} from './logger';
 import {rawAsap as asap} from './asap';
+import {IDL} from './idl';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -199,7 +200,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         register: () => {
             Api.register.apply(Api, arguments);
             return window[webviewExport];
-        },
+        }/*,
         widget: {
             toast: function (toastMessage) {
                 return new Promise(function (resolve, reject) {
@@ -216,8 +217,35 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
                     upload(msg);
                 });
             }
-        }
+        }*/
     };
+
+    for(let cmdKey in IDL) {
+        let cmd = IDL[cmdKey];
+        for(let methodKey in cmd) {
+            let method = cmd[methodKey];
+            let args = method.arguments.split(',');
+            (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = () => {
+                const inputData = {};
+                args.forEach((arg, idx) => {
+                    inputData[arg] = arguments[idx];
+                });
+                return new Promise(function (resolve, reject) {
+                    const msg = new RequestMessage({
+                        cmd: cmdKey,
+                        method: methodKey,
+                        inputData: inputData
+                    }).on('data', function (evt) {
+                        resolve(evt.data);
+                    }).on('error', function (evt) {
+                        reject(evt.data);
+                    });
+
+                    upload(msg);
+                });
+            };
+        }
+    }
 
 
     /**

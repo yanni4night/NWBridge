@@ -18,8 +18,8 @@ var extend = require('../dist/extend').extend;
 
 var supports = {
     widget: {
-        confirm: function () {
-            return 'true';
+        toast: function (data) {
+            return data.toastMessage;
         }
     }
 };
@@ -40,7 +40,7 @@ window.prompt = function (messageStr) {
             outputData: {
                 errNo: 0,
                 errMsg: 'success',
-                data: supports[message.cmd][message.method]()
+                data: supports[message.cmd][message.method](message.inputData)
             }
         })));
     } else {
