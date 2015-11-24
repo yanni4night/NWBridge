@@ -103,22 +103,19 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
             if (READY_STATE_ENUM.ERROR === readyState) {
                 shouldFlow = false;
-                // Prevent from queu overflow
+                // Prevent from queue overflow
                 messageQueueFromNative.pop();
+                Logger.warn('NOT FLOW IN ERROR');
             } else if (undefined === message) {
                 shouldFlow = false;
                 // Handshake is always on the top;
             } else if (message.isHandShake()) {
-                if (READY_STATE_ENUM.PENDING === readyState) {
-                    shouldFlow = true;
-                } else {
+                if (READY_STATE_ENUM.PENDING !== readyState) {
                     // Ignore duplicated handshakes
                     messageQueueFromNative.pop();
                     shouldFlow = false;
                     Logger.warn('Duplicated handshake received');
                 }
-            } else if (READY_STATE_ENUM.PENDING === readyState) {
-                shouldFlow = true;
             }
 
             if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
@@ -197,7 +194,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             } else {
-                Logger.warn('RECEIVE FROM NATIVE[INVALID]:' + messageStr);
+                Logger.warn('[INVALID]:' + messageStr);
             }
             return messageStr || '[DEFAULT]';
         }

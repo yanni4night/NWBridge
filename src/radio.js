@@ -11,6 +11,7 @@
  */
 
 import {Queue} from './queue';
+import {Logger} from './logger';
 
 function IOSRadio(scheme) {
     const iframe = document.createElement('iframe');
@@ -29,7 +30,8 @@ function IOSRadio(scheme) {
      */
     this.send = (message) => {
         queue.push(message);
-        iframe.src = scheme + 'trigger-message-fetch';
+        iframe.src = scheme + 'trigger-message-fetch'
+        Logger.log('REAL iframe src=' + iframe.src);
     };
 
     this.extension = {
