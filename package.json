@@ -4,7 +4,9 @@
   "description": "js bridge",
   "main": "bridge.dist.min.js",
   "scripts": {
-    "test": "karma start"
+    "test": "karma start",
+    "dist": "grunt --pub=dist",
+    "dev": "grunt"
   },
   "repository": {
     "type": "git",
