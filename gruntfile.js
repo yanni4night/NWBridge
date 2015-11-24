@@ -14,10 +14,16 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
-    var doDist = grunt.option('--dist');
+    var doDist = 'dist' === grunt.option('pub');
+    var now = new Date();
+    var timestamp = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('-') + ' ' + [now.getHours(), now.getMinutes(),
+        now.getSeconds()
+    ].join(':');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        versionPrefix: doDist ? 'Released' : 'Development',
+        timestamp: timestamp,
         clean: {
             all: ['dist', 'bridge.dist{/.min}.js']
         },
@@ -48,8 +54,8 @@ module.exports = function (grunt) {
                 maxLineLen: 5000,
                 ASCIIOnly: true,
                 screwIE8: true,
-                drop_console: doDist,
-                banner: '/*! bridge.js v<%=pkg.version%> | (c) 2015 tieba.baidu.com | MIT */\n'
+                beautify: !doDist,
+                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015 tieba.baidu.com | MIT */\n'
             },
             dist: {
                 files: {
