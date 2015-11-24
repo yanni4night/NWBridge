@@ -1,11 +1,11 @@
 # JsBridge
 
-Js bridge for connecting between webview and native on iOS/Android.
+Js bridge for connecting webview and native on iOS/Android.
 
 # Build
 
-    $grunt
-    $grunt --pub=dist
+    $npm run dev
+    $npm run dist
 
 # Test
 
