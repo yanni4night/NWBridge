@@ -1,10 +1,10 @@
 {
-  "name": "tbjsbridge",
+  "name": "jsbridge",
   "version": "1.0.0",
-  "description": "bridge for tieba app",
-  "main": "index.js",
+  "description": "js bridge",
+  "main": "bridge.dist.min.js",
   "scripts": {
-    "test": "mocha"
+    "test": "karma start"
   },
   "repository": {
     "type": "git",
