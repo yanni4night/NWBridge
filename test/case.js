@@ -332,11 +332,11 @@ describe('Message', function () {
 describe('TiebaJsBridge', function () {
     describe('API', function () {
         this.timeout(5e3);
-        it('#widget.toast()', function (done) {
+        it('#testCmd.doTest()', function (done) {
             ready.then(function () {
                 assert.ok('undefined' !== typeof TiebaJsBridge);
                 assert.deepEqual(TiebaJsBridge.readyState, 'complete');
-                TiebaJsBridge.widget.toast('Hello World').then(function () {
+                TiebaJsBridge.testCmd.doTest('Hello World').then(function () {
                     done();
                 }).catch(function () {
                     done();
@@ -344,6 +344,6 @@ describe('TiebaJsBridge', function () {
             }).catch(function (e) {
                 console.error(e);
             });
-        })
+        });
     });
 });

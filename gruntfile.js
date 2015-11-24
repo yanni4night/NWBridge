@@ -14,7 +14,10 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
+    var doDist = grunt.option('--dist');
+
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         clean: {
             all: ['dist', 'bridge.dist{/.min}.js']
         },
@@ -41,6 +44,13 @@ module.exports = function (grunt) {
             }
         },
         uglify: {
+            options: {
+                maxLineLen: 5000,
+                ASCIIOnly: true,
+                screwIE8: true,
+                drop_console: doDist,
+                banner: '/*! bridge.js v<%=pkg.version%> | (c) 2015 tieba.baidu.com | MIT */\n'
+            },
             dist: {
                 files: {
                     'bridge.dist.min.js': 'bridge.dist.js'

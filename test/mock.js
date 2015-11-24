@@ -21,6 +21,11 @@ var supports = {
         toast: function (data) {
             return data.toastMessage;
         }
+    },
+    testCmd: {
+        doTest: function(data){
+            return data.testArg;
+        }
     }
 };
 

@@ -11,6 +11,11 @@
  */
 
 export var IDL = {
+    testCmd: {
+        doTest: {
+            arguments: 'testArg'
+        }
+    },
     widget: {
         toast: {
             arguments: 'toastMessage'
