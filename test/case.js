@@ -332,11 +332,11 @@ describe('Message', function () {
 describe('TiebaJsBridge', function () {
     describe('API', function () {
         this.timeout(5e3);
-        it('#widgets.confirm()', function (done) {
+        it('#widget.toast()', function (done) {
             ready.then(function () {
                 assert.ok('undefined' !== typeof TiebaJsBridge);
                 assert.deepEqual(TiebaJsBridge.readyState, 'complete');
-                TiebaJsBridge.widgets.confirm('yes?').then(function () {
+                TiebaJsBridge.widget.toast('Hello World').then(function () {
                     done();
                 }).catch(function () {
                     done();

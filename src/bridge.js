@@ -200,33 +200,13 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
             Api.register.apply(Api, arguments);
             return window[webviewExport];
         },
-        widgets: {
-            confirm: function (confirmMessage) {
+        widget: {
+            toast: function (toastMessage) {
                 return new Promise(function (resolve, reject) {
                     const msg = new RequestMessage({
-                        cmd: 'widgets',
-                        method: 'confirm',
-                        inputData: confirmMessage
-                    }).on('data', function (evt) {
-                        resolve(/^(yes|true|1|comfirmed)$/i.test(evt.data));
-                    }).on('error', function (evt) {
-                        reject(evt.data);
-                    });
-
-                    upload(msg);
-                });
-            }
-        },
-        http: {
-            get: function (url, cookies) {
-                return new Promise(function (resolve) {
-                    const msg = new RequestMessage({
-                        cmd: 'http',
-                        method: 'get',
-                        inputData: {
-                            url: url,
-                            cookies: cookies || {}
-                        }
+                        cmd: 'widget',
+                        method: 'toast',
+                        inputData: toastMessage
                     }).on('data', function (evt) {
                         resolve(evt.data);
                     }).on('error', function (evt) {

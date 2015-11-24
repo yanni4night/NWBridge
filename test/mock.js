@@ -17,7 +17,7 @@ var ResponseMessage = require('../dist/message').ResponseMessage;
 var extend = require('../dist/extend').extend;
 
 var supports = {
-    widgets: {
+    widget: {
         confirm: function () {
             return 'true';
         }
