@@ -29,7 +29,7 @@ function send(msgObj) {
 }
 
 window.prompt = function (messageStr) {
-    var message = Message.fromMetaString(messageStr.replace(/^tieba:\/\//i, ''));
+    var message = Message.fromMetaString(messageStr.replace(/^ctieba:\/\//i, ''));
 
     if (message.messageType !== Message.MESSAGE_TYPE.REQUEST) {
         return;

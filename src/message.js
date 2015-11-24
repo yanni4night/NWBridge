@@ -16,9 +16,9 @@ import {Callback} from './callback';
 import {Event} from './event';
 
 const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
-    REQUEST: 0x1,
-    RESPONSE: 0x2,
-    HANDSHAKE: 0x3
+    REQUEST: 'request',
+    RESPONSE: 'response',
+    HANDSHAKE: 'handshake'
 };
 
 export function Message(metaData) {

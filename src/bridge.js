@@ -57,6 +57,8 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var domReadyTriggered = false;
 
+    const HANDSHAKE_TIMEOUT = 500;
+
     /**
      * Notify document that bridge is ready.
      *
@@ -165,7 +167,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
         self.changeState(READY_STATE_ENUM.ERROR);
-    }, 2e3);
+    }, HANDSHAKE_TIMEOUT);
 
     // Export to native
     window[nativeExport] = {
@@ -200,24 +202,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         register: () => {
             Api.register.apply(Api, arguments);
             return window[webviewExport];
-        }/*,
-        widget: {
-            toast: function (toastMessage) {
-                return new Promise(function (resolve, reject) {
-                    const msg = new RequestMessage({
-                        cmd: 'widget',
-                        method: 'toast',
-                        inputData: toastMessage
-                    }).on('data', function (evt) {
-                        resolve(evt.data);
-                    }).on('error', function (evt) {
-                        reject(evt.data);
-                    });
-
-                    upload(msg);
-                });
-            }
-        }*/
+        }
     };
 
     for(let cmdKey in IDL) {
@@ -301,4 +286,4 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 }; // Bridge
 
 // Construct
-new Bridge('__tb_js_bridge', 'TiebaJsBridge', 'tieba://');
+new Bridge('__tb_js_bridge', 'TiebaJsBridge', 'ctieba://');
