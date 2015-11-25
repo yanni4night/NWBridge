@@ -20,10 +20,17 @@ module.exports = function (grunt) {
         now.getSeconds()
     ].join(':');
 
+    var startYear = 2015;
+    var endYear = '';
+    if (startYear < now.getFullYear()) {
+        endYear = '-' + now.getFullYear();
+    }
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         versionPrefix: doDist ? 'Released' : 'Development',
         timestamp: timestamp,
+        endYear: endYear,
         clean: {
             all: ['dist', '*.dist.*']
         },
@@ -64,10 +71,9 @@ module.exports = function (grunt) {
             options: {
                 maxLineLen: 5000,
                 ASCIIOnly: true,
-                screwIE8: true,
                 beautify: !doDist,
                 mangle: doDist,
-                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015 yanni4night.com | Author <%=pkg.author%> | MIT */\n'
+                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015<%=endYear%> yanni4night.com | github.com/yanni4night/NWBridge.git | MIT */\n'
             },
             dist: {
                 files: {
