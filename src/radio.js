@@ -38,6 +38,7 @@ function IOSRadio(scheme) {
         fetch: () => {
             const ret = queue.serialize();
             queue.clear();
+            Logger.log('FETCH:' + ret);
             return ret;
         }
     };
