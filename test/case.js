@@ -21,8 +21,8 @@ var Event = require('../dist/event').Event;
 var Message = require('../dist/message').Message;
 
 var ready = new Promise(function (resolve, reject) {
-    document.addEventListener('TiebaJsBridgeReady', function (evt) {
-        resolve(evt.tiebaJsBridgeReady);
+    document.addEventListener('JsBridgeReady', function (evt) {
+        resolve(evt.jsBridge);
     }, false);
 });
 
@@ -329,14 +329,14 @@ describe('Message', function () {
     });
 });
 
-describe('TiebaJsBridge', function () {
+describe('JsBridge', function () {
     describe('API', function () {
         this.timeout(5e3);
         it('#testCmd.doTest()', function (done) {
             ready.then(function () {
-                assert.ok('undefined' !== typeof TiebaJsBridge);
-                assert.deepEqual(TiebaJsBridge.readyState, 'complete');
-                TiebaJsBridge.testCmd.doTest('Hello World').then(function () {
+                assert.ok('undefined' !== typeof JsBridge);
+                assert.deepEqual(JsBridge.readyState, 'complete');
+                JsBridge.testCmd.doTest('Hello World').then(function () {
                     done();
                 }).catch(function () {
                     done();

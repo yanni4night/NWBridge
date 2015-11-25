@@ -19,7 +19,7 @@ import {Event} from './event';
 import {Callback} from './callback';
 import {Promise} from './promise';
 import {Logger} from './logger';
-import {rawAsap as asap} from './asap';
+import {asap} from './asap';
 import {IDL} from './idl';
 
 const READY_STATE_ENUM = {

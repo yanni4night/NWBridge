@@ -11,7 +11,7 @@
   * @see https://github.com/then/promise/blob/master/src/core.js
   */
  
-import {rawAsap as asap} from './asap';
+import {asap} from './asap';
  
 function noop() {}
  

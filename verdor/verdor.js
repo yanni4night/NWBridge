@@ -9,7 +9,7 @@
   * @version 1.0.0
   * @since 1.0.0
   */
-if (!window.__tb_js_bridge) {
+if (!window.__js_bridge) {
     // Construct
     new NWBridge('__js_bridge', 'JsBridge', 'scheme://');
 }
