@@ -25,7 +25,7 @@ keys.forEach(function(key) {
         }
         var p = document.createElement('li');
         p.className = key;
-        p.innerHTML = arguments[0]
+        p.innerHTML = '[' + new Date().toISOString() + ']' + (arguments[0]);
         father.appendChild(p);
     };
 });
