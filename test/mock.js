@@ -29,7 +29,7 @@ var supports = {
 };
 
 function send(msgObj) {
-    window.__tb_js_bridge.send(JSON.stringify(msgObj.assemble()));
+    window.__tb_js_bridge.send(msgObj.serialize());
 }
 
 window.prompt = function (messageStr) {
@@ -48,7 +48,7 @@ window.prompt = function (messageStr) {
             }
         })));
     } else {
-        send(new ResponseMessage(extend(message.assemble, {
+        send(new ResponseMessage(extend(message.assemble(), {
             outputData: {
                 errNo: -1,
                 errMsg: 'Not found',
