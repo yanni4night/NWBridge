@@ -1,7 +1,7 @@
 {
-  "name": "jsbridge",
+  "name": "nwbridge",
   "version": "1.0.0",
-  "description": "js bridge",
+  "description": "native&webview bridge",
   "main": "bridge.dist.min.js",
   "scripts": {
     "test": "karma start",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://g@gitlab.baidu.com:8022/tieba-bravo/TbJsBridge.git"
+    "url": "https://github.com/yanni4night/NWBridge.git"
   },
   "keywords": [
     "tieba",
