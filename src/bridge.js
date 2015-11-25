@@ -162,12 +162,14 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     extend(this, new Event());
 
     this.on('statechange', function (evt, state) {
+        export2Webview();
         if (state === READY_STATE_ENUM.COMPLETE) {
             this.flush2Native();
+            domReady();
             this.flush2Webview();
+        } else if (state === READY_STATE_ENUM.ERROR) {
+            domReady();
         }
-
-        domReady();
     }, this);
 
     // Wait only few seconds for the handshake from native
@@ -201,63 +203,72 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     };
 
     var oldWvExport = window[webviewExport];
-    // Export to webview
-    window[webviewExport] = {
-        readyState: readyState,
-        /**
-         * Register API for native.
-         *
-         * @todo test
-         * @return {this}
-         */
-        register: () => {
-            Api.register.apply(Api, arguments);
-            return window[webviewExport];
-        }
-    };
 
-    for(let cmdKey in IDL) {
-        let cmd = IDL[cmdKey];
-        for(let methodKey in cmd) {
-            let method = cmd[methodKey];
-            let args = method.arguments.split(',');
-            (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = () => {
-                const inputData = {};
-                const timeout = arguments[arguments.length - 1];
+    function export2Webview() {
+        // Export to webview
+        if (READY_STATE_ENUM.COMPLETE == readyState) {
+            window[webviewExport] = {
+                readyState: readyState,
+                /**
+                 * Register API for native.
+                 *
+                 * @todo test
+                 * @return {this}
+                 */
+                register: () => {
+                    Api.register.apply(Api, arguments);
+                    return window[webviewExport];
+                }
+            };
 
-                args.forEach((arg, idx) => {
-                    inputData[arg] = arguments[idx];
-                });
+            for (let cmdKey in IDL) {
+                let cmd = IDL[cmdKey];
+                for (let methodKey in cmd) {
+                    let method = cmd[methodKey];
+                    let args = method.arguments.split(',');
+                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = () => {
+                        const inputData = {};
+                        const timeout = arguments[arguments.length - 1];
 
-                return new Promise((resolve, reject) => {
-                    const msg = new RequestMessage({
-                        cmd: cmdKey,
-                        method: methodKey,
-                        inputData: inputData
-                    }, timeout).on('data', (evt) => {
-                        resolve(evt.data);
-                    }).on('error', (evt) => {
-                        reject(evt.data);
-                    });
+                        args.forEach((arg, idx) => {
+                            inputData[arg] = arguments[idx];
+                        });
 
-                    upload(msg);
-                });
+                        return new Promise((resolve, reject) => {
+                            const msg = new RequestMessage({
+                                cmd: cmdKey,
+                                method: methodKey,
+                                inputData: inputData
+                            }, timeout).on('data', (evt) => {
+                                resolve(evt.data);
+                            }).on('error', (evt) => {
+                                reject(evt.data);
+                            });
+
+                            upload(msg);
+                        });
+                    };
+                }
+            }
+        } else {
+            window[webviewExport] = {
+                readyState: readyState
             };
         }
+
+
+        /**
+         * Similar to jQuery.noConflict
+         *
+         * @version 1.0.0
+         * @since 1.0.0
+         */
+        window[webviewExport].noConflict = () => {
+            if (undefined !== oldWvExport) {
+                window[webviewExport] = oldWvExport;
+            }
+        };
     }
-
-
-    /**
-     * Similar to jQuery.noConflict
-     *
-     * @version 1.0.0
-     * @since 1.0.0
-     */
-    window[webviewExport].noConflict = () => {
-        if (undefined !== oldWvExport) {
-            window[webviewExport] = oldWvExport;
-        }
-    };
 
     extend(Bridge.prototype, {
         /**
@@ -268,11 +279,10 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
          * @since 1.0.0
          */
         changeState: function (state) {
-            if(READY_STATE_ENUM.PENDING!==readyState){
+            if (READY_STATE_ENUM.PENDING !== readyState) {
                 throw new Error('State error');
             }
-            window[webviewExport].readyState = readyState = state;
-            this.emit('statechange', state);
+            this.emit('statechange', readyState = state);
         },
         /**
          * flush2Native.
