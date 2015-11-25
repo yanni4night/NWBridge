@@ -25,7 +25,7 @@ keys.forEach(function(key) {
         }
         var p = document.createElement('li');
         p.className = key;
-        p.innerHTML = '<font color=cyan>[' + new Date().toISOString() + ']</font> ' + (arguments[0]);
+        p.innerHTML = '<font color=#666>[' + new Date().toISOString() + ']</font> ' + (arguments[0]);
         father.appendChild(p);
     };
 });
