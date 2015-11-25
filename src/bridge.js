@@ -309,5 +309,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     });
 }; // Bridge
 
-// Construct
-new Bridge('__tb_js_bridge', 'TiebaJsBridge', 'ctieba://');
+if (!window.__tb_js_bridge) {
+    // Construct
+    new Bridge('__tb_js_bridge', 'TiebaJsBridge', 'ctieba://');
+}
