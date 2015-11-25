@@ -73,7 +73,7 @@ module.exports = function (grunt) {
                 ASCIIOnly: true,
                 beautify: !doDist,
                 mangle: doDist,
-                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015<%=endYear%> yanni4night.com | github.com/yanni4night/NWBridge.git | MIT */\n'
+                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015<%=endYear%> yanni4night.com | github.com/yanni4night/NWBridge | MIT */\n'
             },
             dist: {
                 files: {
