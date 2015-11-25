@@ -55,7 +55,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var handshakeTimeout;
 
-    var domReadyTriggered = false;
+    var bridgeReadyTriggered = false;
 
     const HANDSHAKE_TIMEOUT = 6e4;
 
@@ -67,20 +67,20 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    const domReady = () => {
+    const bridgeReady = () => {
         const evtData = {};
 
-        if (domReadyTriggered) {
+        if (bridgeReadyTriggered) {
             return;
         }
 
-        Logger.log('DOMREADY:' + readyState);
+        Logger.log('BRIDGEREADY:' + readyState);
 
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
         })] = window[webviewExport];
         DomEvent.trigger(webviewExport + 'Ready', evtData);
-        domReadyTriggered = true;
+        bridgeReadyTriggered = true;
     };
     /**
      * Send message from bridge to native.
@@ -165,10 +165,10 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         export2Webview();
         if (state === READY_STATE_ENUM.COMPLETE) {
             this.flush2Native();
-            domReady();
+            bridgeReady();
             this.flush2Webview();
         } else if (state === READY_STATE_ENUM.ERROR) {
-            domReady();
+            bridgeReady();
         }
     }, this);
 
