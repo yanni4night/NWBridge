@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 tieba.baidu.com
+ * Copyright (C) 2015 yanni4night.com
  * callback.js
  *
  * changelog
