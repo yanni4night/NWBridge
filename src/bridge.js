@@ -37,7 +37,7 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
+export function Bridge(nativeExport, webviewExport, scheme) {
 
     const self = this;
 
@@ -278,7 +278,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         };
     }
 
-    extend(Bridge.prototype, {
+    extend(this, {
         /**
          * Change readyState.
          * 
