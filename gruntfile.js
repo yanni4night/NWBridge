@@ -66,6 +66,7 @@ module.exports = function (grunt) {
                 ASCIIOnly: true,
                 screwIE8: true,
                 beautify: !doDist,
+                mangle: doDist,
                 banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015 yanni4night.com | Author <%=pkg.author%> | MIT */\n'
             },
             dist: {
