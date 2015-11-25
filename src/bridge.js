@@ -162,12 +162,19 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
     extend(this, new Event());
 
     this.on('statechange', function (evt, state) {
+        // Export first because we trigger "bridgeReady" right now
         export2Webview();
+
         if (state === READY_STATE_ENUM.COMPLETE) {
+            // Bridge is ready,native receiving works immediately
             this.flush2Native();
+            // Trigger bridge ready because we should
+            // give business the time to add some listeners.
             bridgeReady();
+            // Then push webview to handle the other data beyond handshake
             this.flush2Webview();
         } else if (state === READY_STATE_ENUM.ERROR) {
+            // When error,just notify business about this
             bridgeReady();
         }
     }, this);
@@ -178,7 +185,7 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
     }, HANDSHAKE_TIMEOUT);
 
-    // Export to native
+    // Export to native always
     window[nativeExport] = {
         /**
          * Native send string data to bridge.
@@ -204,8 +211,9 @@ const Bridge = function Bridge(nativeExport, webviewExport, scheme) {
 
     var oldWvExport = window[webviewExport];
 
+    // Export to webview
     function export2Webview() {
-        // Export to webview
+        // What in webviewExport depends on state
         if (READY_STATE_ENUM.COMPLETE == readyState) {
             window[webviewExport] = {
                 readyState: readyState,
