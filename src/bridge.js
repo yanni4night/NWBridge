@@ -37,7 +37,7 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-export function Bridge(nativeExport, webviewExport, scheme) {
+window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     const self = this;
 
@@ -315,9 +315,4 @@ export function Bridge(nativeExport, webviewExport, scheme) {
             }
         }
     });
-}; // Bridge
-
-if (!window.__tb_js_bridge) {
-    // Construct
-    new Bridge('__tb_js_bridge', 'TiebaJsBridge', 'ctieba://');
-}
+}; // NWBridge
