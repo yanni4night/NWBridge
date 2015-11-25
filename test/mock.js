@@ -30,11 +30,11 @@ var supports = {
 };
 
 function send(msgObj) {
-    window.__tb_js_bridge.send(msgObj.serialize());
+    window.__js_bridge.send(msgObj.serialize());
 }
 
 window.prompt = function (messageStr) {
-    var message = Message.fromMetaString(messageStr.replace(/^ctieba:\/\//i, ''));
+    var message = Message.fromMetaString(messageStr.replace(/^scheme:\/\//i, ''));
 
     if (message.messageType !== Message.MESSAGE_TYPE.REQUEST) {
         return;

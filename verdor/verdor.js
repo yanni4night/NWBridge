@@ -11,5 +11,5 @@
   */
 if (!window.__tb_js_bridge) {
     // Construct
-    new NWBridge('__tb_js_bridge', 'TiebaJsBridge', 'ctieba://');
+    new NWBridge('__js_bridge', 'JsBridge', 'scheme://');
 }
