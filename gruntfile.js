@@ -25,7 +25,7 @@ module.exports = function (grunt) {
         versionPrefix: doDist ? 'Released' : 'Development',
         timestamp: timestamp,
         clean: {
-            all: ['dist', 'bridge.dist{/.min}.js']
+            all: ['dist', '*.dist.*']
         },
         babel: {
             options: {
