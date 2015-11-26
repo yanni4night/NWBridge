@@ -93,7 +93,7 @@ export function Event() {
             if (Array.isArray(objs)) {
                 objs.forEach((obj) => {
                     // add timestamp
-                    obj.timestamp = +new Date();
+                    obj.timestamp = Date.now();
                     obj.func.call(obj.thisArg || null, obj, data);
                 });
             }
