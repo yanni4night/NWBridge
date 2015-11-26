@@ -89,8 +89,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         limit: 5
     });
 
-    //var readyState = READY_STATE_ENUM.PENDING;
-
     var radio;
 
     var fsm;
@@ -124,6 +122,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         DomEvent.trigger(webviewExport + 'Ready', evtData);
         bridgeReadyTriggered = true;
     };
+
     /**
      * Send message from bridge to native.
      * 
@@ -134,6 +133,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     const upload = (message) => {
         messageQueueToNative.push(message);
     };
+
     // native -> webview
     messageQueueFromNative.on('push', () => {
         // Release native thread
@@ -162,20 +162,20 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
                 return;
             }
+
             message.on('handshake', (evt, respMsg) => {
                 // Prevent duplicated handshake
                 if (fsm.cannot('complete') && fsm.cannot('error')) {
                     radio.send(respMsg);
                     return;
                 }
-                
+
                 Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
 
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     extend(window[nativeExport], radio.extension);
-                    // newState = READY_STATE_ENUM.COMPLETE;
-                    radio.send(respMsg); // send to radio immediately,not upload
+                    radio.send(respMsg);
                 } catch (e) {
                     // Hey,native,you have only one chance,
                     // I will never echo if you missed.
@@ -202,8 +202,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         });
     });
 
-    extend(this, new Event());
-
     Api.register('kernel', 'notifyConnected', () => {
         clearTimeout(handshakeTimeout);
         if (fsm.can('complete')) {
@@ -223,12 +221,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             to: READY_STATE_ENUM.COMPLETE
         }],
         callbacks: {
-            onaftererror: function () {
+            onaftererror: () => {
                 export2Webview();
                 // And notify business about this
                 bridgeReady();
             },
-            onaftercomplete: function () {
+            onaftercomplete: () => {
                 export2Webview();
                 // Bridge is ready,native receiving works immediately
                 self.flush2Native();
@@ -326,7 +324,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             };
         }
 
-
         /**
          * Similar to jQuery.noConflict
          *
@@ -341,19 +338,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     }
 
     extend(this, {
-        /**
-         * Change readyState.
-         * 
-         * @param  {number} state
-         * @version 1.0.0
-         * @since 1.0.0
-         */
-        /*changeState: function (state) {
-            if (READY_STATE_ENUM.PENDING !== readyState) {
-                throw new Error('State error');
-            }
-            this.emit('statechange', readyState = state);
-        },*/
         /**
          * flush2Native.
          *
