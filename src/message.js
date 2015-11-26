@@ -93,13 +93,15 @@ extend(Message.prototype, {
             } catch (e) {
                 Logger.error('FLOW REQUEST:' + e.message);
             } finally {
-                respMsg = new ResponseMessage(extend(this.assemble(), {
-                    outputData: {
-                        errNo: success ? 0 : -1,
-                        errMsg: success ? 'success' : 'failed',
-                        data: ret || {}
-                    }
-                }));
+                if (this.callbackId) {
+                    respMsg = new ResponseMessage(extend(this.assemble(), {
+                        outputData: {
+                            errNo: success ? 0 : -1,
+                            errMsg: success ? 'success' : 'failed',
+                            data: ret || {}
+                        }
+                    }));
+                }
             }
             break;
         case MESSAGE_TYPE.RESPONSE:
