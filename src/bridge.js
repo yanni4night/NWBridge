@@ -164,11 +164,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             }
             message.on('handshake', (evt, respMsg) => {
                 // Prevent duplicated handshake
-                if (radio) {
+                if (fsm.cannot('complete') && fsm.cannot('error')) {
                     radio.send(respMsg);
                     return;
                 }
-
+                
                 Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
 
                 try {
@@ -206,7 +206,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     Api.register('kernel', 'notifyConnected', () => {
         clearTimeout(handshakeTimeout);
-        fsm.complete();
+        if (fsm.can('complete')) {
+            fsm.complete();
+        }
     });
 
     fsm = StateMachine.create({
