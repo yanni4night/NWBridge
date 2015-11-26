@@ -14,6 +14,7 @@ require('../dist/bridge');
 require('../verdor/verdor.js');
 var Message = require('../dist/message').Message;
 var ResponseMessage = require('../dist/message').ResponseMessage;
+var RequestMessage = require('../dist/message').RequestMessage;
 var extend = require('../dist/extend').extend;
 
 var supports = {
@@ -36,7 +37,13 @@ function send(msgObj) {
 window.prompt = function (messageStr) {
     var message = Message.fromMetaString(messageStr.replace(/^scheme:\/\//i, ''));
 
-    if (message.messageType !== Message.MESSAGE_TYPE.REQUEST) {
+    if (message.messageType === Message.MESSAGE_TYPE.RESPONSE) {
+        if('handshake' === message.cmd) {
+            send(new RequestMessage({
+                cmd: 'kernel',
+                method: 'notifyConnected'
+            }));
+        }
         return;
     }
     
@@ -62,6 +69,7 @@ window.prompt = function (messageStr) {
 
 var handShakeMessage = new Message({
     messageType: Message.MESSAGE_TYPE.HANDSHAKE,
+    cmd: 'handshake',
     inputData: {
         platform: 'android'
     }

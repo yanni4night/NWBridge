@@ -60,7 +60,7 @@ extend(Message.prototype, {
                 this.messageType !==
                 MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) ||
             (
-                MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || this.method));
+                MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || !this.method));
     },
     flow: function () {
         var respMsg;

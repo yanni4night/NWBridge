@@ -121,23 +121,24 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 return;
             }
             message.on('handshake', (evt, respMsg) => {
-                var newState;
-                clearTimeout(handshakeTimeout);
+                // Prevent duplicated handshake
+                if (radio) {
+                    radio.send(respMsg);
+                    return;
+                }
                 
                 Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
                 
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     extend(window[nativeExport], radio.extension);
-                    newState = READY_STATE_ENUM.COMPLETE;
+                    // newState = READY_STATE_ENUM.COMPLETE;
                     radio.send(respMsg);// send to radio immediately,not upload
                 } catch (e) {
                     // Hey,native,you have only one chance,
                     // I will never echo if you missed.
-                    newState = READY_STATE_ENUM.ERROR;
+                    self.changeState(READY_STATE_ENUM.ERROR);
                     Logger.error(e.message);
-                } finally {
-                    self.changeState(newState);
                 }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
@@ -161,6 +162,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     extend(this, new Event());
 
+    Api.register('kernel', 'notifyConnected', () => {
+        clearTimeout(handshakeTimeout);
+        self.changeState(READY_STATE_ENUM.COMPLETE);
+    });
+
     this.on('statechange', function (evt, state) {
         // Export first because we trigger "bridgeReady" right now
         export2Webview();
@@ -174,7 +180,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             // Then push webview to handle the other data beyond handshake
             this.flush2Webview();
         } else if (state === READY_STATE_ENUM.ERROR) {
-            // When error,just notify business about this
+            // And notify business about this
             bridgeReady();
         }
     }, this);
