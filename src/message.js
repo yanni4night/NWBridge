@@ -65,6 +65,7 @@ extend(Message.prototype, {
     flow: function () {
         var respMsg;
         var isHandShake = false;
+        var err;
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
@@ -91,6 +92,7 @@ extend(Message.prototype, {
                 ret = api.invoke();
                 success = true;
             } catch (e) {
+                err = e;
                 Logger.error('FLOW REQUEST:' + e.message);
             } finally {
                 if (this.callbackId) {
@@ -110,6 +112,7 @@ extend(Message.prototype, {
             try {
                 callback.invoke(this.outputData);
             } catch (e) {
+                err = e;
                 Logger.error('FLOW RESPONSE:', e.message);
             }
 
@@ -119,12 +122,13 @@ extend(Message.prototype, {
         }
 
         if (isHandShake) {
-            return this.emit('handshake', respMsg);
+            this.emit('handshake', respMsg);
+        } else if (respMsg) {
+            this.emit('response', respMsg);
+        } else if (err) {
+            this.emit('error', err);
         }
 
-        if (respMsg) {
-            this.emit('response', respMsg);
-        }
         return this;
     }
 });
