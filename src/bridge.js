@@ -2,6 +2,24 @@
  * Copyright (C) 2015 yanni4night.com
  * bridge.js
  *
+ * Workflow:
+ *
+ *                       |--Bridge--|
+ *                     |--          --|
+ *                    |-              -|
+ *                    |                |                  
+ * NBusiness       Native           Webview         WBusiness
+ *     |              | ==handshake==> |               |
+ *     |              | <==response==  |               |
+ *     | <==notify==  |                |               |
+ *     |              |  ==notify==>   |               |
+ *     |              |                |  ==notify==>  |
+ *     |              |                |               |
+ *     |   ------------bridge connected------------    |
+ *
+ * "WBusiness" but not "NBusiness" can request IMMEDIATELY
+ * When notified the bridge is connected.
+ * 
  * changelog
  * 2015-11-18[16:16:12]:revised
  *
@@ -9,58 +27,19 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-import {
-    DomEvent
-}
-from './dom-event';
-import {
-    extend
-}
-from './extend';
-import {
-    Queue, PriorityQueue
-}
-from './queue';
-import {
-    Message, RequestMessage
-}
-from './message';
-import {
-    Radio
-}
-from './radio';
-import {
-    Api
-}
-from './api';
-import {
-    Event
-}
-from './event';
-import {
-    Callback
-}
-from './callback';
-import {
-    Promise
-}
-from './promise';
-import {
-    Logger
-}
-from './logger';
-import {
-    asap
-}
-from './asap';
-import {
-    IDL
-}
-from './idl';
-import {
-    StateMachine
-}
-from './fsm';
+import {DomEvent} from './dom-event';
+import {extend} from './extend';
+import {Queue, PriorityQueue} from './queue';
+import {Message, RequestMessage} from './message';
+import {Radio} from './radio';
+import {Api} from './api';
+import {Event} from './event';
+import {Callback} from './callback';
+import {Promise} from './promise';
+import {Logger} from './logger';
+import {asap} from './asap';
+import {IDL} from './idl';
+import {StateMachine} from './fsm';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
