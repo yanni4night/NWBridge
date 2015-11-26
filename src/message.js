@@ -110,7 +110,7 @@ extend(Message.prototype, {
             try {
                 callback.invoke(this.outputData);
             } catch (e) {
-                console.error('FLOW RESPONSE:', e.message);
+                Logger.error('FLOW RESPONSE:', e.message);
             }
 
             break;

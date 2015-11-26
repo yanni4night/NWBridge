@@ -25,7 +25,10 @@ export function Callback(func) {
         var err = null;
         var ret;
 
-        if (0 !== +outputData.errNo) {
+        if (!outputData) {
+            outputData = {};
+            err = new Error('No data');
+        } else if (0 !== +outputData.errNo) {
             err = new Error(outputData.errMsg || 'Unknown error');
         }
         ret = func.call(null, err, outputData.data);
