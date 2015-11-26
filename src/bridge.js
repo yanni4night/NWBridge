@@ -9,18 +9,58 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-import {DomEvent} from './dom-event';
-import {extend} from './extend';
-import {Queue, PriorityQueue} from './queue';
-import {Message, RequestMessage} from './message';
-import {Radio} from './radio';
-import {Api} from './api';
-import {Event} from './event';
-import {Callback} from './callback';
-import {Promise} from './promise';
-import {Logger} from './logger';
-import {asap} from './asap';
-import {IDL} from './idl';
+import {
+    DomEvent
+}
+from './dom-event';
+import {
+    extend
+}
+from './extend';
+import {
+    Queue, PriorityQueue
+}
+from './queue';
+import {
+    Message, RequestMessage
+}
+from './message';
+import {
+    Radio
+}
+from './radio';
+import {
+    Api
+}
+from './api';
+import {
+    Event
+}
+from './event';
+import {
+    Callback
+}
+from './callback';
+import {
+    Promise
+}
+from './promise';
+import {
+    Logger
+}
+from './logger';
+import {
+    asap
+}
+from './asap';
+import {
+    IDL
+}
+from './idl';
+import {
+    StateMachine
+}
+from './fsm';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -49,9 +89,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         limit: 5
     });
 
-    var readyState = READY_STATE_ENUM.PENDING;
+    //var readyState = READY_STATE_ENUM.PENDING;
 
     var radio;
+
+    var fsm;
 
     var handshakeTimeout;
 
@@ -74,7 +116,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             return;
         }
 
-        Logger.log('BRIDGEREADY:' + readyState);
+        Logger.log('BRIDGEREADY:' + fsm.current);
 
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
@@ -100,7 +142,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             var message = messageQueueFromNative.top();
             var shouldFlow = true;
 
-            if (READY_STATE_ENUM.ERROR === readyState) {
+            if (fsm.is(READY_STATE_ENUM.ERROR)) {
                 shouldFlow = false;
                 // Prevent from queue overflow
                 messageQueueFromNative.pop();
@@ -109,7 +151,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 shouldFlow = false;
                 // Handshake is always on the top;
             } else if (message.isHandShake()) {
-                if (READY_STATE_ENUM.PENDING !== readyState) {
+                if (!fsm.is(READY_STATE_ENUM.PENDING)) {
                     // Ignore duplicated handshakes
                     messageQueueFromNative.pop();
                     shouldFlow = false;
@@ -126,18 +168,18 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                     radio.send(respMsg);
                     return;
                 }
-                
+
                 Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
-                
+
                 try {
                     radio = new Radio((message.inputData || {}).platform, scheme);
                     extend(window[nativeExport], radio.extension);
                     // newState = READY_STATE_ENUM.COMPLETE;
-                    radio.send(respMsg);// send to radio immediately,not upload
+                    radio.send(respMsg); // send to radio immediately,not upload
                 } catch (e) {
                     // Hey,native,you have only one chance,
                     // I will never echo if you missed.
-                    self.changeState(READY_STATE_ENUM.ERROR);
+                    fsm.error();
                     Logger.error(e.message);
                 }
             }).on('response', function (evt, respMsg) {
@@ -150,7 +192,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     messageQueueToNative.on('push', () => {
         // Release webview thread
         asap(() => {
-            if (READY_STATE_ENUM.COMPLETE === readyState) {
+            if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
                 const message = messageQueueToNative.pop();
 
                 if (message) {
@@ -164,30 +206,42 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     Api.register('kernel', 'notifyConnected', () => {
         clearTimeout(handshakeTimeout);
-        self.changeState(READY_STATE_ENUM.COMPLETE);
+        fsm.complete();
     });
 
-    this.on('statechange', function (evt, state) {
-        // Export first because we trigger "bridgeReady" right now
-        export2Webview();
-
-        if (state === READY_STATE_ENUM.COMPLETE) {
-            // Bridge is ready,native receiving works immediately
-            this.flush2Native();
-            // Trigger bridge ready because we should
-            // give business the time to add some listeners.
-            bridgeReady();
-            // Then push webview to handle the other data beyond handshake
-            this.flush2Webview();
-        } else if (state === READY_STATE_ENUM.ERROR) {
-            // And notify business about this
-            bridgeReady();
+    fsm = StateMachine.create({
+        initial: READY_STATE_ENUM.PENDING,
+        events: [{
+            name: 'error',
+            from: READY_STATE_ENUM.PENDING,
+            to: READY_STATE_ENUM.ERROR
+        }, {
+            name: 'complete',
+            from: READY_STATE_ENUM.PENDING,
+            to: READY_STATE_ENUM.COMPLETE
+        }],
+        callbacks: {
+            onaftererror: function () {
+                export2Webview();
+                // And notify business about this
+                bridgeReady();
+            },
+            onaftercomplete: function () {
+                export2Webview();
+                // Bridge is ready,native receiving works immediately
+                self.flush2Native();
+                // Trigger bridge ready because we should
+                // give business the time to add some listeners.
+                bridgeReady();
+                // Then push webview to handle the other data beyond handshake
+                self.flush2Webview();
+            }
         }
-    }, this);
+    });
 
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
-        self.changeState(READY_STATE_ENUM.ERROR);
+        self.error();
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
     }, HANDSHAKE_TIMEOUT);
 
@@ -220,9 +274,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     // Export to webview
     function export2Webview() {
         // What in webviewExport depends on state
-        if (READY_STATE_ENUM.COMPLETE == readyState) {
+        if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
             window[webviewExport] = {
-                readyState: readyState,
+                readyState: fsm.current,
                 /**
                  * Register API for native.
                  *
@@ -266,7 +320,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             }
         } else {
             window[webviewExport] = {
-                readyState: readyState
+                readyState: fsm.current
             };
         }
 
@@ -292,12 +346,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          * @version 1.0.0
          * @since 1.0.0
          */
-        changeState: function (state) {
+        /*changeState: function (state) {
             if (READY_STATE_ENUM.PENDING !== readyState) {
                 throw new Error('State error');
             }
             this.emit('statechange', readyState = state);
-        },
+        },*/
         /**
          * flush2Native.
          *
