@@ -15,10 +15,5 @@ export var IDL = {
         doTest: {
             arguments: 'testArg'
         }
-    },
-    widget: {
-        toast: {
-            arguments: 'toastMessage'
-        }
     }
 };
