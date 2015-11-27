@@ -220,7 +220,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
-        self.error();
+        fsm.error();
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
     }, HANDSHAKE_TIMEOUT);
 
