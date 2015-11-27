@@ -22,6 +22,12 @@ const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     HANDSHAKE: 'handshake'
 };
 
+/**
+ * Custom message class
+ * @param {object} metaData
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 export function Message(metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
@@ -38,10 +44,27 @@ export function Message(metaData) {
         ++this.priority;
     }
 }
+
 extend(Message.prototype, {
+
+    /**
+     * Return if it's a handshake.
+     * 
+     * @return {Boolean}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     isHandShake: function () {
         return this.messageType === MESSAGE_TYPE.HANDSHAKE;
     },
+
+    /**
+     * Assemble meta data into a plain object.
+     * 
+     * @return {object}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     assemble: function () {
         return {
             messageType: this.messageType,
@@ -52,9 +75,25 @@ extend(Message.prototype, {
             callbackId: this.callbackId
         };
     },
+
+    /**
+     * Return the string type of it's meta data.
+     * 
+     * @return {string}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     serialize: function () {
         return JSON.stringify(this.assemble());
     },
+
+    /**
+     * If it's an invalid message.
+     * 
+     * @return {Boolean}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     isInvalid: function () {
         return (this.messageType !== MESSAGE_TYPE.REQUEST && this.messageType !== MESSAGE_TYPE.RESPONSE &&
                 this.messageType !==
@@ -62,6 +101,14 @@ extend(Message.prototype, {
             (
                 MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || !this.method));
     },
+
+    /**
+     * Flow this message.
+     * 
+     * @return {this}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     flow: function () {
         var respMsg;
         var isHandShake = false;
@@ -133,6 +180,14 @@ extend(Message.prototype, {
     }
 });
 
+/**
+ * Parse a message from a string.
+ * 
+ * @param  {string} metaString
+ * @return {Message}
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 Message.fromMetaString = function (metaString) {
     var metaData;
     // Ignore invalid
@@ -143,6 +198,15 @@ Message.fromMetaString = function (metaString) {
     }
     return new Message(metaData);
 };
+
+/**
+ * Request Message.
+ * 
+ * @param {object} metaData
+ * @param {number} timeout
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 export function RequestMessage(metaData, timeout) {
     var self;
 
@@ -179,6 +243,13 @@ export function RequestMessage(metaData, timeout) {
     })));
 }
 
+/**
+ * Response message.
+ * 
+ * @param {object} metaData
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 export function ResponseMessage(metaData) {
     return new Message(extend(metaData, {
         messageType: MESSAGE_TYPE.RESPONSE
