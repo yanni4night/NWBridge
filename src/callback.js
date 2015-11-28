@@ -10,11 +10,11 @@
  * @since 1.0.0
  */
 
-var callbacks = {};
+const callbacks = {};
 
 var index = 0;
 
-export function Callback(func) {
+export function Callback(channelId, func) {
     var id = 'cb_' + (++index) + '_' + (Math.random() * 1e7 | 0);
 
     this.getId = () => {
@@ -37,12 +37,12 @@ export function Callback(func) {
     };
 
     this.remove = () => {
-        delete callbacks[id];
+        return callbacks[channelId] ? delete callbacks[channelId][id] : false;
     };
 
-    callbacks[id] = this;
+    (callbacks[channelId] || (callbacks[channelId] = {}))[id] = this;
 };
 
-Callback.findById = (id) => {
-    return callbacks[id];
+Callback.findById = (id, channelId) => {
+    return callbacks[channelId] ? callbacks[channelId][id] : undefined;
 };

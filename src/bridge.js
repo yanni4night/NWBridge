@@ -27,17 +27,17 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-import {DomEvent} from './dom-event';
-import {extend} from './extend';
-import {Queue, PriorityQueue} from './queue';
-import {Message, RequestMessage} from './message';
-import {Radio} from './radio';
-import {Api} from './api';
-import {Promise} from './promise';
-import {Logger} from './logger';
-import {asap} from './asap';
-import {IDL} from './idl';
-import {StateMachine} from './fsm';
+import {DomEvent} from'./dom-event';
+import {extend} from'./extend';
+import {Queue, PriorityQueue} from'./queue';
+import {Message, RequestMessage} from'./message';
+import {Radio} from'./radio';
+import {Api} from'./api';
+import {Promise} from'./promise';
+import {Logger} from'./logger';
+import {asap} from'./asap';
+import {IDL} from'./idl';
+import {StateMachine} from'./fsm';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -74,7 +74,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     var bridgeReadyTriggered = false;
 
-    const HANDSHAKE_TIMEOUT = 6e4;
+    const HANDSHAKE_TIMEOUT = 1e3;
+
+    // Indicate this bridge
+    const channelId = 'channel:' + nativeExport;
 
     if (window[nativeExport]) {
         throw new Error('"' + nativeExport + '" already in use');
@@ -146,7 +149,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
             message.on('handshake', (evt, respMsg) => {
                 // Prevent duplicated handshake
-                if (fsm.cannot('complete') && fsm.cannot('error')) {
+                if (fsm.cannot('success') && fsm.cannot('fail')) {
                     radio.send(respMsg);
                     return;
                 }
@@ -160,7 +163,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 } catch (e) {
                     // Hey,native,you have only one chance,
                     // I will never echo if you missed.
-                    fsm.error();
+                    fsm.fail();
                     Logger.error(e.message);
                 }
             }).on('response', function (evt, respMsg) {
@@ -183,31 +186,31 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         });
     });
 
-    Api.register('kernel', 'notifyConnected', () => {
+    Api.register(channelId, 'kernel', 'notifyConnected', () => {
         clearTimeout(handshakeTimeout);
-        if (fsm.can('complete')) {
-            fsm.complete();
+        if (fsm.can('success')) {
+            fsm.success();
         }
     });
 
     fsm = StateMachine.create({
         initial: READY_STATE_ENUM.PENDING,
         events: [{
-            name: 'error',
+            name: 'fail',
             from: READY_STATE_ENUM.PENDING,
             to: READY_STATE_ENUM.ERROR
         }, {
-            name: 'complete',
+            name: 'success',
             from: READY_STATE_ENUM.PENDING,
             to: READY_STATE_ENUM.COMPLETE
         }],
         callbacks: {
-            onaftererror: () => {
+            onafterfail: () => {
                 export2Webview();
                 // And notify business about this
                 bridgeReady();
             },
-            onaftercomplete: () => {
+            onaftersuccess: () => {
                 export2Webview();
                 // Bridge is ready,native receiving works immediately
                 self.flush2Native();
@@ -222,7 +225,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
-        fsm.error();
+        fsm.fail();
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
     }, HANDSHAKE_TIMEOUT);
 
@@ -240,7 +243,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          */
         send: function (messageStr) {
             Logger.log('RECEIVE FROM NATIVE:' + messageStr);
-            const message = Message.fromMetaString(messageStr);
+            const message = Message.fromMetaString(messageStr, channelId);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             } else {
@@ -265,7 +268,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                  * @return {this}
                  */
                 register: () => {
-                    Api.register.apply(Api, arguments);
+                    Api.register.apply(Api, Array.prototype.slice.call(arguments).unshift(channelId));
                     return window[webviewExport];
                 }
             };
@@ -284,7 +287,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                         });
 
                         return new Promise((resolve, reject) => {
-                            const msg = new RequestMessage({
+                            const msg = new RequestMessage(channelId, {
                                 cmd: cmdKey,
                                 method: methodKey,
                                 inputData: inputData

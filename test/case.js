@@ -100,14 +100,16 @@ describe('PriorityQueue', function () {
 describe('Callback', function () {
     describe('#findById()', function () {
         it('should get the callback by its id', function () {
-            var callback = new Callback(function () {});
-            assert.deepEqual(Callback.findById(callback.getId()), callback)
+            var channelId = '__t_0120';
+            var callback = new Callback(channelId, function () {});
+            assert.deepEqual(Callback.findById(callback.getId(), channelId), callback)
         });
     });
 
     describe('#invoke()', function () {
         it('should call function when invoke', function () {
-            var callback = new Callback(function (err, ret) {
+            var channelId = '__t_0121';
+            var callback = new Callback(channelId, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -155,7 +157,7 @@ describe('Radio', function () {
                 done();
             };
             var radio = new Radio('android', 'http://');
-            radio.send(new Message({
+            radio.send(new Message('__t__t_203', {
                 cmd: 'Jim'
             }));
 
@@ -166,7 +168,7 @@ describe('Radio', function () {
             var receivedStr;
             var received;
             var radio = new Radio('ios', 'http://');
-            radio.send(new Message({
+            radio.send(new Message('__t_t_23857', {
                 cmd: 'Jim'
             }));
             assert.ok(!!document.querySelector('iframe[src^="http://"]'));
@@ -263,7 +265,8 @@ describe('Event', function () {
 describe('Message', function () {
     describe('#construct', function () {
         it('should inject variables from metaData', function () {
-            var msg = new Message({
+            var channelId = '__t_2011';
+            var msg = new Message(channelId, {
                 cmd: 'foo',
                 method: 'say'
             });
@@ -271,24 +274,28 @@ describe('Message', function () {
             assert.deepEqual(msg.method, 'say');
         });
         it('should has a priority', function () {
-            assert.deepEqual(new Message().priority, 0);
+            var channelId = '__t_2011_0';
+            assert.deepEqual(new Message(channelId).priority, 0);
         });
 
         it('should be an event', function () {
-            var msg = new Message();
+            var channelId = '__t_2011_1';
+            var msg = new Message(channelId);
             assert.ok('function' === typeof msg.on);
             assert.ok('function' === typeof msg.off);
             assert.ok('function' === typeof msg.emit);
         });
 
         it('should has a default messageType', function () {
-            assert.deepEqual(new Message().messageType, Message.MESSAGE_TYPE.REQUEST);
+            var channelId = '__t_2011_3';
+            assert.deepEqual(new Message(channelId).messageType, Message.MESSAGE_TYPE.REQUEST);
         });
     });
     describe('#assemble()', function () {
         it('should return plain object', function () {
+            var channelId = '__t_2012';
             var keys = 'messageType,cmd,method,inputData,outputData,callbackId'.split(',');
-            var msg = new Message().assemble();
+            var msg = new Message(channelId).assemble();
             assert.ok(!keys.some(function (key) {
                 return !(key in msg);
             }));
@@ -297,8 +304,9 @@ describe('Message', function () {
 
     describe('#serialize()', function () {
         it('should return json string', function () {
+            var channelId = '__t_2013';
             var keys = 'messageType,cmd,method,inputData,callbackId'.split(',');
-            var msg = new Message({
+            var msg = new Message(channelId, {
                 cmd: 1,
                 method: 2,
                 inputData: {
@@ -334,4 +342,19 @@ describe('JsBridge', function () {
             });
         });
     });
+});
+
+describe('NWBridge', function () {
+    describe('timeout', function () {
+        this.timeout(1500);
+        it('should timeout if no handshake received', function (done) {
+            document.addEventListener('TjsBridgeReady', function (e) {
+                assert.ok(!!e.tjsBridge);
+                assert.deepEqual(e.tjsBridge.readyState, 'error');
+                done();
+            }, false);
+            new NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
+        });
+    });
+
 });

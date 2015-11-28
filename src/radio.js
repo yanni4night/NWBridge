@@ -54,7 +54,7 @@ function AndroidRadio(scheme) {
      * @since 1.0.0
      */
     this.send = (message) => {
-        Logger.log('RADIO send:' + message.serialize());
+        Logger.log('RADIO send:' + scheme + message.serialize());
         window.prompt(scheme + message.serialize());
     };
     this.extension = {};

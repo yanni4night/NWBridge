@@ -28,7 +28,7 @@ const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
  * @version 1.0.0
  * @since 1.0.0
  */
-export function Message(metaData) {
+export function Message(channelId, metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
         cmd: undefined,
@@ -37,6 +37,7 @@ export function Message(metaData) {
         inputData: undefined,
         outputData: undefined
     }, {
+        channelId: channelId,
         priority: 0
     }, metaData, new Event());
 
@@ -116,22 +117,22 @@ extend(Message.prototype, {
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
-            respMsg = new ResponseMessage(extend(this.assemble(), {
+            respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
                 outputData: {
                     errNo: 0,
                     errMsg: 'success',
                     data: {
-                        cookieEnabled: new Api('cookie', 'enabled').invoke(),
-                        url: new Api('location', 'href').invoke(),
-                        localStorageEnabled: new Api('localStorage', 'enabled').invoke(),
-                        ua: new Api('navigator', 'getUserAgent').invoke()
+                        cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
+                        url: new Api(this.channelId, 'location', 'href').invoke(),
+                        localStorageEnabled: new Api(this.channelId, 'localStorage', 'enabled').invoke(),
+                        ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()
                     }
                 }
             }));
             isHandShake = true;
             break;
         case MESSAGE_TYPE.REQUEST:
-            var api = new Api(this.cmd, this.method, this.inputData);
+            var api = new Api(this.channelId, this.cmd, this.method, this.inputData);
             var ret;
             var success = false;
 
@@ -143,7 +144,9 @@ extend(Message.prototype, {
                 Logger.error('FLOW REQUEST:' + e.message);
             } finally {
                 if (this.callbackId) {
-                    respMsg = new ResponseMessage(extend(this.assemble(), {
+                    respMsg = new ResponseMessage(this.channelId, extend({
+                        channelId:this.channelId
+                    },this.assemble(), {
                         outputData: {
                             errNo: success ? 0 : -1,
                             errMsg: success ? 'success' : 'failed',
@@ -154,7 +157,7 @@ extend(Message.prototype, {
             }
             break;
         case MESSAGE_TYPE.RESPONSE:
-            var callback = Callback.findById(this.callbackId);
+            var callback = Callback.findById(this.callbackId, this.channelId);
 
             try {
                 callback.invoke(this.outputData);
@@ -188,7 +191,7 @@ extend(Message.prototype, {
  * @version 1.0.0
  * @since 1.0.0
  */
-Message.fromMetaString = function (metaString) {
+Message.fromMetaString = function (metaString, channelId) {
     var metaData;
     // Ignore invalid
     try {
@@ -196,7 +199,7 @@ Message.fromMetaString = function (metaString) {
     } catch (e) {
         metaData = {}
     }
-    return new Message(metaData);
+    return new Message(channelId, metaData);
 };
 
 /**
@@ -207,7 +210,7 @@ Message.fromMetaString = function (metaString) {
  * @version 1.0.0
  * @since 1.0.0
  */
-export function RequestMessage(metaData, timeout) {
+export function RequestMessage(channelId, metaData, timeout) {
     var self;
 
     var defaultTimeout = 3e3;
@@ -225,7 +228,7 @@ export function RequestMessage(metaData, timeout) {
         self.emit('error', new Error('Timeout'));
     }, timeout);
 
-    var callback = new Callback((err, data) => {
+    var callback = new Callback(channelId, (err, data) => {
         clearTimeout(timeoutBundler);
         if (!hasTimeout) {
             if (err) {
@@ -237,7 +240,7 @@ export function RequestMessage(metaData, timeout) {
 
     });
 
-    return (self = new Message(extend(metaData, {
+    return (self = new Message(channelId, extend(metaData, {
         messageType: MESSAGE_TYPE.REQUEST,
         callbackId: callback.getId()
     })));
@@ -250,8 +253,8 @@ export function RequestMessage(metaData, timeout) {
  * @version 1.0.0
  * @since 1.0.0
  */
-export function ResponseMessage(metaData) {
-    return new Message(extend(metaData, {
+export function ResponseMessage(channelId, metaData) {
+    return new Message(channelId, extend(metaData, {
         messageType: MESSAGE_TYPE.RESPONSE
     }));
 }

@@ -10,7 +10,9 @@
  * @since 1.0.0
  */
 
-var apis = {
+import {extend} from './extend';
+
+const defaultApis = {
     location: {
         href: () => {
             return location.href;
@@ -79,26 +81,34 @@ var apis = {
     }
 };
 
-export function Api(cmd, method, data) {
+const apis = {};
+
+export function Api(channelId, cmd, method, data) {
+
+    if (!apis[channelId]) {
+        apis[channelId] = extend(true, {}, defaultApis);
+    }
 
     this.exists = () => {
-        return apis[cmd] && 'function' === typeof apis[cmd][method];
+        return apis[channelId][cmd] && 'function' === typeof apis[channelId][cmd][method];
     };
 
     this.invoke = () => {
         if (!this.exists()) {
-            throw new Error('"' + cmd + '.' + method + '" does not exist');
+            console.log(apis);
+            throw new Error(channelId + ':"' + cmd + '.' + method + '" does not exist');
         }
-        var ret = apis[cmd][method](data);
+        var ret = apis[channelId][cmd][method](data);
         return ret;
     };
 
 }
 
-Api.register = function (cmd, method, func) {
-    apis[cmd] = apis[cmd] || {};
-    if (apis[cmd][method]) {
+Api.register = function (channelId, cmd, method, func) {
+    apis[channelId] = apis[channelId] || extend(true, {}, defaultApis);;
+    apis[channelId][cmd] = apis[channelId][cmd] || {};
+    if (apis[channelId][cmd][method]) {
         throw new Error('Duplicated "' + cmd + '.' + method + '"')
     }
-    apis[cmd][method] = func;
+    apis[channelId][cmd][method] = func;
 };
