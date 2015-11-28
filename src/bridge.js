@@ -78,6 +78,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     const HANDSHAKE_TIMEOUT = 6e4;
 
+    if (window[nativeExport]) {
+        throw new Error('"' + nativeExport + '" already in use');
+    }
+    
     /**
      * Notify document that bridge is ready.
      *
