@@ -11,8 +11,6 @@
   */
 var keys = 'info,log,debug,warn,error'.split(',');
 
-var defaultLog = console.log || (function() {});
-
 var Logger = {};
 
 keys.forEach(function(key) {

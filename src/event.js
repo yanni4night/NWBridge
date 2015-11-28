@@ -101,4 +101,4 @@ export function Event() {
 
         return this;
     };
-};
+}

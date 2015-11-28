@@ -50,7 +50,8 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['src/*.js']
+            src: ['src/*.js', '!src/promise.js', '!src/fsm.js', '!src/extend.js'],
+            test: ['test/*.js']
         },
         browserify: {
             dist: {

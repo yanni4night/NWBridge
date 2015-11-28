@@ -15,7 +15,7 @@ const callbacks = {};
 var index = 0;
 
 export function Callback(channelId, func) {
-    var id = 'cb_' + (++index) + '_' + (Math.random() * 1e7 | 0);
+    var id = 'cb_' + (index += 1) + '_' + (Math.random() * 1e7 | 0);
 
     this.getId = () => {
         return id;
@@ -41,7 +41,7 @@ export function Callback(channelId, func) {
     };
 
     (callbacks[channelId] || (callbacks[channelId] = {}))[id] = this;
-};
+}
 
 Callback.findById = (id, channelId) => {
     return callbacks[channelId] ? callbacks[channelId][id] : undefined;

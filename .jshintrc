@@ -1,5 +1,4 @@
 {
-  "bitwise": true,
   "camelcase": true,
   "eqeqeq": true,
   "latedef": true,
@@ -13,6 +12,11 @@
   "funcscope": true,
   "browser": true,
   "globals": {
-    "console": true
+    "console": true,
+    "setImmediate": true,
+    "require": true,
+    "describe": true,
+    "it": true,
+    "exports": true
   }
 }

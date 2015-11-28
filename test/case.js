@@ -16,11 +16,11 @@ var Queue = require('../dist/queue').Queue;
 var Callback = require('../dist/callback').Callback;
 var DomEvent = require('../dist/dom-event').DomEvent;
 var Radio = require('../dist/radio').Radio;
-var Promise = require('../dist/promise').Promise;
-var Event = require('../dist/event').Event;
+var XPromise = require('../dist/promise').Promise;
+var XEvent = require('../dist/event').Event;
 var Message = require('../dist/message').Message;
 
-var ready = new Promise(function (resolve, reject) {
+var ready = new Promise(function (resolve) {
     document.addEventListener('JsBridgeReady', function (evt) {
         resolve(evt.jsBridge);
     }, false);
@@ -72,7 +72,7 @@ describe('Queue', function () {
     describe('#clear()', function () {
         it('should clear all elements of queue', function () {
             var queue = new Queue();
-            queue.push(1).push(2)
+            queue.push(1).push(2);
             assert.deepEqual(queue.clear(), queue);
             assert.ok(queue.empty());
         });
@@ -102,7 +102,7 @@ describe('Callback', function () {
         it('should get the callback by its id', function () {
             var channelId = '__t_0120';
             var callback = new Callback(channelId, function () {});
-            assert.deepEqual(Callback.findById(callback.getId(), channelId), callback)
+            assert.deepEqual(Callback.findById(callback.getId(), channelId), callback);
         });
     });
 
@@ -185,7 +185,7 @@ describe('Radio', function () {
 describe('Promise', function () {
     describe('#then()', function () {
         it('should call first callback of "then" when resolved', function (done) {
-            var promise = new Promise(function (resolve) {
+            var promise = new XPromise(function (resolve) {
                 resolve();
             });
             promise.then(function () {
@@ -196,7 +196,7 @@ describe('Promise', function () {
 
     describe('#then()', function () {
         it('should call second callback of "then" when rejected', function (done) {
-            var promise = new Promise(function (resolve, reject) {
+            var promise = new XPromise(function (resolve, reject) {
                 reject();
             });
             promise.then(function () {
@@ -208,7 +208,7 @@ describe('Promise', function () {
     });
     describe('#catch()', function () {
         it('should call "catch" when rejected', function (done) {
-            var promise = new Promise(function (resolve, reject) {
+            var promise = new XPromise(function (resolve, reject) {
                 reject();
             });
             promise.catch(function () {
@@ -221,7 +221,7 @@ describe('Promise', function () {
 describe('Event', function () {
     describe('#on()#emit()', function () {
         it('should call listener if "emit" after "on"', function (done) {
-            var evt = new Event();
+            var evt = new XEvent();
             evt.on('test', function (evt, data) {
                 assert.ok(!!data);
                 assert.deepEqual(data.name, 'Peter');
@@ -229,12 +229,12 @@ describe('Event', function () {
             });
             evt.emit('test', {
                 name: 'Peter'
-            })
+            });
         });
     });
     describe('#off', function () {
         it('should remove listener when "off"', function () {
-            var evt = new Event();
+            var evt = new XEvent();
             var foo = 0;
 
             var callOne = function () {
@@ -259,7 +259,7 @@ describe('Event', function () {
             evt.off('test');
             assert.deepEqual(foo, 0);
         });
-    });;
+    });
 });
 
 describe('Message', function () {
@@ -330,9 +330,9 @@ describe('JsBridge', function () {
         this.timeout(5e3);
         it('#testCmd.doTest()', function (done) {
             ready.then(function () {
-                assert.ok('undefined' !== typeof JsBridge);
-                assert.deepEqual(JsBridge.readyState, 'complete');
-                JsBridge.testCmd.doTest('Hello World').then(function () {
+                assert.ok('undefined' !== typeof window.JsBridge);
+                assert.deepEqual(window.JsBridge.readyState, 'complete');
+                window.JsBridge.testCmd.doTest('Hello World').then(function () {
                     done();
                 }).catch(function () {
                     done();
@@ -353,7 +353,7 @@ describe('NWBridge', function () {
                 assert.deepEqual(e.tjsBridge.readyState, 'error');
                 done();
             }, false);
-            new NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
+            new window.NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
         });
     });
 

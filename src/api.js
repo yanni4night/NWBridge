@@ -105,10 +105,10 @@ export function Api(channelId, cmd, method, data) {
 }
 
 Api.register = function (channelId, cmd, method, func) {
-    apis[channelId] = apis[channelId] || extend(true, {}, defaultApis);;
+    apis[channelId] = apis[channelId] || extend(true, {}, defaultApis);
     apis[channelId][cmd] = apis[channelId][cmd] || {};
     if (apis[channelId][cmd][method]) {
-        throw new Error('Duplicated "' + cmd + '.' + method + '"')
+        throw new Error('Duplicated "' + cmd + '.' + method + '"');
     }
     apis[channelId][cmd][method] = func;
 };

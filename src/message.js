@@ -9,6 +9,7 @@
  * @version 1.0.0
  * @since 1.0.0
  */
+/*global Message, RequestMessage, ResponseMessage*/
 
 import {Api} from './api';
 import {extend} from './extend';
@@ -28,7 +29,7 @@ const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
  * @version 1.0.0
  * @since 1.0.0
  */
-export function Message(channelId, metaData) {
+export function Message (channelId, metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
         cmd: undefined,
@@ -42,7 +43,7 @@ export function Message(channelId, metaData) {
     }, metaData, new Event());
 
     if (MESSAGE_TYPE.HANDSHAKE === this.messageType) {
-        ++this.priority;
+        this.priority += 1;
     }
 }
 
@@ -100,7 +101,7 @@ extend(Message.prototype, {
                 this.messageType !==
                 MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) ||
             (
-                MESSAGE_TYPE.REQUEST == this.messageType && (!this.cmd || !this.method));
+                MESSAGE_TYPE.REQUEST === this.messageType && (!this.cmd || !this.method));
     },
 
     /**
@@ -197,7 +198,7 @@ Message.fromMetaString = function (metaString, channelId) {
     try {
         metaData = JSON.parse(metaString);
     } catch (e) {
-        metaData = {}
+        metaData = {};
     }
     return new Message(channelId, metaData);
 };

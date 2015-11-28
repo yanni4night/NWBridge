@@ -13,5 +13,5 @@
 const hasSetImmediate = typeof setImmediate === "function";
  
 export function asap(task) {
-    hasSetImmediate ? setImmediate(task) : setTimeout(task);
+    return hasSetImmediate ? setImmediate(task) : setTimeout(task);
 }

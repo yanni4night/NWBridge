@@ -80,12 +80,12 @@ export function Queue(config) {
             if (prev[key] > next[key]) {
                 return -1;
             } else if (prev[key] < next[key]) {
-                return 1
+                return 1;
             } else return 0;
         });
 
         return this;
-    };
+    }
 
     extend(this, new Event());
 }
