@@ -33,8 +33,6 @@ import {Queue, PriorityQueue} from './queue';
 import {Message, RequestMessage} from './message';
 import {Radio} from './radio';
 import {Api} from './api';
-import {Event} from './event';
-import {Callback} from './callback';
 import {Promise} from './promise';
 import {Logger} from './logger';
 import {asap} from './asap';
@@ -81,7 +79,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     if (window[nativeExport]) {
         throw new Error('"' + nativeExport + '" already in use');
     }
-    
+
     /**
      * Notify document that bridge is ready.
      *
