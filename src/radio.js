@@ -65,6 +65,8 @@ function AndroidRadio(scheme) {
  * 
  * @param {string} platform iOS/Android
  * @param {string} scheme   Protocol scheme
+ * @version 1.0.0
+ * @since 1.0.0
  */
 export function Radio(platform, scheme) {
     switch (String(platform).toLowerCase()) {
