@@ -4,18 +4,18 @@
  *
  * Workflow:
  *
- *                       |--Bridge--|
- *                     |--          --|
- *                    |-              -|
- *                    |                |                  
- * NBusiness       Native           Webview         WBusiness
- *     |              | ==handshake==> |               |
- *     |              | <==response==  |               |
- *     | <==notify==  |                |               |
- *     |              |  ==notify==>   |               |
- *     |              |                |  ==notify==>  |
- *     |              |                |               |
- *     |   ------------bridge connected------------    |
+ *                      |--Bridge--|
+ *                    |--          --|
+ *                   |-              -|
+ *                   |                |                  
+ * NBusiness      Native           Webview       WBusiness
+ *     |             | ==handshake==> |             |
+ *     |             | <==response==  |             |
+ *     | <==notify== |                |             |
+ *     |             |  ===notify==>  |             |
+ *     |             |                | ==notify==> |
+ *     |             |                |             |
+ *     | --------------bridge connected------------ |
  *
  * "WBusiness" but not "NBusiness" can request IMMEDIATELY
  * When notified the bridge is connected.
