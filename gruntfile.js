@@ -46,6 +46,12 @@ module.exports = function (grunt) {
                 dest: 'dist'
             }
         },
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            src: ['src/*.js']
+        },
         browserify: {
             dist: {
                 src: ['dist/bridge.js'],
@@ -88,6 +94,6 @@ module.exports = function (grunt) {
             }
         }
     });
-    var tasks = ['clean', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
+    var tasks = ['clean', 'jshint', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
     grunt.registerTask('default', tasks);
 };

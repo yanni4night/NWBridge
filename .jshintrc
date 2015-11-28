@@ -1,0 +1,18 @@
+{
+  "bitwise": true,
+  "camelcase": true,
+  "eqeqeq": true,
+  "latedef": true,
+  "plusplus": true,
+  "quotmark": true,
+  "undef": true,
+  "unused": true,
+  "esnext": true,
+  "eqnull": true,
+  "evil": true,
+  "funcscope": true,
+  "browser": true,
+  "globals": {
+    "console": true
+  }
+}
