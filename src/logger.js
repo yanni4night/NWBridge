@@ -10,11 +10,11 @@
  * @since 1.0.0
  */
 
-var keys = 'info,log,debug,warn,error'.split(',');
+const keys = 'info,log,debug,warn,error'.split(',');
 
-var defaultLog = console.log || (() => {});
+const defaultLog = console.log || (() => {});
 
-export var Logger = {};
+export const Logger = {};
 
 keys.forEach((key) => {
     Logger[key] = function () {
