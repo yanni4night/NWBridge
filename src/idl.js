@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 
-export var IDL = {
+export const IDL = {
     testCmd: {
         doTest: {
             arguments: 'testArg'
