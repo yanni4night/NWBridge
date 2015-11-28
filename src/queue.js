@@ -16,7 +16,8 @@ export function Queue(config) {
     var queue = [];
 
     config = extend({
-        limit: 0
+        limit: 0,
+        priorityKey: null
     }, config);
 
     this.top = () => {
@@ -37,7 +38,15 @@ export function Queue(config) {
         }
 
         if (element) {
+            let key = config.priorityKey;
             queue[queue.length] = element;
+
+            // Sort if necessary
+            if (key && this.size() > 1 && queue[queue.length - 1][key] > queue[queue.length -
+                    2][key]) {
+                sort();
+            }
+
             this.emit('push', element);
         }
         return this;
@@ -61,7 +70,8 @@ export function Queue(config) {
         return this;
     };
 
-    this.sortBy = function(key) {
+    function sort() {
+        var key = config.priorityKey;
         if (!key) {
             return this;
         }
@@ -81,14 +91,15 @@ export function Queue(config) {
 }
 
 export function PriorityQueue(config) {
-    var queue = new Queue(config = extend({
+    config = extend({
         priorityKey: 'priority'
-    }, config));
-    var _push = queue.push;
+    }, config);
 
-    queue.push = function() {
-        return _push.apply(queue, arguments).sortBy(config.priorityKey);
-    };
+    if ('string' !== typeof config.priorityKey) {
+        throw new Error('priorityKey is required');
+    }
+
+    var queue = new Queue(config);
 
     return queue;
 }

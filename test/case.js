@@ -77,18 +77,6 @@ describe('Queue', function () {
             assert.ok(queue.empty());
         });
     });
-    describe('#sortBy()', function () {
-        it('should sort queue', function () {
-            var queue = new Queue();
-            queue.push({
-                age: 25
-            }).push({
-                age: 28
-            });
-            assert.deepEqual(queue.sortBy('age'), queue);
-            assert.deepEqual(queue.pop().age, 28);
-        });
-    });
 });
 
 describe('PriorityQueue', function () {
