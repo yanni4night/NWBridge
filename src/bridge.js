@@ -149,8 +149,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 return;
             }
 
-            Logger.debug('POPED:' + message.serialize());
-
             message.on('handshake', (evt, respMsg) => {
                 // Prevent duplicated handshake
                 if (fsm.cannot('success') && fsm.cannot('fail')) {
@@ -184,16 +182,13 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     // webview -> native
     messageQueueToNative.on('push', () => {
-        // Release webview thread
-       // asap(() => {
-            if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
-                const message = messageQueueToNative.pop();
+        if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
+            const message = messageQueueToNative.pop();
 
-                if (message) {
-                    radio.send(message);
-                }
+            if (message) {
+                radio.send(message);
             }
-      //  });
+        }
     });
 
     Api.register(channelId, 'kernel', 'notifyConnected', () => {
