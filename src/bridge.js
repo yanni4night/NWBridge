@@ -171,10 +171,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
 
-                if ('kernel' === respMsg.cmd && 'notifyConnected' === respMsg.method) {
-                    if (fsm.can('success')) {
-                        fsm.success();
-                    }
+                if (respMsg.isHandBack() && fsm.can('success')) {
+                    fsm.success();
                 }
             }).flow();
         });

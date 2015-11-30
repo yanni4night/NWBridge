@@ -44,7 +44,7 @@ export function Message (channelId, metaData) {
 
     if (MESSAGE_TYPE.HANDSHAKE === this.messageType) {
         this.priority += 2;
-    } else if ('kernel' === this.cmd && 'notifyConnected' === this.method) {
+    } else if (this.isHandBack()) {
         this.priority += 1;
     }
 }
@@ -60,6 +60,17 @@ extend(Message.prototype, {
      */
     isHandShake: function () {
         return this.messageType === MESSAGE_TYPE.HANDSHAKE;
+    },
+
+    /**
+     * Return if it's a handback message.
+     * 
+     * @return {Boolean}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
+    isHandBack: function(){
+        return 'kernel' === this.cmd && 'notifyConnected' === this.method;
     },
 
     /**
