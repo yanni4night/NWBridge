@@ -149,6 +149,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 return;
             }
 
+            Logger.debug('POPED:' + message.serialize());
+
             message.on('handshake', (evt, respMsg) => {
                 // Prevent duplicated handshake
                 if (fsm.cannot('success') && fsm.cannot('fail')) {
@@ -170,6 +172,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
+
+                if ('kernel' === respMsg.cmd && 'notifyConnected' === respMsg.method) {
+                    if (fsm.can('success')) {
+                        fsm.success();
+                    }
+                }
             }).flow();
         });
     });
@@ -177,7 +185,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     // webview -> native
     messageQueueToNative.on('push', () => {
         // Release webview thread
-        asap(() => {
+       // asap(() => {
             if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
                 const message = messageQueueToNative.pop();
 
@@ -185,14 +193,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                     radio.send(message);
                 }
             }
-        });
+      //  });
     });
 
     Api.register(channelId, 'kernel', 'notifyConnected', () => {
         clearTimeout(handshakeTimeout);
-        if (fsm.can('success')) {
-            fsm.success();
-        }
     });
 
     fsm = StateMachine.create({
@@ -331,8 +336,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          * @since 1.0.0
          */
         flush2Native: () => {
-            while (!messageQueueToNative.empty()) {
+            var size = messageQueueToNative.size();
+            while (size) {
                 messageQueueToNative.emit('push');
+                size -= 1;
             }
         },
         /**
@@ -342,8 +349,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          * @since 1.0.0
          */
         flush2Webview: () => {
-            while (!messageQueueFromNative.empty()) {
+            var size = messageQueueFromNative.size();
+            while (size) {
                 messageQueueFromNative.emit('push');
+                size -= 1;
             }
         }
     });

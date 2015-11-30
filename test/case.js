@@ -320,8 +320,20 @@ describe('Message', function () {
     });
 });
 
-describe('JsBridge', function () {
-    describe('API', function () {
+describe('NWBridge', function () {
+    describe('timeout', function () {
+        this.timeout(1500);
+        it('should timeout if no handshake received', function (done) {
+            document.addEventListener('TjsBridgeReady', function (e) {
+                assert.ok(!!e.tjsBridge);
+                assert.deepEqual(e.tjsBridge.readyState, 'error');
+                done();
+            }, false);
+            new window.NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
+        });
+    });
+
+    describe('apis', function () {
         this.timeout(5e3);
         it('#testCmd.doTest()', function (done) {
 
@@ -330,9 +342,9 @@ describe('JsBridge', function () {
                     resolve(evt.jsBridge);
                 }, false);
             });
-            
+
             new window.NWBridge('__js_bridge', 'JsBridge', 'scheme://');
-            
+
             var serverBridge = new ServerBridge('__js_bridge', 'scheme://');
             serverBridge.handshake();
 
@@ -349,19 +361,49 @@ describe('JsBridge', function () {
             });
         });
     });
-});
 
-describe('NWBridge', function () {
-    describe('timeout', function () {
-        this.timeout(1500);
-        it('should timeout if no handshake received', function (done) {
-            document.addEventListener('TjsBridgeReady', function (e) {
-                assert.ok(!!e.tjsBridge);
-                assert.deepEqual(e.tjsBridge.readyState, 'error');
-                done();
-            }, false);
-            new window.NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
+    describe('cache before handshake', function () {
+        this.timeout(5e3);
+        it('can handle message before handshake', function (done) {
+
+            new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://');
+
+            var serverBridge = new ServerBridge('__js_098_bridge', 'pscheme://');
+
+
+
+            Promise.all([
+                new Promise(function (resolve) {
+                    serverBridge.on('response', function (evt, message) {
+                        if ('location' === message.cmd && 'href' ===
+                            message.method) {
+                            resolve();
+                        }
+                    });
+                }),
+                new Promise(function (resolve) {
+                    serverBridge.on('response', function (evt, message) {
+                        if ('location' === message.cmd && 'hash' ===
+                            message.method) {
+                            resolve();
+                        }
+                    });
+                })
+
+            ]).then(function(){done();});
+
+            serverBridge.send(serverBridge.createRequestMessage({
+                cmd: 'location',
+                method: 'href'
+            }));
+
+            serverBridge.send(serverBridge.createRequestMessage({
+                cmd: 'location',
+                method: 'hash'
+            }));
+
+            serverBridge.handshake();
+
         });
     });
-
 });

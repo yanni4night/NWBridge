@@ -15,9 +15,12 @@ var Message = require('../dist/message').Message;
 var ResponseMessage = require('../dist/message').ResponseMessage;
 var RequestMessage = require('../dist/message').RequestMessage;
 var extend = require('../dist/extend').extend;
+var XEvent = require('../dist/event').Event;
 
 
 function ServerBridge(nativeExport, scheme) {
+
+    var self = this;
 
     var CHANNEL_ID = 'server' + nativeExport;
 
@@ -29,10 +32,14 @@ function ServerBridge(nativeExport, scheme) {
         }
     };
 
-    function send(msgObj) {
+    var send = this.send = function(msgObj) {
         window[nativeExport].send(msgObj.serialize());
-    }
+    };
+
+    extend(this, new XEvent());
+
     var oldPrompt = window.prompt;
+
     window.prompt = function (messageStr) {
         if (messageStr.indexOf(scheme)) {
             return oldPrompt.apply(window, arguments);
@@ -46,6 +53,8 @@ function ServerBridge(nativeExport, scheme) {
                     cmd: 'kernel',
                     method: 'notifyConnected'
                 }));
+            } else {
+                self.emit('response', message);
             }
             return;
         }
@@ -75,11 +84,15 @@ function ServerBridge(nativeExport, scheme) {
         inputData: {
             platform: 'android'
         }
-    }).on('response', function () {});
+    });
 
     this.handshake = function () {
         console.info(CHANNEL_ID, 'mock send handShakeMessage');
         send(handShakeMessage);
+    };
+
+    this.createRequestMessage = function (config) {
+        return new RequestMessage(CHANNEL_ID, config);
     };
 }
 

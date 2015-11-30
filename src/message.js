@@ -43,6 +43,8 @@ export function Message (channelId, metaData) {
     }, metaData, new Event());
 
     if (MESSAGE_TYPE.HANDSHAKE === this.messageType) {
+        this.priority += 2;
+    } else if ('kernel' === this.cmd && 'notifyConnected' === this.method) {
         this.priority += 1;
     }
 }
