@@ -11,4 +11,3 @@
   */
 
 require('./case');
-require('./mock');

@@ -10,6 +10,7 @@
  * @since 1.0.0
  */
 
+var ServerBridge = require('./mock').ServerBridge;
 var assert = require('assert');
 var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
@@ -19,12 +20,6 @@ var Radio = require('../dist/radio').Radio;
 var XPromise = require('../dist/promise').Promise;
 var XEvent = require('../dist/event').Event;
 var Message = require('../dist/message').Message;
-
-var ready = new Promise(function (resolve) {
-    document.addEventListener('JsBridgeReady', function (evt) {
-        resolve(evt.jsBridge);
-    }, false);
-});
 
 describe('Queue', function () {
     describe('#push()', function () {
@@ -329,6 +324,18 @@ describe('JsBridge', function () {
     describe('API', function () {
         this.timeout(5e3);
         it('#testCmd.doTest()', function (done) {
+
+            var ready = new Promise(function (resolve) {
+                document.addEventListener('JsBridgeReady', function (evt) {
+                    resolve(evt.jsBridge);
+                }, false);
+            });
+            
+            new window.NWBridge('__js_bridge', 'JsBridge', 'scheme://');
+            
+            var serverBridge = new ServerBridge('__js_bridge', 'scheme://');
+            serverBridge.handshake();
+
             ready.then(function () {
                 assert.ok('undefined' !== typeof window.JsBridge);
                 assert.deepEqual(window.JsBridge.readyState, 'complete');

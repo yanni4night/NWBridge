@@ -11,7 +11,6 @@
  */
 
 require('../dist/bridge');
-require('../verdor/verdor.js');
 var Message = require('../dist/message').Message;
 var ResponseMessage = require('../dist/message').ResponseMessage;
 var RequestMessage = require('../dist/message').RequestMessage;
@@ -84,6 +83,4 @@ function ServerBridge(nativeExport, scheme) {
     };
 }
 
-var serverBridge = new ServerBridge('__js_bridge', 'scheme://');
-serverBridge.handshake();
-
+exports.ServerBridge = ServerBridge;
