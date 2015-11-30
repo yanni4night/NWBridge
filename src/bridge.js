@@ -12,7 +12,7 @@
  *     |             | ==handshake==> |             |
  *     |             | <==response==  |             |
  *     | <==notify== |                |             |
- *     |             |  ===notify==>  |             |
+ *     |             | ==handback==>  |             |
  *     |             |                | ==notify==> |
  *     |             |                |             |
  *     | --------------bridge connected------------ |
