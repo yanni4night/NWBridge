@@ -12,7 +12,7 @@
 
 import {extend} from './extend';
 
-export var DomEvent = {
+export const DomEvent = {
     /**
      * Trigger an event on window.document.
      * 
@@ -22,7 +22,7 @@ export var DomEvent = {
      * @since 1.0.0
      */
     trigger: (evtName, evtPayload) => {
-        var evt = document.createEvent('Events');
+        const evt = document.createEvent('Events');
         evt.initEvent(evtName);
         extend(evt, evtPayload);
         document.dispatchEvent(evt);
