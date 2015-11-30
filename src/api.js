@@ -95,7 +95,6 @@ export function Api(channelId, cmd, method, data) {
 
     this.invoke = () => {
         if (!this.exists()) {
-            console.log(apis);
             throw new Error(channelId + ':"' + cmd + '.' + method + '" does not exist');
         }
         var ret = apis[channelId][cmd][method](data);
