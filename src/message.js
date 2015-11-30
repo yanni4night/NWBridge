@@ -193,6 +193,10 @@ extend(Message.prototype, {
             this.emit('error', err);
         }
 
+        if (this.isHandBack()) {
+            this.emit('handback', this);
+        }
+
         return this;
     }
 });

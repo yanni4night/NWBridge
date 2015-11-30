@@ -72,7 +72,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     var bridgeReadyTriggered = false;
 
-    const HANDSHAKE_TIMEOUT = 1e3;
+    const HANDSHAKE_TIMEOUT = 1e3;//6e5;
 
     const QUEUE_LIMIT_TO_NATIVE = 5;
 
@@ -83,6 +83,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         throw new Error('"' + nativeExport + '" already in use');
     }
 
+    Logger.debug('TIMEOUT:' + HANDSHAKE_TIMEOUT + 'ms');
+    
     /**
      * Notify document that bridge is ready.
      *
@@ -120,9 +122,17 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         messageQueueToNative.push(message);
     };
 
+    /**
+     * If can upload a message.
+     * 
+     * @return {boolean}
+     * @version 1.0.0
+     * @since 1.0.0
+     */
     const canUpload = () => {
         return messageQueueToNative.size() < QUEUE_LIMIT_TO_NATIVE;
     };
+
     // native -> webview
     messageQueueFromNative.on('push', () => {
         // Release native thread
@@ -173,8 +183,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
-
-                if (respMsg.isHandBack() && fsm.can('success')) {
+            }).on('handback', function() {
+                if (fsm.can('success')) {
                     fsm.success();
                 }
             }).flow();
