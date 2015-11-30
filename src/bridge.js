@@ -100,9 +100,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
         Logger.log('BRIDGEREADY:' + fsm.current);
 
+        // Like "JsBridge" to "jsBridge"
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
         })] = window[webviewExport];
+        // Like "JsBridgeReady"
         DomEvent.trigger(webviewExport + 'Ready', evtData);
         bridgeReadyTriggered = true;
     };
