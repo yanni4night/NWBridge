@@ -364,13 +364,11 @@ describe('NWBridge', function () {
 
     describe('cache before handshake', function () {
         this.timeout(5e3);
-        it('can handle message before handshake', function (done) {
+        it('can cache messages before handshake', function (done) {
 
             new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://');
 
             var serverBridge = new ServerBridge('__js_098_bridge', 'pscheme://');
-
-
 
             Promise.all([
                 new Promise(function (resolve) {
