@@ -62,9 +62,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         priorityKey: 'priority'
     });
 
-    const messageQueueToNative = new Queue({
-        limit: 5
-    });
+    const messageQueueToNative = new Queue();
 
     var radio;
 
@@ -75,6 +73,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     var bridgeReadyTriggered = false;
 
     const HANDSHAKE_TIMEOUT = 1e3;
+
+    const QUEUE_LIMIT_TO_NATIVE = 5;
 
     // Indicate this bridge
     const channelId = 'channel:' + nativeExport;
@@ -120,6 +120,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         messageQueueToNative.push(message);
     };
 
+    const canUpload = () => {
+        return messageQueueToNative.size() < QUEUE_LIMIT_TO_NATIVE;
+    };
     // native -> webview
     messageQueueFromNative.on('push', () => {
         // Release native thread
@@ -287,17 +290,23 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                         });
 
                         return new Promise((resolve, reject) => {
-                            const msg = new RequestMessage(channelId, {
-                                cmd: cmdKey,
-                                method: methodKey,
-                                inputData: inputData
-                            }, timeout).on('data', (evt) => {
-                                resolve(evt.data);
-                            }).on('error', (evt) => {
-                                reject(evt.data);
-                            });
 
-                            upload(msg);
+                            if (!canUpload()) {
+                                reject(new Error('Too often'));
+                            } else {
+                                let msg = new RequestMessage(channelId, {
+                                    cmd: cmdKey,
+                                    method: methodKey,
+                                    inputData: inputData
+                                }, timeout).on('data', (evt) => {
+                                    resolve(evt.data);
+                                }).on('error', (evt) => {
+                                    reject(evt.data);
+                                });
+
+                                upload(msg);
+                            }
+                           
                         });
                     };
                 }
