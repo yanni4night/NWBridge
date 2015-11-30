@@ -42,7 +42,7 @@ export function Message (channelId, metaData) {
         priority: 0
     }, metaData, new Event());
 
-    if (MESSAGE_TYPE.HANDSHAKE === this.messageType) {
+    if (this.isHandShake()) {
         this.priority += 2;
     } else if (this.isHandBack()) {
         this.priority += 1;
