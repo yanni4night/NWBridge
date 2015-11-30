@@ -9,6 +9,9 @@
  * @version 1.0.0
  * @since 1.0.0
  */
+
+var dateFormat = require('dateFormat');
+
 module.exports = function (grunt) {
 
     require('load-grunt-tasks')(grunt);
@@ -16,9 +19,7 @@ module.exports = function (grunt) {
 
     var doDist = 'dist' === grunt.option('pub');
     var now = new Date();
-    var timestamp = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('-') + ' ' + [now.getHours(), now.getMinutes(),
-        now.getSeconds()
-    ].join(':');
+    var timestamp = dateFormat(now, 'yyyy-mm-dd HH:MM:ss Z');
 
     var startYear = 2015;
     var endYear = '';
@@ -80,7 +81,7 @@ module.exports = function (grunt) {
                 ASCIIOnly: true,
                 beautify: !doDist,
                 mangle: doDist,
-                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (c) 2015<%=endYear%> yanni4night.com | github.com/yanni4night/NWBridge | MIT */\n'
+                banner: '/*! bridge.js <%=versionPrefix%> v<%=pkg.version%> Build <%=timestamp%> | (C) 2015<%=endYear%> yanni4night.com | github.com/yanni4night/NWBridge | MIT */\n'
             },
             dist: {
                 files: {
