@@ -323,27 +323,31 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     extend(this, {
         /**
-         * flush2Native.
+         * Flush messages in queue to native.
          *
          * @version 1.0.0
          * @since 1.0.0
          */
         flush2Native: () => {
+            // DO NOT use infinite loop
             var size = messageQueueToNative.size();
             while (size) {
+                // Make sure do pop in each emit
                 messageQueueToNative.emit('push');
                 size -= 1;
             }
         },
         /**
-         * flush2Webview
+         * Flush messages in queue to webview
          *
          * @version 1.0.0
          * @since 1.0.0
          */
         flush2Webview: () => {
+            // DO NOT use infinite loop
             var size = messageQueueFromNative.size();
             while (size) {
+                // Make sure do pop in each emit
                 messageQueueFromNative.emit('push');
                 size -= 1;
             }
