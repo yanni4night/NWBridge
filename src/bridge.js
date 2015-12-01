@@ -38,6 +38,7 @@ import {Logger} from'./logger';
 import {asap} from'./asap';
 import {IDL} from'./idl';
 import {StateMachine} from'./fsm';
+import {Statistics} from './statistics';
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -63,6 +64,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     });
 
     const messageQueueToNative = new Queue();
+
+    const statistics = new Statistics(nativeExport);
 
     var radio;
 
@@ -180,10 +183,14 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                     // I will never echo if you missed.
                     fsm.fail();
                     Logger.error(e.message);
+                    statistics.trace({});
                 }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
-            }).on('handback', function() {
+            }).on('handback', function(evt, msg) {
+                if (msg.inputData.logid) {
+                    statistics.startup(msg.inputData.logid);
+                }
                 if (fsm.can('success')) {
                     fsm.success();
                 }
