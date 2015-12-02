@@ -211,6 +211,14 @@ describe('Promise', function () {
             });
         });
     });
+
+    describe('#resolve()', function () {
+        it('should return true if resolve', function () {
+            Promise.resolve(56).then(function (val) {
+                assert.deepEqual(val, 5);
+            });
+        });
+    });
 });
 
 describe('Event', function () {
@@ -414,7 +422,7 @@ describe('NWBridge', function () {
                 assert.deepEqual(evt.vjsBridge.readyState, 'error');
                 done();
             }, false);
-            
+
             new window.NWBridge('__js_09x_bridge', 'VjsBridge', 'vscheme://');
 
             var serverBridge = new ServerBridge('__js_09x_bridge', 'vscheme://');
@@ -442,7 +450,7 @@ describe('NWBridge', function () {
                 });*/
                 done();
             }, false);
-            
+
             new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://');
 
             var serverBridge = new ServerBridge('__js_09x02_bridge', 'cscheme://');
