@@ -213,9 +213,10 @@ describe('Promise', function () {
     });
 
     describe('#resolve()', function () {
-        it('should return true if resolve', function () {
-            Promise.resolve(56).then(function (val) {
-                assert.deepEqual(val, 5);
+        it('should return true if resolve', function (done) {
+            XPromise.resolve(56).then(function (val) {
+                assert.deepEqual(val, 56);
+                done();
             });
         });
     });
