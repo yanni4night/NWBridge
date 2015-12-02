@@ -388,7 +388,9 @@ describe('NWBridge', function () {
                     });
                 })
 
-            ]).then(function(){done();});
+            ]).then(function () {
+                done();
+            });
 
             serverBridge.send(serverBridge.createRequestMessage({
                 cmd: 'location',
@@ -402,6 +404,25 @@ describe('NWBridge', function () {
 
             serverBridge.handshake();
 
+        });
+    });
+
+    describe('handshake validation', function () {
+        this.timeout(2e3);
+        it('timeout if handshake illegal', function (done) {
+            document.addEventListener('VjsBridgeReady', function (evt) {
+                assert.deepEqual(evt.vjsBridge.readyState, 'error');
+                done();
+            }, false);
+            new window.NWBridge('__js_09x_bridge', 'VjsBridge', 'vscheme://');
+
+            var serverBridge = new ServerBridge('__js_09x_bridge', 'vscheme://');
+            serverBridge.send(new Message('__t_201uh7', {
+                messageType: Message.MESSAGE_TYPE.HANDSHAKE,
+                inputData: {
+
+                }
+            }));
         });
     });
 });
