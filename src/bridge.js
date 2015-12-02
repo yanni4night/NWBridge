@@ -173,10 +173,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                     radio.send(respMsg);
                     return;
                 }
-
-                radio = new Radio((message.inputData || {}).platform, scheme);
-                extend(window[nativeExport], radio.extension);
-                radio.send(respMsg);
+                if (!radio) {
+                    radio = new Radio((message.inputData || {}).platform, scheme);
+                    extend(window[nativeExport], radio.extension);
+                    radio.send(respMsg);
+                }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
             }).on('handback', function() {
