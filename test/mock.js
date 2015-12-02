@@ -82,8 +82,12 @@ function ServerBridge(nativeExport, scheme) {
         messageType: Message.MESSAGE_TYPE.HANDSHAKE,
         cmd: 'handshake',
         inputData: {
-            platform: 'android'
-        }
+            platform: 'android',
+            logid: 'HKJFHUIRW',
+            version: '1.0.0',
+            switch: 'true'
+        },
+        callbackId: 'mock_handshake_id'
     });
 
     this.handshake = function () {

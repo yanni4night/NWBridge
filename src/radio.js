@@ -78,3 +78,7 @@ export function Radio(platform, scheme) {
         throw new Error(platform + ' not supported');
     }
 }
+
+Radio.isSupported = (platform) => {
+    return ['android', 'ios'].indexOf(String(platform).toLowerCase()) !== -1;
+};

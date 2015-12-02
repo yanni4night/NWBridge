@@ -16,6 +16,7 @@ import {extend} from './extend';
 import {Callback} from './callback';
 import {Event} from './event';
 import {Logger} from './logger';
+import {Radio} from './radio';
 
 const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     REQUEST: 'request',
@@ -131,19 +132,37 @@ extend(Message.prototype, {
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
-            respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
-                outputData: {
-                    errNo: 0,
-                    errMsg: 'success',
-                    data: {
-                        cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
-                        url: new Api(this.channelId, 'location', 'href').invoke(),
-                        localStorageEnabled: new Api(this.channelId, 'localStorage', 'enabled').invoke(),
-                        ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()
+            // notify logid first
+            if (this.inputData && this.inputData.logid) {
+                this.emit('logid', this.inputData.logid);
+            }
+
+            if (!this.inputData) {
+                err = new Error('No inputData in handshake');
+            } else if (!this.inputData.logid) {
+                err = new Error('No logid in handshake');
+            } else if (!this.inputData.version) {
+                err = new Error('No version in handshake');
+            } else if (!this.inputData.platform) {
+                err = new Error('No platform in handshake');
+            } else if (!Radio.isSupported(this.inputData.platform)) {
+                err = new Error('"' + this.inputData.platform + '" not supported');
+            } else if (this.callbackId) {
+                respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
+                    outputData: {
+                        errNo: '0',
+                        errMsg: 'success',
+                        data: {
+                            cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
+                            url: new Api(this.channelId, 'location', 'href').invoke(),
+                            localStorageEnabled: new Api(this.channelId, 'localStorage', 'enabled').invoke(),
+                            ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()
+                        }
                     }
-                }
-            }));
-            isHandShake = true;
+                }));
+                isHandShake = true;
+            }
+            
             break;
         case MESSAGE_TYPE.REQUEST:
             var api = new Api(this.channelId, this.cmd, this.method, this.inputData);
@@ -162,7 +181,7 @@ extend(Message.prototype, {
                         channelId:this.channelId
                     },this.assemble(), {
                         outputData: {
-                            errNo: success ? 0 : -1,
+                            errNo: success ? '0' : '1',
                             errMsg: success ? 'success' : 'failed',
                             data: ret || {}
                         }

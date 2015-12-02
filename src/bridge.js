@@ -172,28 +172,30 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                     return;
                 }
 
-                Logger.log('RECEIVE A HANDSHAKE:' + message.serialize());
-
-                try {
-                    radio = new Radio((message.inputData || {}).platform, scheme);
-                    extend(window[nativeExport], radio.extension);
-                    radio.send(respMsg);
-                } catch (e) {
-                    // Hey,native,you have only one chance,
-                    // I will never echo if you missed.
-                    fsm.fail();
-                    Logger.error(e.message);
-                    statistics.trace({});
-                }
+                radio = new Radio((message.inputData || {}).platform, scheme);
+                extend(window[nativeExport], radio.extension);
+                radio.send(respMsg);
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
-            }).on('handback', function(evt, msg) {
-                if (msg.inputData.logid) {
-                    statistics.startup(msg.inputData.logid);
-                }
+            }).on('handback', function() {
                 if (fsm.can('success')) {
                     fsm.success();
+                    statistics.trace({
+                        title: 'bridge connected'
+                    });
                 }
+            }).on('logid', (logid) => {
+                if ('true' === message.inputData.switch) {
+                    Logger.log('Statistics startup');
+                    statistics.startup(logid);
+                }
+            }).on('error', (evt, err) => {
+                if (message.isHandShake()){
+                    statistics.trace({
+                        title: 'illegal handshake'
+                    });
+                }
+                Logger.error(err.message);
             }).flow();
         });
     });
@@ -247,6 +249,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     handshakeTimeout = setTimeout(() => {
         fsm.fail();
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
+        statistics.trace({
+            title: 'handshake timeout'
+        });
     }, HANDSHAKE_TIMEOUT);
 
     // Export to native always

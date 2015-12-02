@@ -15,8 +15,10 @@ export const Statistics = function (name) {
     var started = false;
     var logid;
 
-    const send = function () {
+    this.name = name;
 
+    const send = function (log) {
+        console.log('[STATISTICS]', log.title);
     };
 
     this.startup = function (id) {
@@ -24,6 +26,7 @@ export const Statistics = function (name) {
         while (cache.length) {
             send(cache.shift());
         }
+        started = true;
     };
 
     this.trace = function (log) {
