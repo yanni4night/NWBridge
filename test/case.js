@@ -414,14 +414,47 @@ describe('NWBridge', function () {
                 assert.deepEqual(evt.vjsBridge.readyState, 'error');
                 done();
             }, false);
+            
             new window.NWBridge('__js_09x_bridge', 'VjsBridge', 'vscheme://');
 
             var serverBridge = new ServerBridge('__js_09x_bridge', 'vscheme://');
             serverBridge.send(new Message('__t_201uh7', {
                 messageType: Message.MESSAGE_TYPE.HANDSHAKE,
+                cmd: 'handshake',
                 inputData: {
 
-                }
+                },
+                callbackId: '__SFJJ'
+            }));
+        });
+    });
+
+    describe('system.version()', function () {
+        it('version got', function (done) {
+            document.addEventListener('CjsBridgeReady', function (evt) {
+                assert.deepEqual(evt.cjsBridge.readyState, 'complete');
+                /*assert.deepEqual(typeof CjsBridge, 'object');
+                console.log(window.CjsBridge);
+                window.CjsBridge.system.version().then(function (version) {
+                    assert.deepEqual(version, '1.0.0');
+                }, function(e){
+                    console.error(e);
+                });*/
+                done();
+            }, false);
+            
+            new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://');
+
+            var serverBridge = new ServerBridge('__js_09x02_bridge', 'cscheme://');
+            serverBridge.send(new Message('__t_201uh7', {
+                messageType: Message.MESSAGE_TYPE.HANDSHAKE,
+                cmd: 'handshake',
+                inputData: {
+                    version: '1.0.0',
+                    platform: 'android',
+                    logid: 'sH*(G'
+                },
+                callbackId: '__DSFI'
             }));
         });
     });

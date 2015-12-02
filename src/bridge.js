@@ -82,6 +82,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     // Indicate this bridge
     const channelId = 'channel:' + nativeExport;
 
+    var system;
+
     if (window[nativeExport]) {
         throw new Error('"' + nativeExport + '" already in use');
     }
@@ -184,10 +186,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                         title: 'bridge connected'
                     });
                 }
-            }).on('logid', (logid) => {
-                if ('true' === message.inputData.switch) {
+            }).on('system', (systemData) => {
+                system = extend(true, systemData);
+                if ('true' === system.switch && system.logid) {
                     Logger.log('Statistics startup');
-                    statistics.startup(logid);
+                    statistics.startup(system.logid);
                 }
             }).on('error', (evt, err) => {
                 if (message.isHandShake()){
@@ -295,6 +298,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 register: () => {
                     Api.register.apply(Api, Array.prototype.slice.call(arguments).unshift(channelId));
                     return window[webviewExport];
+                },
+                system: {
+                    version: () => {
+                        return Promise.resolve(system.version);
+                    }
                 }
             };
 

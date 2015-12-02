@@ -133,8 +133,8 @@ extend(Message.prototype, {
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
             // notify logid first
-            if (this.inputData && this.inputData.logid) {
-                this.emit('logid', this.inputData.logid);
+            if (this.inputData) {
+                this.emit('system', this.inputData);
             }
 
             if (!this.inputData) {
