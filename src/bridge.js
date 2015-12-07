@@ -187,8 +187,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                         title: 'bridge connected'
                     });
                 }
-            }).on('system', (systemData) => {
-                system = extend(true, systemData);
+            }).on('system', (evt, systemData) => {
+                system = extend(true, {}, systemData);
                 if ('true' === system.switch && system.logid) {
                     Logger.log('Statistics startup');
                     statistics.startup(system.logid);
