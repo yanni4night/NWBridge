@@ -11,6 +11,7 @@
  */
 
 import {extend} from './extend';
+import {Logger} from './logger';
 
 export const Statistics = function (name) {
     const cache = [];
@@ -31,8 +32,8 @@ export const Statistics = function (name) {
     };
 
     const send = function (log) {
-        console.log('[STATISTICS]', log.title);
         const param = [];
+        var imgSrc;
 
         const finalLog = extend(true, commonTrack, log);
 
@@ -40,7 +41,10 @@ export const Statistics = function (name) {
             param.push(key + '=' + encodeURIComponent(finalLog[key]));
         }
 
-        new Image().src = URL + param.join('&');
+        imgSrc = URL + param.join('&');
+
+        Logger.log('[STATISTICS]' + imgSrc);
+        new Image().src = imgSrc;
     };
 
     this.startup = function (id) {
