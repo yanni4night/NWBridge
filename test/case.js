@@ -431,7 +431,8 @@ describe('NWBridge', function () {
                 messageType: Message.MESSAGE_TYPE.HANDSHAKE,
                 cmd: 'handshake',
                 inputData: {
-
+                    logid: 'HS*FY(',
+                    switch: 'true'
                 },
                 callbackId: '__SFJJ'
             }));
@@ -461,7 +462,8 @@ describe('NWBridge', function () {
                 inputData: {
                     version: '1.0.0',
                     platform: 'android',
-                    logid: 'sH*(G'
+                    logid: 'sH*(G',
+                    switch: 'true'
                 },
                 callbackId: '__DSFI'
             }));

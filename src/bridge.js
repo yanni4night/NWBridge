@@ -79,6 +79,13 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     const QUEUE_LIMIT_TO_NATIVE = 5;
 
+    const ERROR_NUMBER = {
+        TIMEOUT: 0x1,
+        ILLEGAL_HANDSHAKE: 0x2,
+        HANDBACK_TIMEOUT: 0x3,
+        HANDSHAKE_TIMEOUT: 0x4
+    };
+
     // Indicate this bridge
     const channelId = 'channel:' + nativeExport;
 
@@ -183,9 +190,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             }).on('handback', function() {
                 if (fsm.can('success')) {
                     fsm.success();
-                    statistics.trace({
-                        title: 'bridge connected'
-                    });
                 }
             }).on('system', (evt, systemData) => {
                 system = extend(true, {}, systemData);
@@ -195,9 +199,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 }
             }).on('error', (evt, err) => {
                 if (message.isHandShake()){
-                    statistics.trace({
-                        title: 'illegal handshake'
-                    });
+                    statistics.trace(ERROR_NUMBER.ILLEGAL_HANDSHAKE, 'illegal handshake');
                 }
                 Logger.error(err.message);
             }).flow();
@@ -253,9 +255,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     handshakeTimeout = setTimeout(() => {
         fsm.fail();
         Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
-        statistics.trace({
-            title: 'handshake timeout'
-        });
+        if (!!system) {
+            statistics.trace(ERROR_NUMBER.HANDBACK_TIMEOUT, 'handback timeout');
+        } else {
+            statistics.trace(ERROR_NUMBER.HANDSHAKE_TIMEOUT, 'handshake timeout');
+        }
     }, HANDSHAKE_TIMEOUT);
 
     // Export to native always
@@ -303,6 +307,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 system: {
                     version: () => {
                         return Promise.resolve(system.version);
+                    },
+                    platform: () => {
+                        return Promise.resolve(system.platform);
                     }
                 }
             };

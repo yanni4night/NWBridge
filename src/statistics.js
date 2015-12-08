@@ -25,9 +25,9 @@ export const Statistics = function (name) {
         /*jshint camelcase:false*/
         client_type: 'wap_smart', // Fixed
         /*jshint camelcase:true*/
-        task: 'JsBridge', // IMPORTANT
+        task: 'Hybrid', // IMPORTANT
         page: 'pb', // Any value
-        locate: 'left', // Any value
+        locate: '成功率', // Any value
         type: 'show' // Fixed
     };
 
@@ -49,7 +49,7 @@ export const Statistics = function (name) {
 
     this.startup = function (id) {
         /*jshint camelcase:false*/
-        commonTrack.app_log_id = id;
+        commonTrack.obj_param1 = id;
         /*jshint camelcase:true*/
         while (cache.length) {
             send(cache.shift());
@@ -57,11 +57,19 @@ export const Statistics = function (name) {
         started = true;
     };
 
-    this.trace = function (log) {
+    this.trace = function (no, desc) {
+         /*jshint camelcase:false*/
         if (started) {
-            send(log);
+            send({
+                obj_param2: no,
+                obj_param3: desc
+            });
         } else {
-            cache.push(log);
+            cache.push({
+                obj_param2: no,
+                obj_param3: desc
+            });
         }
+         /*jshint camelcase:true*/
     };
 };
