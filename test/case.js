@@ -443,14 +443,19 @@ describe('NWBridge', function () {
         it('version got', function (done) {
             document.addEventListener('CjsBridgeReady', function (evt) {
                 assert.deepEqual(evt.cjsBridge.readyState, 'complete');
-                /*assert.deepEqual(typeof CjsBridge, 'object');
+                assert.deepEqual(typeof CjsBridge, 'object');
                 console.log(window.CjsBridge);
                 window.CjsBridge.system.version().then(function (version) {
                     assert.deepEqual(version, '1.0.0');
+                    return window.CjsBridge.system.platform();
+                    // done();
                 }, function(e){
                     console.error(e);
-                });*/
-                done();
+                }).then(function(platform){
+                    assert.deepEqual(platform, 'android');
+                    done();
+                });
+                
             }, false);
 
             new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://');
