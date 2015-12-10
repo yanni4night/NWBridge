@@ -92,6 +92,6 @@ module.exports = function (grunt) {
             }
         }
     });
-    var tasks = ['clean', /*'jshint',*/ 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
+    var tasks = ['clean', 'jshint', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
     grunt.registerTask('default', tasks);
 };

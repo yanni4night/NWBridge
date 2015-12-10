@@ -314,40 +314,44 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 }
             };
 
+            var createApi = function (cmdKey, methodKey, args) {
+                return function () {
+                    const inputData = {};
+                    const fargs = Array.prototype.slice.call(arguments);
+                    const timeout = fargs[fargs.length - 1];
+
+                    args.forEach((arg, idx) => {
+                        inputData[arg] = fargs[idx];
+                    });
+
+                    return new Promise((resolve, reject) => {
+
+                        if (!canUpload()) {
+                            reject(new Error('Too often'));
+                        } else {
+                            let msg = new RequestMessage(channelId, {
+                                cmd: cmdKey,
+                                method: methodKey,
+                                inputData: inputData
+                            }, timeout).on('data', (evt, data) => {
+                                resolve(data);
+                            }).on('error', (evt, err) => {
+                                reject(err);
+                            });
+
+                            upload(msg);
+                        }
+
+                    });
+                };
+            };
+
             for (let cmdKey in IDL) {
                 let cmd = IDL[cmdKey];
                 for (let methodKey in cmd) {
                     let method = cmd[methodKey];
                     let args = method.arguments.split(',');
-                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = function () {
-                        const inputData = {};
-                        const fargs = Array.prototype.slice.call(arguments);
-                        const timeout = fargs[fargs.length - 1];
-
-                        args.forEach((arg, idx) => {
-                            inputData[arg] = fargs[idx];
-                        });
-
-                        return new Promise((resolve, reject) => {
-
-                            if (!canUpload()) {
-                                reject(new Error('Too often'));
-                            } else {
-                                let msg = new RequestMessage(channelId, {
-                                    cmd: cmdKey,
-                                    method: methodKey,
-                                    inputData: inputData
-                                }, timeout).on('data', (evt, data) => {
-                                    resolve(data);
-                                }).on('error', (evt, err) => {
-                                    reject(err);
-                                });
-
-                                upload(msg);
-                            }
-                           
-                        });
-                    };
+                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey, args);
                 }
             }
         } else {
