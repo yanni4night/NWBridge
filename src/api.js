@@ -38,8 +38,8 @@ const defaultApis = {
         hash: () => {
             return location.hash;
         },
-        reload: function (newUrl) {
-            return location.reload(newUrl);
+        reload: function () {
+            return location.reload();
         },
         assign: function (newUrl) {
             return location.assign(newUrl);

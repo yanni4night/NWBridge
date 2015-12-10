@@ -314,11 +314,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 }
             };
 
-            var createApi = function (cmdKey, methodKey, args) {
+            const createApi = function (cmdKey, methodKey, args) {
                 return function () {
                     const inputData = {};
                     const fargs = Array.prototype.slice.call(arguments);
-                    const timeout = fargs[fargs.length - 1];
+                    const timeout = fargs[args.length];
 
                     args.forEach((arg, idx) => {
                         inputData[arg] = fargs[idx];

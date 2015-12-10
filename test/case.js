@@ -378,6 +378,24 @@ describe('NWBridge', function () {
         });
     });
 
+/*    describe('api timeout', function () {
+        this.timeout(1.2e3);
+        it('should timeout of specified', function(done{
+
+            document.addEventListener('QjsBridgeReady', function(){
+                window.QjsBridge.testCmd.toast('World', 1e3).then(function(){},
+                    function(){
+                        done();
+                    });
+            }, false);
+
+             new window.NWBridge('__js_01087_bridge', 'QjsBridge', 'qscheme://');
+
+             var serverBridge = new ServerBridge('__js_01087_bridge', 'qscheme://');
+             serverBridge.handshake();
+        });
+    });*/
+
     describe('cache before handshake', function () {
         this.timeout(5e3);
         it('can cache messages before handshake', function (done) {
