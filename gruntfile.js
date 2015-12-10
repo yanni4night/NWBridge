@@ -62,6 +62,10 @@ module.exports = function (grunt) {
             test: {
                 src: ['test/test.js'],
                 dest: 'test.dist.js'
+            },
+            browser: {
+                src: ['test/browser.js'],
+                dest: 'browser.dist.js'
             }
         },
         copy: {
