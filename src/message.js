@@ -139,9 +139,9 @@ extend(Message.prototype, {
 
             if (!this.inputData) {
                 err = new Error('No inputData in handshake');
-            } else if (!this.inputData.logid) {
+            } /*else if (!this.inputData.logid) {
                 err = new Error('No logid in handshake');
-            } else if (!this.inputData.version) {
+            }*/ else if (!this.inputData.version) {
                 err = new Error('No version in handshake');
             } else if (!this.inputData.platform) {
                 err = new Error('No platform in handshake');
@@ -191,12 +191,17 @@ extend(Message.prototype, {
             break;
         case MESSAGE_TYPE.RESPONSE:
             var callback = Callback.findById(this.callbackId, this.channelId);
+            
+            if(!callback) {
+                Logger.error(this.channelId + ':' + this.callbackId + ' not found');
+                break;
+            }
 
             try {
                 callback.invoke(this.outputData);
             } catch (e) {
                 err = e;
-                Logger.error('FLOW RESPONSE:', e.message);
+                Logger.error('FLOW RESPONSE:' + e.message);
             }
 
             break;

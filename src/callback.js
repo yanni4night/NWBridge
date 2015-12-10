@@ -10,6 +10,8 @@
  * @since 1.0.0
  */
 
+import {Logger} from './logger';
+
 const callbacks = {};
 
 var index = 0;
@@ -41,8 +43,10 @@ export function Callback(channelId, func) {
     };
 
     (callbacks[channelId] || (callbacks[channelId] = {}))[id] = this;
+    Logger.log('NEW-CALLBACK' + JSON.stringify(callbacks));
 }
 
 Callback.findById = (id, channelId) => {
+    Logger.log('[CALLBACK]' + JSON.stringify(callbacks));
     return callbacks[channelId] ? callbacks[channelId][id] : undefined;
 };

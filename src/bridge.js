@@ -319,12 +319,13 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 for (let methodKey in cmd) {
                     let method = cmd[methodKey];
                     let args = method.arguments.split(',');
-                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = () => {
+                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = function () {
                         const inputData = {};
-                        const timeout = arguments[arguments.length - 1];
+                        const fargs = Array.prototype.slice.call(arguments);
+                        const timeout = fargs[fargs.length - 1];
 
                         args.forEach((arg, idx) => {
-                            inputData[arg] = arguments[idx];
+                            inputData[arg] = fargs[idx];
                         });
 
                         return new Promise((resolve, reject) => {
@@ -336,10 +337,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                                     cmd: cmdKey,
                                     method: methodKey,
                                     inputData: inputData
-                                }, timeout).on('data', (evt) => {
-                                    resolve(evt.data);
-                                }).on('error', (evt) => {
-                                    reject(evt.data);
+                                }, timeout).on('data', (evt, data) => {
+                                    resolve(data);
+                                }).on('error', (evt, err) => {
+                                    reject(err);
                                 });
 
                                 upload(msg);

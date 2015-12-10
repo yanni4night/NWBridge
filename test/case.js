@@ -344,7 +344,7 @@ describe('NWBridge', function () {
 
     describe('apis', function () {
         this.timeout(5e3);
-        it('#testCmd.doTest()', function (done) {
+        it('#testCmd.doTest()...', function (done) {
 
             var ready = new Promise(function (resolve) {
                 document.addEventListener('JsBridgeReady', function (evt) {
@@ -361,9 +361,16 @@ describe('NWBridge', function () {
                 assert.ok('undefined' !== typeof window.JsBridge);
                 assert.deepEqual(window.JsBridge.readyState, 'complete');
                 window.JsBridge.testCmd.doTest('Hello World').then(function () {
+                   return window.JsBridge.testCmd.httpRequest();
+                }).then(function(){
+                    return window.JsBridge.testCmd.goToFrsByForumName('test123');
+                }).then(function(){
+                    return window.JsBridge.testCmd.showToast('Hello');
+                }).then(function(data){
+                    assert.deepEqual(data, 'Hello');
                     done();
-                }).catch(function () {
-                    done();
+                }).catch(function(e){
+                    console.error(e);
                 });
             }).catch(function (e) {
                 console.error(e);

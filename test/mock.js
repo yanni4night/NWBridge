@@ -28,11 +28,20 @@ function ServerBridge(nativeExport, scheme) {
         testCmd: {
             doTest: function (data) {
                 return data.testArg;
+            },
+            httpRequest: function () {
+                return 0;
+            },
+            goToFrsByForumName: function () {
+                return 0;
+            },
+            showToast: function (data) {
+                return data.message;
             }
         }
     };
 
-    var send = this.send = function(msgObj) {
+    var send = this.send = function (msgObj) {
         window[nativeExport].send(msgObj.serialize());
     };
 
