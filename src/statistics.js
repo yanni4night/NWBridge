@@ -13,11 +13,11 @@
 import {extend} from './extend';
 import {Logger} from './logger';
 
-export const Statistics = function (name) {
+export const Statistics = function (name, baseUrl) {
     const cache = [];
     var started = false;
 
-    const URL = 'http://static.tieba.baidu.com/tb/img/track.gif?';
+    const URL = baseUrl || '/';
 
     this.name = name;
 

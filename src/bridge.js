@@ -55,7 +55,7 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-window.NWBridge = function (nativeExport, webviewExport, scheme) {
+window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     const self = this;
 
@@ -65,7 +65,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     const messageQueueToNative = new Queue();
 
-    const statistics = new Statistics(nativeExport);
+    const statistics = new Statistics(nativeExport, trackBaseUrl);
 
     var radio;
 
