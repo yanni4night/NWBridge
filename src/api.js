@@ -81,6 +81,10 @@ const defaultApis = {
     }
 };
 
+defaultApis.location.assign.gone = true;
+defaultApis.location.reload.gone = true;
+defaultApis.location.replace.gone = true;
+
 const apis = {};
 
 export function Api(channelId, cmd, method, data) {
@@ -101,13 +105,29 @@ export function Api(channelId, cmd, method, data) {
         return ret;
     };
 
+    this.isGone = function () {
+        if(!this.exists()){
+            return false;
+        } else {
+            let func = apis[channelId][cmd][method];
+            return !!func.gone;
+        }
+    };
+
 }
 
-Api.register = function (channelId, cmd, method, func) {
+Api.register = function (channelId, cmd, method, func, gone) {
     apis[channelId] = apis[channelId] || extend(true, {}, defaultApis);
     apis[channelId][cmd] = apis[channelId][cmd] || {};
+    
     if (apis[channelId][cmd][method]) {
         throw new Error('Duplicated "' + cmd + '.' + method + '"');
     }
+    
+    if ('boolean' !== typeof gone) {
+        gone = false;
+    }
+
+    func.gone = gone;
     apis[channelId][cmd][method] = func;
 };

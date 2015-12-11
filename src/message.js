@@ -30,7 +30,7 @@ const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
  * @version 1.0.0
  * @since 1.0.0
  */
-export function Message (channelId, metaData) {
+export function Message(channelId, metaData) {
     extend(this, {
         messageType: MESSAGE_TYPE.REQUEST,
         cmd: undefined,
@@ -70,7 +70,7 @@ extend(Message.prototype, {
      * @version 1.0.0
      * @since 1.0.0
      */
-    isHandBack: function(){
+    isHandBack: function () {
         return 'kernel' === this.cmd && 'notifyConnected' === this.method;
     },
 
@@ -139,9 +139,11 @@ extend(Message.prototype, {
 
             if (!this.inputData) {
                 err = new Error('No inputData in handshake');
-            } /*else if (!this.inputData.logid) {
-                err = new Error('No logid in handshake');
-            }*/ else if (!this.inputData.version) {
+            }
+            /*else if (!this.inputData.logid) {
+                           err = new Error('No logid in handshake');
+                       }*/
+            else if (!this.inputData.version) {
                 err = new Error('No version in handshake');
             } else if (!this.inputData.platform) {
                 err = new Error('No platform in handshake');
@@ -155,44 +157,63 @@ extend(Message.prototype, {
                         data: {
                             cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
                             url: new Api(this.channelId, 'location', 'href').invoke(),
-                            localStorageEnabled: new Api(this.channelId, 'localStorage', 'enabled').invoke(),
+                            localStorageEnabled: new Api(this.channelId, 'localStorage',
+                                'enabled').invoke(),
                             ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()
                         }
                     }
                 }));
                 isHandShake = true;
             }
-            
+
             break;
         case MESSAGE_TYPE.REQUEST:
             var api = new Api(this.channelId, this.cmd, this.method, this.inputData);
             var ret;
             var success = false;
 
+            if (api.isGone()) {
+                respMsg = new ResponseMessage(this.channelId, this.assemble(), {
+                    outputData: {
+                        errNo: '0',
+                        errMsg: 'success',
+                        data: {}
+                    }
+                });
+
+                this.emit('response', respMsg);
+
+                try {
+                    api.invoke();
+                } catch (e) {}
+
+                return this;
+            }
+            
             try {
                 ret = api.invoke();
                 success = true;
             } catch (e) {
                 err = e;
                 Logger.error('FLOW REQUEST:' + e.message);
-            } finally {
-                if (this.callbackId) {
-                    respMsg = new ResponseMessage(this.channelId, extend({
-                        channelId:this.channelId
-                    },this.assemble(), {
-                        outputData: {
-                            errNo: success ? '0' : '1',
-                            errMsg: success ? 'success' : 'failed',
-                            data: ret || {}
-                        }
-                    }));
-                }
             }
+
+
+            if (this.callbackId) {
+                respMsg = new ResponseMessage(this.channelId, this.assemble(), {
+                    outputData: {
+                        errNo: success ? '0' : '1',
+                        errMsg: success ? 'success' : 'failed',
+                        data: ret || {}
+                    }
+                });
+            }
+
             break;
         case MESSAGE_TYPE.RESPONSE:
             var callback = Callback.findById(this.callbackId, this.channelId);
-            
-            if(!callback) {
+
+            if (!callback) {
                 Logger.error(this.channelId + ':' + this.callbackId + ' not found');
                 break;
             }

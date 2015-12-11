@@ -10,8 +10,6 @@
  * @since 1.0.0
  */
 
-import {Logger} from './logger';
-
 const callbacks = {};
 
 var index = 0;
