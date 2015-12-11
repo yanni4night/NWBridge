@@ -150,7 +150,8 @@ extend(Message.prototype, {
             } else if (!Radio.isSupported(this.inputData.platform)) {
                 err = new Error('"' + this.inputData.platform + '" not supported');
             } else if (this.callbackId) {
-                respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
+                respMsg = new Message(this.channelId, extend(this.assemble(), {
+                    messageType: MESSAGE_TYPE.HANDSHAKE,
                     outputData: {
                         errNo: '0',
                         errMsg: 'success',
