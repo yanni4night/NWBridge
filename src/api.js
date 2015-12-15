@@ -53,8 +53,13 @@ const defaultApis = {
             if ('undefined' === typeof localStorage) {
                 return false;
             }
-            localStorage.setItem('__test', 1);
-            return 1 === +localStorage.getItem('__test');
+            try {
+                let key = '__test_jsbridge__' + Date.now();
+                localStorage.setItem(key, 1);
+                return 1 === +localStorage.getItem(key);
+            } catch (e) {
+                return false;
+            }
         },
         setItem: function (key, value) {
             localStorage.setItem(key, value);
