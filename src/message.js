@@ -132,18 +132,14 @@ extend(Message.prototype, {
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
-            // notify logid first
+
             if (this.inputData) {
                 this.emit('system', this.inputData);
             }
 
             if (!this.inputData) {
                 err = new Error('No inputData in handshake');
-            }
-            /*else if (!this.inputData.logid) {
-                           err = new Error('No logid in handshake');
-                       }*/
-            else if (!this.inputData.version) {
+            } else if (!this.inputData.version) {
                 err = new Error('No version in handshake');
             } else if (!this.inputData.platform) {
                 err = new Error('No platform in handshake');
@@ -156,11 +152,11 @@ extend(Message.prototype, {
                         errNo: '0',
                         errMsg: 'success',
                         data: {
-                            cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
+                            /*cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
                             url: new Api(this.channelId, 'location', 'href').invoke(),
                             localStorageEnabled: new Api(this.channelId, 'localStorage',
                                 'enabled').invoke(),
-                            ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()
+                            ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()*/
                         }
                     }
                 }));
