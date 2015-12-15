@@ -83,7 +83,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         TIMEOUT: 0x1,
         ILLEGAL_HANDSHAKE: 0x2,
         HANDBACK_TIMEOUT: 0x3,
-        HANDSHAKE_TIMEOUT: 0x4
+        HANDSHAKE_TIMEOUT: 0x4,
+        RADIO_FAILED: 0x5
     };
 
     // Indicate this bridge
@@ -175,15 +176,22 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
             }
 
             message.on('handshake', (evt, respMsg) => {
+                Logger.log('received a handshake');
                 // Prevent duplicated handshake
                 if (fsm.cannot('success') && fsm.cannot('fail')) {
                     radio.send(respMsg);
                     return;
                 }
                 if (!radio) {
-                    radio = new Radio((message.inputData || {}).platform, scheme);
-                    extend(window[nativeExport], radio.extension);
-                    radio.send(respMsg);
+                    try {
+                        radio = new Radio((message.inputData || {}).platform, scheme);
+                        extend(window[nativeExport], radio.extension);
+                        radio.send(respMsg);
+                    } catch (e) {
+                        Logger.error(e.message);
+                        fsm.fail();
+                        statistics.trace(ERROR_NUMBER.RADIO_FAILED, e.message);
+                    }
                 }
             }).on('response', function (evt, respMsg) {
                 upload(respMsg);
@@ -253,12 +261,14 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     // Wait only few seconds for the handshake from native
     handshakeTimeout = setTimeout(() => {
-        fsm.fail();
-        Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT);
-        if (!!system) {
-            statistics.trace(ERROR_NUMBER.HANDBACK_TIMEOUT, 'handback timeout');
-        } else {
-            statistics.trace(ERROR_NUMBER.HANDSHAKE_TIMEOUT, 'handshake timeout');
+        if (fsm.can('fail')) {
+            fsm.fail();
+            Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT + 'ms');
+            if (!!system) {
+                statistics.trace(ERROR_NUMBER.HANDBACK_TIMEOUT, 'handback timeout');
+            } else {
+                statistics.trace(ERROR_NUMBER.HANDSHAKE_TIMEOUT, 'handshake timeout');
+            }
         }
     }, HANDSHAKE_TIMEOUT);
 
