@@ -59,6 +59,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     const self = this;
 
+    const VERSION = '1.0.0';
+
     const messageQueueFromNative = new PriorityQueue({
         priorityKey: 'priority'
     });
@@ -300,9 +302,15 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     // Export to webview
     function export2Webview() {
+        var webviewExportExtension;
+        
+        if (!window[webviewExport]) {
+            window[webviewExport] = {};
+        }
+
         // What in webviewExport depends on state
         if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
-            window[webviewExport] = {
+            webviewExportExtension = {
                 readyState: fsm.current,
                 /**
                  * Register API for native.
@@ -324,7 +332,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 }
             };
 
-            const createApi = function (cmdKey, methodKey, args) {
+            let createApi = function (cmdKey, methodKey, args) {
                 return function () {
                     const inputData = {};
                     const fargs = Array.prototype.slice.call(arguments);
@@ -365,10 +373,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 }
             }
         } else {
-            window[webviewExport] = {
+            webviewExportExtension = {
                 readyState: fsm.current
             };
         }
+
+        extend(window[webviewExport], webviewExportExtension);
 
         /**
          * Similar to jQuery.noConflict
@@ -381,6 +391,18 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 window[webviewExport] = oldWvExport;
             }
         };
+
+        // Set version
+        if (Object.defineProperty) {
+            Object.defineProperty(window[webviewExport], 'version', {
+                value: VERSION,
+                writable: true,
+                enumerable: false,
+                configurable: false
+            });
+        } else {
+            window[webviewExport].version = VERSION;
+        }
     }
 
     extend(this, {
