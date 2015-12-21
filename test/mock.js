@@ -57,16 +57,16 @@ function ServerBridge(nativeExport, scheme) {
         var message = Message.fromMetaString(messageStr.replace(scheme, ''), CHANNEL_ID);
 
         if (message.messageType === Message.MESSAGE_TYPE.HANDSHAKE) {
-            if ('handshake' === message.cmd) {
-                send(new RequestMessage(CHANNEL_ID, {
-                    cmd: 'kernel',
-                    method: 'notifyConnected'
-                }));
-            } 
+            //if ('handshake' === message.cmd) {
+            send(new RequestMessage(CHANNEL_ID, {
+                cmd: 'kernel',
+                method: 'notifyConnected'
+            }));
+            //} 
             return;
         }
 
-        if(message.messageType === Message.MESSAGE_TYPE.RESPONSE){
+        if (message.messageType === Message.MESSAGE_TYPE.RESPONSE) {
             self.emit('response', message);
             return;
         }
@@ -92,7 +92,7 @@ function ServerBridge(nativeExport, scheme) {
 
     var handShakeMessage = new Message(CHANNEL_ID, {
         messageType: Message.MESSAGE_TYPE.HANDSHAKE,
-        cmd: 'handshake',
+        //cmd: 'handshake',
         inputData: {
             platform: 'android',
             logid: 'HKJFHUIRW',
