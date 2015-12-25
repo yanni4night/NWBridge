@@ -11,18 +11,9 @@
  */
 
 export const IDL = {
-    testCmd: {
-        doTest: {
-            arguments: 'testArg'
-        },
-        httpRequest: {
-            arguments: ''
-        },
-        goToFrsByForumName: {
-            arguments: 'forum_name'
-        },
-        showToast: {
-            arguments: 'message'
+    shareCmd: {
+        shareByHybrid: {
+            timeout: 1e3
         }
     }
 };

@@ -25,18 +25,9 @@ function ServerBridge(nativeExport, scheme) {
     var CHANNEL_ID = 'server' + nativeExport;
 
     var supports = {
-        testCmd: {
-            doTest: function (data) {
-                return data.testArg;
-            },
-            httpRequest: function () {
-                return 0;
-            },
-            goToFrsByForumName: function () {
-                return 0;
-            },
-            showToast: function (data) {
-                return data.message;
+        shareCmd: {
+            shareByHybrid: function (data) {
+                return data;
             }
         }
     };

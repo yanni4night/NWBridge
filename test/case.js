@@ -342,7 +342,7 @@ describe('NWBridge', function () {
         });
     });
 
-    describe('apis', function () {
+    /*describe('apis', function () {
         this.timeout(5e3);
         it('#testCmd.doTest()...', function (done) {
 
@@ -361,33 +361,55 @@ describe('NWBridge', function () {
                 assert.ok('undefined' !== typeof window.JsBridge);
                 assert.deepEqual(window.JsBridge.readyState, 'complete');
                 window.JsBridge.testCmd.doTest('Hello World').then(function () {
-                   return window.JsBridge.testCmd.httpRequest();
-                }).then(function(){
+                    return window.JsBridge.testCmd.httpRequest();
+                }).then(function () {
                     return window.JsBridge.testCmd.goToFrsByForumName('test123');
-                }).then(function(){
+                }).then(function () {
                     return window.JsBridge.testCmd.showToast('Hello');
-                }).then(function(data){
+                }).then(function (data) {
                     assert.deepEqual(data, 'Hello');
                     done();
-                }).catch(function(e){
+                }).catch(function (e) {
                     console.error(e);
                 });
             }).catch(function (e) {
                 console.error(e);
             });
         });
+    });*/
+
+    describe('share', function () {
+        it('', function (done) {
+            document.addEventListener('Y0jsBridgeReady', function () {
+                window.Y0jsBridge.shareCmd.shareByHybrid({
+                    title: 'test',
+                    desc: 'share',
+                    iconImgPath: 'http://img.org',
+                    shareUrl: 'http://www.baidu.com'
+                }).then(function (data) {
+                    assert.deepEqual('test', data.title);
+                    assert.deepEqual('share', data.desc);
+                    done();
+                });
+            }, false);
+
+            new window.NWBridge('__js_0108p09a_bridge', 'Y0jsBridge', 'y0scheme://');
+
+            var serverBridge = new ServerBridge('__js_0108p09a_bridge', 'y0scheme://');
+            serverBridge.handshake();
+        });
     });
 
     describe('version', function () {
-        it('should get version ', function(){
-            document.addEventListener('KKjsBridgeReady', function(){
+        it('should get version ', function () {
+            document.addEventListener('KKjsBridgeReady', function () {
                 assert.ok(!!window.KKjsBridge.version);
             }, false);
 
-             new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://');
+            new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://');
 
-             var serverBridge = new ServerBridge('__js_0108p09_bridge', 'kkscheme://');
-             serverBridge.handshake();
+            var serverBridge = new ServerBridge('__js_0108p09_bridge', 'kkscheme://');
+            serverBridge.handshake();
         });
     });
 
@@ -464,18 +486,18 @@ describe('NWBridge', function () {
             document.addEventListener('CjsBridgeReady', function (evt) {
                 assert.deepEqual(evt.cjsBridge.readyState, 'complete');
                 assert.deepEqual(typeof CjsBridge, 'object');
-                console.log(window.CjsBridge);
+
                 window.CjsBridge.system.version().then(function (version) {
                     assert.deepEqual(version, '1.0.0');
                     return window.CjsBridge.system.platform();
                     // done();
-                }, function(e){
+                }, function (e) {
                     console.error(e);
-                }).then(function(platform){
+                }).then(function (platform) {
                     assert.deepEqual(platform, 'android');
                     done();
                 });
-                
+
             }, false);
 
             new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://');

@@ -332,25 +332,16 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 }
             };
 
-            let createApi = function (cmdKey, methodKey, args) {
-                return function () {
-                    const inputData = {};
-                    const fargs = Array.prototype.slice.call(arguments);
-                    const timeout = fargs[args.length];
-
-                    args.forEach((arg, idx) => {
-                        inputData[arg] = fargs[idx];
-                    });
-
+            let createApi = function (cmdKey, methodKey) {
+                return function (args, timeout) {
                     return new Promise((resolve, reject) => {
-
                         if (!canUpload()) {
                             reject(new Error('Too often'));
                         } else {
                             let msg = new RequestMessage(channelId, {
                                 cmd: cmdKey,
                                 method: methodKey,
-                                inputData: inputData
+                                inputData: extend(true, {}, args)
                             }, timeout).on('data', (evt, data) => {
                                 resolve(data);
                             }).on('error', (evt, err) => {
@@ -367,9 +358,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
             for (let cmdKey in IDL) {
                 let cmd = IDL[cmdKey];
                 for (let methodKey in cmd) {
-                    let method = cmd[methodKey];
-                    let args = method.arguments.split(',');
-                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey, args);
+                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey);
                 }
             }
         } else {
