@@ -318,8 +318,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                  * @todo test
                  * @return {this}
                  */
-                register: () => {
-                    Api.register.apply(Api, Array.prototype.slice.call(arguments).unshift(channelId));
+                register: function () {
+                    var args = Array.prototype.slice.call(arguments);
+                    args.unshift(channelId);
+                    Api.register.apply(Api, args);
                     return window[webviewExport];
                 },
                 system: {

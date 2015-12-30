@@ -480,7 +480,42 @@ describe('NWBridge', function () {
             }));
         });
     });
+    
+    describe('#register()', function(){
+        it('should get data from webview', function(done){
 
+            document.addEventListener('C12jsBridgeReady', function (evt) {
+                var bridge = evt.c12jsBridge;
+                bridge.register('tank','do',function(data){
+                    return data;
+                });
+            });
+
+            new window.NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://');
+
+            var serverBridge = new ServerBridge('__js_09x1230_bridge', '12scheme://');
+            
+            serverBridge.handshake();
+            
+            serverBridge.on('response', function(evt, respMsg){
+                if (respMsg.cmd === 'tank' && 'do' === respMsg.method) {
+                    assert.deepEqual(respMsg.outputData.data.hello, 'world');
+                    done();
+                }
+            });
+
+            serverBridge.send(new Message('__t_2&01uh7', {
+                messageType: Message.MESSAGE_TYPE.REQUEST,
+                cmd: 'tank',
+                method: 'do',
+                inputData: {
+                    hello: 'world'
+                },
+                callbackId: '__DSFI'
+            }));
+        });
+    });
+    
     describe('system.version()', function () {
         it('version got', function (done) {
             document.addEventListener('CjsBridgeReady', function (evt) {

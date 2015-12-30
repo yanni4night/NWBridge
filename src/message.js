@@ -170,13 +170,13 @@ extend(Message.prototype, {
             var success = false;
 
             if (api.isGone()) {
-                respMsg = new ResponseMessage(this.channelId, this.assemble(), {
+                respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
                     outputData: {
                         errNo: '0',
                         errMsg: 'success',
                         data: {}
                     }
-                });
+                }));
 
                 this.emit('response', respMsg);
 
@@ -197,13 +197,14 @@ extend(Message.prototype, {
 
 
             if (this.callbackId) {
-                respMsg = new ResponseMessage(this.channelId, this.assemble(), {
+                respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
                     outputData: {
                         errNo: success ? '0' : '1',
                         errMsg: success ? 'success' : 'failed',
                         data: ret || {}
                     }
-                });
+                }));
+
             }
 
             break;
