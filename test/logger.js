@@ -14,12 +14,18 @@ var keys = 'info,log,debug,warn,error'.split(',');
 var Logger = {};
 
 keys.forEach(function(key) {
+    var domId = 'js-bridge-log';
     Logger[key] = function () {
-        var father = document.querySelector('#err');
+        var father = document.querySelector('#' + domId);
         if(!father){
             father = document.createElement('ol');
-            father.id = 'err';
+            father.id = domId;
             document.body.appendChild(father);
+
+            var style = document.createElement('style');
+            style.type = 'text/css';
+            style.innerHTML = '#js-bridge-log li {margin-top: 10px} #js-bridge-log .warn{color: #E27B44} #js-bridge-log .error{color: red} #js-bridge-log .log{color:green} #js-bridge-log .info{color: blue}';
+            document.head.appendChild(style);
         }
         var p = document.createElement('li');
         p.className = key;
