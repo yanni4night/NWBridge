@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 
-var dateFormat = require('dateFormat');
+var dateFormat = require('dateformat');
 
 module.exports = function (grunt) {
 
