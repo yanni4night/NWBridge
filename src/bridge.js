@@ -98,7 +98,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         throw new Error('"' + nativeExport + '" already in use');
     }
 
-    Logger.debug('TIMEOUT:' + HANDSHAKE_TIMEOUT + 'ms');
+    Logger.debug('TIMEOUT:', HANDSHAKE_TIMEOUT, 'ms');
     
     /**
      * Notify document that bridge is ready.
@@ -115,7 +115,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
             return;
         }
 
-        Logger.log('BRIDGEREADY:' + fsm.current);
+        Logger.log('BRIDGEREADY:', fsm.current);
 
         // Like "JsBridge" to "jsBridge"
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
@@ -265,7 +265,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
     handshakeTimeout = setTimeout(() => {
         if (fsm.can('fail')) {
             fsm.fail();
-            Logger.error('TIMEOUT:' + HANDSHAKE_TIMEOUT + 'ms');
+            Logger.error('TIMEOUT:', HANDSHAKE_TIMEOUT, 'ms');
             if (!!system) {
                 statistics.trace(ERROR_NUMBER.HANDBACK_TIMEOUT, 'handback timeout');
             } else {
@@ -287,12 +287,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
          * @since 1.0.0
          */
         send: function (messageStr) {
-            Logger.log('RECEIVE FROM NATIVE:' + messageStr);
+            Logger.log('RECEIVE FROM NATIVE:', messageStr);
             const message = Message.fromMetaString(messageStr, channelId);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             } else {
-                Logger.warn('[INVALID]:' + messageStr);
+                Logger.warn('[INVALID]:', messageStr);
             }
             return messageStr || '[DEFAULT]';
         }

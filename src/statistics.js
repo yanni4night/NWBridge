@@ -43,7 +43,7 @@ export const Statistics = function (name, baseUrl) {
 
         imgSrc = URL + param.join('&');
 
-        Logger.log('[STATISTICS]' + imgSrc);
+        Logger.log('[STATISTICS]', imgSrc);
         new Image().src = imgSrc;
     };
 
