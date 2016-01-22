@@ -15,5 +15,20 @@ export const IDL = {
         shareByHybrid: {
             timeout: 1e3
         }
+    },
+    drawLotteryPB: {
+        getInitPageData: {},
+        drawLottery: {},
+        getPlayCount: {},
+        toAwardListPage: {},
+        pageFinish: {},
+        drawLotteryPB: {}
+    },
+    core: {
+        toUserCenterPage: {},
+        alert: {}
+    },
+    system: {
+        copyToClipboard: {}
     }
 };

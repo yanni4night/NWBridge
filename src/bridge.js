@@ -334,7 +334,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 }
             };
 
-            let createApi = function (cmdKey, methodKey) {
+            let createApi = function (cmdKey, methodKey, defaultTimeout) {
                 return function (args, timeout) {
                     return new Promise((resolve, reject) => {
                         if (!canUpload()) {
@@ -344,7 +344,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                                 cmd: cmdKey,
                                 method: methodKey,
                                 inputData: extend(true, {}, args)
-                            }, timeout).on('data', (evt, data) => {
+                            }, timeout || defaultTimeout).on('data', (evt, data) => {
                                 resolve(data);
                             }).on('error', (evt, err) => {
                                 reject(err);
@@ -360,7 +360,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
             for (let cmdKey in IDL) {
                 let cmd = IDL[cmdKey];
                 for (let methodKey in cmd) {
-                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey);
+                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey, cmd[methodKey].timeout);
                 }
             }
         } else {
