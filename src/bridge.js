@@ -36,7 +36,6 @@ import {Api} from'./api';
 import {Promise} from'./promise';
 import {Logger} from'./logger';
 import {asap} from'./asap';
-import {IDL} from'./idl';
 import {StateMachine} from'./fsm';
 import {Statistics} from './statistics';
 
@@ -331,10 +330,30 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                     platform: () => {
                         return Promise.resolve(system.platform);
                     }
+                },
+                call: function (cmdKey, methodKey, args, timeout) {
+                    return new Promise((resolve, reject) => {
+                        if (!canUpload()) {
+                            reject(new Error('Too often'));
+                        } else {
+                            let msg = new RequestMessage(channelId, {
+                                cmd: cmdKey,
+                                method: methodKey,
+                                inputData: extend(true, {}, args)
+                            }, timeout).on('data', (evt, data) => {
+                                resolve(data);
+                            }).on('error', (evt, err) => {
+                                reject(err);
+                            });
+
+                            upload(msg);
+                        }
+
+                    });
                 }
             };
 
-            let createApi = function (cmdKey, methodKey, defaultTimeout) {
+         /*   let createApi = function (cmdKey, methodKey, defaultTimeout) {
                 return function (args, timeout) {
                     return new Promise((resolve, reject) => {
                         if (!canUpload()) {
@@ -355,14 +374,14 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
                     });
                 };
-            };
+            };*/
 
-            for (let cmdKey in IDL) {
+            /*for (let cmdKey in IDL) {
                 let cmd = IDL[cmdKey];
                 for (let methodKey in cmd) {
                     (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey, cmd[methodKey].timeout);
                 }
-            }
+            }*/
         } else {
             webviewExportExtension = {
                 readyState: fsm.current

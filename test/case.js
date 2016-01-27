@@ -378,7 +378,7 @@ describe('NWBridge', function () {
         });
     });*/
 
-    describe('share', function () {
+/*    describe('share', function () {
         it('', function (done) {
             document.addEventListener('Y0jsBridgeReady', function () {
                 window.Y0jsBridge.shareCmd.shareByHybrid({
@@ -398,7 +398,7 @@ describe('NWBridge', function () {
             var serverBridge = new ServerBridge('__js_0108p09a_bridge', 'y0scheme://');
             serverBridge.handshake();
         });
-    });
+    });*/
 
     describe('version', function () {
         it('should get version ', function () {

@@ -24,13 +24,7 @@ function ServerBridge(nativeExport, scheme) {
 
     var CHANNEL_ID = 'server' + nativeExport;
 
-    var supports = {
-        shareCmd: {
-            shareByHybrid: function (data) {
-                return data;
-            }
-        }
-    };
+    var supports = {};
 
     var send = this.send = function (msgObj) {
         window[nativeExport].send(msgObj.serialize());

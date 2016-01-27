@@ -25,15 +25,15 @@
     <body>
     <h1>DEMO</h1>
 
-    <button id="share">分享</button>
+    <button id="version">版本</button>
     <pre id="log"></pre>
     </body>
     <script>
 
-    $('#share').addEventListener('click',function(){
+    $('#version').addEventListener('click',function(){
         if(state === 'complete'){
-            JsBridge.shareCmd.shareByHybrid().then(function(){
-                showLog('分享成功');
+            JsBridge.system.version().then(function(){
+                showLog('获取版本成功');
             },function(e){
                 showLog('ERROR:' + e.message);
             });
