@@ -97,4 +97,4 @@ function ServerBridge(nativeExport, scheme) {
     };
 }
 
-exports.ServerBridge = ServerBridge;
+exports.ServerBridge = window.ServerBridge = ServerBridge;
