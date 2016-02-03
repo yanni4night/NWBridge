@@ -86,10 +86,6 @@ const defaultApis = {
     }
 };
 
-defaultApis.location.assign.gone = true;
-defaultApis.location.reload.gone = true;
-defaultApis.location.replace.gone = true;
-
 const apis = {};
 
 export function Api(channelId, cmd, method, data) {
@@ -102,26 +98,36 @@ export function Api(channelId, cmd, method, data) {
         return apis[channelId][cmd] && 'function' === typeof apis[channelId][cmd][method];
     };
 
-    this.invoke = () => {
+    this.invoke = (cb) => {
+        var ret;
         if (!this.exists()) {
             throw new Error(channelId + ':"' + cmd + '.' + method + '" does not exist');
         }
-        var ret = apis[channelId][cmd][method](data);
+
+        if (cb) {
+            apis[channelId][cmd][method](cb, data);
+            return null;
+        }
+        
+        ret = apis[channelId][cmd][method](data);
+
         return ret;
     };
 
-    this.isGone = function () {
+    this.isAsync = function () {
         if(!this.exists()){
             return false;
         } else {
             let func = apis[channelId][cmd][method];
-            return !!func.gone;
+            return !!func.__async;
         }
     };
 
 }
 
-Api.register = function (channelId, cmd, method, func, gone) {
+Api.register = function (channelId, cmd, method, func, async) {
+    var newApi = func;
+
     apis[channelId] = apis[channelId] || extend(true, {}, defaultApis);
     apis[channelId][cmd] = apis[channelId][cmd] || {};
     
@@ -129,10 +135,10 @@ Api.register = function (channelId, cmd, method, func, gone) {
         throw new Error('Duplicated "' + cmd + '.' + method + '"');
     }
     
-    if ('boolean' !== typeof gone) {
-        gone = false;
+    if ('boolean' !== typeof async) {
+        async = false;
     }
 
-    func.gone = gone;
-    apis[channelId][cmd][method] = func;
+    newApi.__async = async;
+    apis[channelId][cmd][method] = newApi;
 };

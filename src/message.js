@@ -151,13 +151,7 @@ extend(Message.prototype, {
                     outputData: {
                         errNo: '0',
                         errMsg: 'success',
-                        data: {
-                            /*cookieEnabled: new Api(this.channelId, 'cookie', 'enabled').invoke(),
-                            url: new Api(this.channelId, 'location', 'href').invoke(),
-                            localStorageEnabled: new Api(this.channelId, 'localStorage',
-                                'enabled').invoke(),
-                            ua: new Api(this.channelId, 'navigator', 'getUserAgent').invoke()*/
-                        }
+                        data: {}
                     }
                 }));
                 isHandShake = true;
@@ -169,22 +163,23 @@ extend(Message.prototype, {
             var ret;
             var success = false;
 
-            if (api.isGone()) {
-                respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
-                    outputData: {
-                        errNo: '0',
-                        errMsg: 'success',
-                        data: {}
-                    }
-                }));
-
-                this.emit('response', respMsg);
-
+            if (api.isAsync()) {
                 try {
-                    api.invoke();
-                } catch (e) {}
-
-                return this;
+                    api.invoke(function (data) {
+                        respMsg = new ResponseMessage(this.channelId, extend(this.assemble(), {
+                            outputData: {
+                                errNo: err ? '-1' : '0',
+                                errMsg: err ? err.message : 'success',
+                                data: data
+                            }
+                        }));
+                        this.emit('response', respMsg);
+                    }.bind(this));
+                    return this;
+                } catch (e) {
+                    err = e;
+                    Logger.error('FLOW REQUEST:' + e.message);
+                }
             }
             
             try {

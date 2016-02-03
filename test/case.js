@@ -329,6 +329,131 @@ describe('Message', function () {
     });
 });
 
+describe('Api', function () {
+    describe('#sync', function () {
+        this.timeout(1e3);
+        it('should response when sync', function (done) {
+            var serverBridge;
+            document.addEventListener('KK0sjsBridgeReady', function () {
+                window.KK0sjsBridge.register('mark', 'tell', function (data) {
+                    return {
+                        age: data.age
+                    };
+                }, false);
+                serverBridge.send(serverBridge.createRequestMessage({
+                    cmd: 'mark',
+                    method: 'tell',
+                    inputData: {
+                        age: 28
+                    },
+                    callbackId: Math.random()
+                }));
+            }, false);
+
+            new window.NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://');
+
+            serverBridge = new ServerBridge('__js_0108p09h_sync_bridge', 'kk0sscheme://');
+            serverBridge.on('response', function (evt, message) {
+                if ('mark' === message.cmd && 'tell' === message.method) {
+                    assert.deepEqual(28, message.outputData.data.age);
+                    done();
+                }
+            });
+            serverBridge.handshake();
+        });
+    });
+    describe('#catch sync crash', function () {
+        this.timeout(1e3);
+        it('should response when sync crash', function (done) {
+            var serverBridge;
+            document.addEventListener('KKcrajsBridgeReady', function () {
+                window.KKcrajsBridge.register('mark', 'tell', function () {
+                    throw 'FATAL';
+                }, false);
+                serverBridge.send(serverBridge.createRequestMessage({
+                    cmd: 'mark',
+                    method: 'tell',
+                    inputData: {
+                        age: 28
+                    },
+                    callbackId: Math.random()
+                }));
+            }, false);
+
+            new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge', 'kkcrascheme://');
+
+            serverBridge = new ServerBridge('__js_0108p09h_sync_crash_bridge', 'kkcrascheme://');
+            serverBridge.on('response', function (evt, message) {
+                if ('mark' === message.cmd && 'tell' === message.method) {
+                    done();
+                }
+            });
+            serverBridge.handshake();
+        });
+    });
+    describe('#async', function () {
+        this.timeout(2e3);
+        it('should response even async', function (done) {
+            var serverBridge;
+            document.addEventListener('KK0jsBridgeReady', function () {
+                window.KK0jsBridge.register('mark', 'tell', function (cb, data) {
+                    cb({
+                        age: data.age
+                    });
+                }, true);
+                serverBridge.send(serverBridge.createRequestMessage({
+                    cmd: 'mark',
+                    method: 'tell',
+                    inputData: {
+                        age: 28
+                    },
+                    callbackId: Math.random()
+                }));
+            }, false);
+
+            new window.NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://');
+
+            serverBridge = new ServerBridge('__js_0108p09h_bridge', 'kk0scheme://');
+            serverBridge.on('response', function (evt, message) {
+                if ('mark' === message.cmd && 'tell' === message.method) {
+                    assert.deepEqual(28, message.outputData.data.age);
+                    done();
+                }
+            });
+            serverBridge.handshake();
+        });
+    });
+    describe('#async crash', function () {
+        this.timeout(2e3);
+        it('should response even async crash', function (done) {
+            var serverBridge;
+            document.addEventListener('KK01jsBridgeReady', function () {
+                window.KK01jsBridge.register('mark', 'tell', function () {
+                    throw 'FATAL';
+                }, true);
+                serverBridge.send(serverBridge.createRequestMessage({
+                    cmd: 'mark',
+                    method: 'tell',
+                    inputData: {
+                        age: 28
+                    },
+                    callbackId: Math.random()
+                }));
+            }, false);
+
+            new window.NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://');
+
+            serverBridge = new ServerBridge('__js_0108p09h1_bridge', 'kk01scheme://');
+            serverBridge.on('response', function (evt, message) {
+                if ('mark' === message.cmd && 'tell' === message.method) {
+                    done();
+                }
+            });
+            serverBridge.handshake();
+        });
+    });
+});
+
 describe('NWBridge', function () {
     describe('timeout', function () {
         this.timeout(1500);
@@ -341,64 +466,6 @@ describe('NWBridge', function () {
             new window.NWBridge('__t_2015_bridge_' + Math.random(), 'TjsBridge', 'matin://');
         });
     });
-
-    /*describe('apis', function () {
-        this.timeout(5e3);
-        it('#testCmd.doTest()...', function (done) {
-
-            var ready = new Promise(function (resolve) {
-                document.addEventListener('JsBridgeReady', function (evt) {
-                    resolve(evt.jsBridge);
-                }, false);
-            });
-
-            new window.NWBridge('__js_bridge', 'JsBridge', 'scheme://');
-
-            var serverBridge = new ServerBridge('__js_bridge', 'scheme://');
-            serverBridge.handshake();
-
-            ready.then(function () {
-                assert.ok('undefined' !== typeof window.JsBridge);
-                assert.deepEqual(window.JsBridge.readyState, 'complete');
-                window.JsBridge.testCmd.doTest('Hello World').then(function () {
-                    return window.JsBridge.testCmd.httpRequest();
-                }).then(function () {
-                    return window.JsBridge.testCmd.goToFrsByForumName('test123');
-                }).then(function () {
-                    return window.JsBridge.testCmd.showToast('Hello');
-                }).then(function (data) {
-                    assert.deepEqual(data, 'Hello');
-                    done();
-                }).catch(function (e) {
-                    console.error(e);
-                });
-            }).catch(function (e) {
-                console.error(e);
-            });
-        });
-    });*/
-
-/*    describe('share', function () {
-        it('', function (done) {
-            document.addEventListener('Y0jsBridgeReady', function () {
-                window.Y0jsBridge.shareCmd.shareByHybrid({
-                    title: 'test',
-                    desc: 'share',
-                    iconImgPath: 'http://img.org',
-                    shareUrl: 'http://www.baidu.com'
-                }).then(function (data) {
-                    assert.deepEqual('test', data.title);
-                    assert.deepEqual('share', data.desc);
-                    done();
-                });
-            }, false);
-
-            new window.NWBridge('__js_0108p09a_bridge', 'Y0jsBridge', 'y0scheme://');
-
-            var serverBridge = new ServerBridge('__js_0108p09a_bridge', 'y0scheme://');
-            serverBridge.handshake();
-        });
-    });*/
 
     describe('version', function () {
         it('should get version ', function () {
@@ -480,13 +547,13 @@ describe('NWBridge', function () {
             }));
         });
     });
-    
-    describe('#register()', function(){
-        it('should get data from webview', function(done){
+
+    describe('#register()', function () {
+        it('should get data from webview', function (done) {
 
             document.addEventListener('C12jsBridgeReady', function (evt) {
                 var bridge = evt.c12jsBridge;
-                bridge.register('tank','do',function(data){
+                bridge.register('tank', 'do', function (data) {
                     return data;
                 });
             });
@@ -494,10 +561,10 @@ describe('NWBridge', function () {
             new window.NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://');
 
             var serverBridge = new ServerBridge('__js_09x1230_bridge', '12scheme://');
-            
+
             serverBridge.handshake();
-            
-            serverBridge.on('response', function(evt, respMsg){
+
+            serverBridge.on('response', function (evt, respMsg) {
                 if (respMsg.cmd === 'tank' && 'do' === respMsg.method) {
                     assert.deepEqual(respMsg.outputData.data.hello, 'world');
                     done();
@@ -515,7 +582,7 @@ describe('NWBridge', function () {
             }));
         });
     });
-    
+
     describe('system.version()', function () {
         it('version got', function (done) {
             document.addEventListener('CjsBridgeReady', function (evt) {
