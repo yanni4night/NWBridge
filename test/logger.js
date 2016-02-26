@@ -20,7 +20,7 @@ keys.forEach(function(key) {
         if(!father){
             father = document.createElement('ol');
             father.id = domId;
-            document.body.appendChild(father);
+            document.body.insertBefore(father, document.body.firstChild);
 
             var style = document.createElement('style');
             style.type = 'text/css';
