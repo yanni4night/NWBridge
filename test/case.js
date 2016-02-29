@@ -380,7 +380,8 @@ describe('Api', function () {
                 }));
             }, false);
 
-            new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge', 'kkcrascheme://');
+            new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge',
+                'kkcrascheme://');
 
             serverBridge = new ServerBridge('__js_0108p09h_sync_crash_bridge', 'kkcrascheme://');
             serverBridge.on('response', function (evt, message) {
@@ -548,6 +549,38 @@ describe('NWBridge', function () {
         });
     });
 
+    describe('#duplicated handshake', function () {
+        it('should handle duplicated handshake', function (done) {
+            var fired = false;
+            document.addEventListener('C12530jsBridgeReady', function () {
+                if (!fired) {
+                    fired = true;
+                    var serverBridge = new ServerBridge('__js_09x12x530_bridge',
+                        '12530scheme://');
+                    serverBridge.handshake();
+                    serverBridge.on('response', function (e, message) {
+                        if (message.cmd === 'navigator' && 'getUserAgent' ===
+                            message.method) {
+                            done();
+                        }
+                    });
+                    serverBridge.send(new Message('__JKHH_SHuy8876_', {
+                        messageType: Message.MESSAGE_TYPE.REQUEST,
+                        cmd: 'navigator',
+                        method: 'getUserAgent',
+                        callbackId: 'K(S)U',
+                        inputData: {}
+                    }));
+                }
+            });
+
+            new window.NWBridge('__js_09x12x530_bridge', 'C12530jsBridge', '12530scheme://');
+            new ServerBridge('__js_09x12x530_bridge', '12530scheme://').handshake();
+
+
+        });
+    });
+
     describe('#register()', function () {
         it('should get data from webview', function (done) {
 
@@ -583,7 +616,7 @@ describe('NWBridge', function () {
         });
     });
 
-    describe('system.version()', function () {
+    describe('#system.version()', function () {
         it('version got', function (done) {
             document.addEventListener('CjsBridgeReady', function (evt) {
                 assert.deepEqual(evt.cjsBridge.readyState, 'complete');

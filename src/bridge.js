@@ -22,9 +22,10 @@
  * 
  * changelog
  * 2015-11-18[16:16:12]:revised
+ * 2016-02-29[13:56:58]:support duplicated handshake
  *
  * @author yanni4night@gmail.com
- * @version 1.0.0
+ * @version 1.2.0
  * @since 1.0.0
  */
 import {DomEvent} from'./dom-event';
@@ -167,8 +168,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
             } else if (message.isHandShake()) {
                 if (!fsm.is(READY_STATE_ENUM.PENDING)) {
                     // Ignore duplicated handshakes
-                    messageQueueFromNative.pop();
-                    shouldFlow = false;
+                    // messageQueueFromNative.pop();
+                    // shouldFlow = false;
                     Logger.warn('Duplicated handshake received');
                 }
             }
