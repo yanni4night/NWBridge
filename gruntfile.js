@@ -78,6 +78,7 @@ module.exports = function (grunt) {
         uglify: {
             options: {
                 maxLineLen: 5000,
+                quote_style: 1,
                 ASCIIOnly: true,
                 beautify: !doDist,
                 mangle: doDist,

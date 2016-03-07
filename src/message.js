@@ -16,7 +16,6 @@ import {extend} from './extend';
 import {Callback} from './callback';
 import {Event} from './event';
 import {Logger} from './logger';
-import {Radio} from './radio';
 
 const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     REQUEST: 'request',
@@ -43,11 +42,11 @@ export function Message(channelId, metaData) {
         priority: 0
     }, metaData, new Event());
 
-    if (this.isHandShake()) {
+    /*if (this.isHandShake()) {
         this.priority += 2;
     } else if (this.isHandBack()) {
         this.priority += 1;
-    }
+    }*/
 }
 
 extend(Message.prototype, {
@@ -61,17 +60,6 @@ extend(Message.prototype, {
      */
     isHandShake: function () {
         return this.messageType === MESSAGE_TYPE.HANDSHAKE;
-    },
-
-    /**
-     * Return if it's a handback message.
-     * 
-     * @return {Boolean}
-     * @version 1.0.0
-     * @since 1.0.0
-     */
-    isHandBack: function () {
-        return 'kernel' === this.cmd && 'notifyConnected' === this.method;
     },
 
     /**
@@ -127,25 +115,12 @@ extend(Message.prototype, {
      */
     flow: function () {
         var respMsg;
-        var isHandShake = false;
         var err;
 
         switch (this.messageType) {
         case MESSAGE_TYPE.HANDSHAKE:
 
-            if (this.inputData) {
-                this.emit('system', this.inputData);
-            }
-
-            if (!this.inputData) {
-                err = new Error('No inputData in handshake');
-            } else if (!this.inputData.version) {
-                err = new Error('No version in handshake');
-            } else if (!this.inputData.platform) {
-                err = new Error('No platform in handshake');
-            } else if (!Radio.isSupported(this.inputData.platform)) {
-                err = new Error('"' + this.inputData.platform + '" not supported');
-            } else if (this.callbackId) {
+            if (this.callbackId) {
                 respMsg = new Message(this.channelId, extend(this.assemble(), {
                     messageType: MESSAGE_TYPE.HANDSHAKE,
                     outputData: {
@@ -154,7 +129,6 @@ extend(Message.prototype, {
                         data: {}
                     }
                 }));
-                isHandShake = true;
             }
 
             break;
@@ -178,7 +152,7 @@ extend(Message.prototype, {
                     return this;
                 } catch (e) {
                     err = e;
-                    Logger.error('FLOW REQUEST:' + e.message);
+                    Logger.error('FLOW REQUEST:', e.message);
                 }
             }
             
@@ -187,7 +161,7 @@ extend(Message.prototype, {
                 success = true;
             } catch (e) {
                 err = e;
-                Logger.error('FLOW REQUEST:' + e.message);
+                Logger.error('FLOW REQUEST:', e.message);
             }
 
 
@@ -223,16 +197,10 @@ extend(Message.prototype, {
             Logger.warn('UNKNOWN TYPE:' + this.messageType);
         }
 
-        if (isHandShake) {
-            this.emit('handshake', respMsg);
-        } else if (respMsg) {
+        if (respMsg) {
             this.emit('response', respMsg);
         } else if (err) {
             this.emit('error', err);
-        }
-
-        if (this.isHandBack()) {
-            this.emit('handback', this);
         }
 
         return this;

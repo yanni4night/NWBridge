@@ -12,5 +12,11 @@
 
 var ServerBridge = require('./mock').ServerBridge;
 
+window.HYBRID_INITIAL_DATA = {
+    platform: 'android',
+    version: '1.0.0',
+    logid: 'NUSIDY(*GFD'
+};
+
 new window.NWBridge('__js_bridge', 'JsBridge', 'scheme://');
 new ServerBridge('__js_bridge', 'scheme://').handshake();

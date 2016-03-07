@@ -23,30 +23,29 @@
  * changelog
  * 2015-11-18[16:16:12]:revised
  * 2016-02-29[13:56:58]:support duplicated handshake
+ * 2016-02-29[13:56:58]:remove handshake
  *
  * @author yanni4night@gmail.com
- * @version 1.2.0
+ * @version 1.3.0
  * @since 1.0.0
  */
-import {DomEvent} from'./dom-event';
-import {extend} from'./extend';
-import {Queue, PriorityQueue} from'./queue';
-import {Message, RequestMessage} from'./message';
-import {Radio} from'./radio';
-import {Api} from'./api';
-import {Promise} from'./promise';
-import {Logger} from'./logger';
-import {asap} from'./asap';
-import {IDL} from'./idl';
-import {StateMachine} from'./fsm';
-import {Statistics} from './statistics';
+import {DomEvent}  from './dom-event';
+import {extend}  from './extend';
+import {Queue, PriorityQueue}  from './queue';
+import {Message, RequestMessage}  from './message';
+import {Radio}  from './radio';
+import {Api}  from './api';
+import {Promise}  from './promise';
+import {Logger}  from './logger';
+import {asap}  from './asap';
+
+/* HYBRID_INITIAL_DATA */
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
     COMPLETE: 'complete',
     ERROR: 'error'
 };
-
 /**
  * The JSBridge class.
  * 
@@ -56,11 +55,9 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
+window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
-    const self = this;
-
-    const VERSION = '1.0.0';
+    const VERSION = '1.3.0';
 
     const messageQueueFromNative = new PriorityQueue({
         priorityKey: 'priority'
@@ -68,39 +65,21 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     const messageQueueToNative = new Queue();
 
-    const statistics = new Statistics(nativeExport, trackBaseUrl);
-
     var radio;
-
-    var fsm;
-
-    var handshakeTimeout;
 
     var bridgeReadyTriggered = false;
 
-    const HANDSHAKE_TIMEOUT = 1e3;//6e5;
-
     const QUEUE_LIMIT_TO_NATIVE = 5;
-
-    const ERROR_NUMBER = {
-        TIMEOUT: 0x1,
-        ILLEGAL_HANDSHAKE: 0x2,
-        HANDBACK_TIMEOUT: 0x3,
-        HANDSHAKE_TIMEOUT: 0x4,
-        RADIO_FAILED: 0x5
-    };
 
     // Indicate this bridge
     const channelId = 'channel:' + nativeExport;
 
-    var system;
+    var readyState = READY_STATE_ENUM.PENDING;
 
     if (window[nativeExport]) {
         throw new Error('"' + nativeExport + '" already in use');
     }
 
-    Logger.debug('TIMEOUT:', HANDSHAKE_TIMEOUT, 'ms');
-    
     /**
      * Notify document that bridge is ready.
      *
@@ -115,8 +94,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         if (bridgeReadyTriggered) {
             return;
         }
-
-        Logger.log('BRIDGEREADY:', fsm.current);
 
         // Like "JsBridge" to "jsBridge"
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
@@ -153,65 +130,15 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
     messageQueueFromNative.on('push', () => {
         // Release native thread
         asap(() => {
-            // Make sure message flows in the right order as pushed
-            var message = messageQueueFromNative.top();
-            var shouldFlow = true;
+            var message;
 
-            if (fsm.is(READY_STATE_ENUM.ERROR)) {
-                shouldFlow = false;
-                // Prevent from queue overflow
-                messageQueueFromNative.pop();
-                Logger.warn('NOT FLOW IN ERROR');
-            } else if (undefined === message) {
-                shouldFlow = false;
-                // Handshake is always on the top;
-            } else if (message.isHandShake()) {
-                if (!fsm.is(READY_STATE_ENUM.PENDING)) {
-                    // Ignore duplicated handshakes
-                    // messageQueueFromNative.pop();
-                    // shouldFlow = false;
-                    Logger.warn('Duplicated handshake received');
-                }
-            }
-
-            if (!shouldFlow || (undefined === (message = messageQueueFromNative.pop()))) {
+            if (undefined === (message = messageQueueFromNative.pop())) {
                 return;
             }
 
-            message.on('handshake', (evt, respMsg) => {
-                Logger.log('received a handshake');
-                // Prevent duplicated handshake
-                if (fsm.cannot('success') && fsm.cannot('fail')) {
-                    radio.send(respMsg);
-                    return;
-                }
-                if (!radio) {
-                    try {
-                        radio = new Radio((message.inputData || {}).platform, scheme);
-                        extend(window[nativeExport], radio.extension);
-                        radio.send(respMsg);
-                    } catch (e) {
-                        Logger.error(e.message);
-                        fsm.fail();
-                        statistics.trace(ERROR_NUMBER.RADIO_FAILED, e.message);
-                    }
-                }
-            }).on('response', function (evt, respMsg) {
+            message.on('response', function (evt, respMsg) {
                 upload(respMsg);
-            }).on('handback', function() {
-                if (fsm.can('success')) {
-                    fsm.success();
-                }
-            }).on('system', (evt, systemData) => {
-                system = extend(true, {}, systemData);
-                if ('true' === system.switch && system.logid) {
-                    Logger.log('Statistics startup');
-                    statistics.startup(system.logid);
-                }
             }).on('error', (evt, err) => {
-                if (message.isHandShake()){
-                    statistics.trace(ERROR_NUMBER.ILLEGAL_HANDSHAKE, 'illegal handshake');
-                }
                 Logger.error(err.message);
             }).flow();
         });
@@ -219,61 +146,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
 
     // webview -> native
     messageQueueToNative.on('push', () => {
-        if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
-            const message = messageQueueToNative.pop();
+        const message = messageQueueToNative.pop();
 
-            if (message) {
-                radio.send(message);
-            }
+        if (message) {
+            radio.send(message);
         }
     });
-
-    Api.register(channelId, 'kernel', 'notifyConnected', () => {
-        clearTimeout(handshakeTimeout);
-    });
-
-    fsm = StateMachine.create({
-        initial: READY_STATE_ENUM.PENDING,
-        events: [{
-            name: 'fail',
-            from: READY_STATE_ENUM.PENDING,
-            to: READY_STATE_ENUM.ERROR
-        }, {
-            name: 'success',
-            from: READY_STATE_ENUM.PENDING,
-            to: READY_STATE_ENUM.COMPLETE
-        }],
-        callbacks: {
-            onafterfail: () => {
-                export2Webview();
-                // And notify business about this
-                bridgeReady();
-            },
-            onaftersuccess: () => {
-                export2Webview();
-                // Bridge is ready,native receiving works immediately
-                self.flush2Native();
-                // Trigger bridge ready because we should
-                // give business the time to add some listeners.
-                bridgeReady();
-                // Then push webview to handle the other data beyond handshake
-                self.flush2Webview();
-            }
-        }
-    });
-
-    // Wait only few seconds for the handshake from native
-    handshakeTimeout = setTimeout(() => {
-        if (fsm.can('fail')) {
-            fsm.fail();
-            Logger.error('TIMEOUT:', HANDSHAKE_TIMEOUT, 'ms');
-            if (!!system) {
-                statistics.trace(ERROR_NUMBER.HANDBACK_TIMEOUT, 'handback timeout');
-            } else {
-                statistics.trace(ERROR_NUMBER.HANDSHAKE_TIMEOUT, 'handshake timeout');
-            }
-        }
-    }, HANDSHAKE_TIMEOUT);
 
     // Export to native always
     window[nativeExport] = {
@@ -299,12 +177,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         }
     };
 
-    var oldWvExport = window[webviewExport];
-
     // Export to webview
     function export2Webview() {
         var webviewExportExtension;
-        
+
         if (!window[webviewExport]) {
             window[webviewExport] = {
                 call: function (cmdKey, methodKey, args, timeout) {
@@ -331,9 +207,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         }
 
         // What in webviewExport depends on state
-        if (fsm.is(READY_STATE_ENUM.COMPLETE)) {
+        if (READY_STATE_ENUM.COMPLETE === readyState) {
             webviewExportExtension = {
-                readyState: fsm.current,
+                readyState: READY_STATE_ENUM.COMPLETE,
                 /**
                  * Register API for native.
                  *
@@ -348,62 +224,20 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
                 },
                 system: {
                     version: () => {
-                        return Promise.resolve(system.version);
+                        return Promise.resolve(window.HYBRID_INITIAL_DATA.version);
                     },
                     platform: () => {
-                        return Promise.resolve(system.platform);
+                        return Promise.resolve(window.HYBRID_INITIAL_DATA.platform);
                     }
                 }
             };
-
-            let createApi = function (cmdKey, methodKey, defaultTimeout) {
-                return function (args, timeout) {
-                    return new Promise((resolve, reject) => {
-                        if (!canUpload()) {
-                            reject(new Error('Too often'));
-                        } else {
-                            let msg = new RequestMessage(channelId, {
-                                cmd: cmdKey,
-                                method: methodKey,
-                                inputData: extend(true, {}, args)
-                            }, timeout || defaultTimeout).on('data', (evt, data) => {
-                                resolve(data);
-                            }).on('error', (evt, err) => {
-                                reject(err);
-                            });
-
-                            upload(msg);
-                        }
-
-                    });
-                };
-            };
-
-            for (let cmdKey in IDL) {
-                let cmd = IDL[cmdKey];
-                for (let methodKey in cmd) {
-                    (window[webviewExport][cmdKey] || (window[webviewExport][cmdKey] = {}))[methodKey] = createApi(cmdKey, methodKey, cmd[methodKey].timeout);
-                }
-            }
         } else {
             webviewExportExtension = {
-                readyState: fsm.current
+                readyState: READY_STATE_ENUM.ERROR
             };
         }
 
         extend(window[webviewExport], webviewExportExtension);
-
-        /**
-         * Similar to jQuery.noConflict
-         *
-         * @version 1.0.0
-         * @since 1.0.0
-         */
-        window[webviewExport].noConflict = () => {
-            if (undefined !== oldWvExport) {
-                window[webviewExport] = oldWvExport;
-            }
-        };
 
         // Set version
         if (Object.defineProperty) {
@@ -418,36 +252,14 @@ window.NWBridge = function (nativeExport, webviewExport, scheme, trackBaseUrl) {
         }
     }
 
-    extend(this, {
-        /**
-         * Flush messages in queue to native.
-         *
-         * @version 1.0.0
-         * @since 1.0.0
-         */
-        flush2Native: () => {
-            // DO NOT use infinite loop
-            var size = messageQueueToNative.size();
-            while (size) {
-                // Make sure do pop in each emit
-                messageQueueToNative.emit('push');
-                size -= 1;
-            }
-        },
-        /**
-         * Flush messages in queue to webview
-         *
-         * @version 1.0.0
-         * @since 1.0.0
-         */
-        flush2Webview: () => {
-            // DO NOT use infinite loop
-            var size = messageQueueFromNative.size();
-            while (size) {
-                // Make sure do pop in each emit
-                messageQueueFromNative.emit('push');
-                size -= 1;
-            }
-        }
-    });
+    try {
+        radio = new Radio(window.HYBRID_INITIAL_DATA.platform, scheme);
+        extend(window[nativeExport], radio.extension);
+        readyState = READY_STATE_ENUM.COMPLETE;
+    } catch (e) {
+        readyState = READY_STATE_ENUM.ERROR;
+    }
+
+    export2Webview();
+    bridgeReady();
 }; // NWBridge

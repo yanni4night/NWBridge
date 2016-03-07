@@ -42,12 +42,7 @@ function ServerBridge(nativeExport, scheme) {
         var message = Message.fromMetaString(messageStr.replace(scheme, ''), CHANNEL_ID);
 
         if (message.messageType === Message.MESSAGE_TYPE.HANDSHAKE) {
-            //if ('handshake' === message.cmd) {
-            send(new RequestMessage(CHANNEL_ID, {
-                cmd: 'kernel',
-                method: 'notifyConnected'
-            }));
-            //} 
+            self.emit('handshake', message);
             return;
         }
 
