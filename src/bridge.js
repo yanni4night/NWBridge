@@ -95,6 +95,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
             return;
         }
 
+        Logger.log('Bridge ready:', readyState);
+
         // Like "JsBridge" to "jsBridge"
         evtData[webviewExport.replace(/^([A-Z])/, function (n) {
             return n.toLowerCase();
