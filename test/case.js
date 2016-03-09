@@ -364,7 +364,7 @@ describe('Api', function () {
                 }));
             }, false);
             new window.NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://');
-            serverBridge.handshake();
+            serverBridge.ping();
         });
     });
     describe('#catch sync crash', function () {
@@ -394,7 +394,7 @@ describe('Api', function () {
             }, false);
             new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge',
                 'kkcrascheme://');
-            serverBridge.handshake();
+            serverBridge.ping();
         });
     });
     describe('#async', function () {
@@ -426,7 +426,7 @@ describe('Api', function () {
                 }));
             }, false);
             new window.NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://');
-            serverBridge.handshake();
+            serverBridge.ping();
         });
     });
     describe('#async crash', function () {
@@ -454,7 +454,7 @@ describe('Api', function () {
                 }));
             }, false);
             new window.NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://');
-            serverBridge.handshake();
+            serverBridge.ping();
         });
     });
 });
@@ -470,13 +470,13 @@ describe('NWBridge', function () {
             new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://');
 
             var serverBridge = new ServerBridge('__js_0108p09_bridge', 'kkscheme://');
-            serverBridge.handshake();
+            serverBridge.ping();
         });
     });
 
-    describe('cache before handshake', function () {
+    describe('cache before ping', function () {
         this.timeout(5e3);
-        it('can cache messages before handshake', function (done) {
+        it('can cache messages before ping', function (done) {
 
             new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://');
 
@@ -514,26 +514,26 @@ describe('NWBridge', function () {
                 method: 'hash'
             }));
 
-            serverBridge.handshake();
+            serverBridge.ping();
 
         });
     });
 
-    describe('#duplicated handshake', function () {
-        it('should handle duplicated handshake', function (done) {
+    describe('#duplicated ping', function () {
+        it('should handle duplicated ping', function (done) {
             var fired = false;
             new window.NWBridge('__js_09x12x530_bridge', 'C12530jsBridge',
                 '12530scheme://');
             var serverBridge = new ServerBridge('__js_09x12x530_bridge',
                 '12530scheme://');
-            serverBridge.on('handshake', function () {
+            serverBridge.on('ping', function () {
                 if (!fired) {
                     fired = true;
-                    serverBridge.handshake();
+                    serverBridge.ping();
                 } else {
                     done();
                 }
-            }).handshake();
+            }).ping();
         });
     });
 
@@ -551,7 +551,7 @@ describe('NWBridge', function () {
 
             var serverBridge = new ServerBridge('__js_09x1230_bridge', '12scheme://');
 
-            serverBridge.handshake();
+            serverBridge.ping();
 
             serverBridge.on('response', function (evt, respMsg) {
                 if (respMsg.cmd === 'tank' && 'do' === respMsg.method) {
@@ -595,8 +595,8 @@ describe('NWBridge', function () {
 
             var serverBridge = new ServerBridge('__js_09x02_bridge', 'cscheme://');
             serverBridge.send(new Message('__t_201uh7', {
-                messageType: Message.MESSAGE_TYPE.HANDSHAKE,
-                cmd: 'handshake',
+                messageType: Message.MESSAGE_TYPE.PING,
+                cmd: 'ping',
                 inputData: {
                     version: '1.0.0',
                     platform: 'android',

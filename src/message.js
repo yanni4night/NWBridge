@@ -20,7 +20,7 @@ import {Logger} from './logger';
 const MESSAGE_TYPE = Message.MESSAGE_TYPE = {
     REQUEST: 'request',
     RESPONSE: 'response',
-    HANDSHAKE: 'handshake'
+    PING: 'ping'
 };
 
 /**
@@ -41,25 +41,19 @@ export function Message(channelId, metaData) {
         channelId: channelId,
         priority: 0
     }, metaData, new Event());
-
-    /*if (this.isHandShake()) {
-        this.priority += 2;
-    } else if (this.isHandBack()) {
-        this.priority += 1;
-    }*/
 }
 
 extend(Message.prototype, {
 
     /**
-     * Return if it's a handshake.
+     * Return if it's a ping.
      * 
      * @return {Boolean}
      * @version 1.0.0
      * @since 1.0.0
      */
-    isHandShake: function () {
-        return this.messageType === MESSAGE_TYPE.HANDSHAKE;
+    isPing: function () {
+        return this.messageType === MESSAGE_TYPE.PING;
     },
 
     /**
@@ -101,7 +95,7 @@ extend(Message.prototype, {
     isInvalid: function () {
         return (this.messageType !== MESSAGE_TYPE.REQUEST && this.messageType !== MESSAGE_TYPE.RESPONSE &&
                 this.messageType !==
-                MESSAGE_TYPE.HANDSHAKE) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) ||
+                MESSAGE_TYPE.PING) || (MESSAGE_TYPE.RESPONSE === this.messageType && !this.callbackId) ||
             (
                 MESSAGE_TYPE.REQUEST === this.messageType && (!this.cmd || !this.method));
     },
@@ -118,11 +112,11 @@ extend(Message.prototype, {
         var err;
 
         switch (this.messageType) {
-        case MESSAGE_TYPE.HANDSHAKE:
+        case MESSAGE_TYPE.PING:
 
             if (this.callbackId) {
                 respMsg = new Message(this.channelId, extend(this.assemble(), {
-                    messageType: MESSAGE_TYPE.HANDSHAKE,
+                    messageType: MESSAGE_TYPE.PING,
                     outputData: {
                         errNo: '0',
                         errMsg: 'success',

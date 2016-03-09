@@ -41,8 +41,8 @@ function ServerBridge(nativeExport, scheme) {
 
         var message = Message.fromMetaString(messageStr.replace(scheme, ''), CHANNEL_ID);
 
-        if (message.messageType === Message.MESSAGE_TYPE.HANDSHAKE) {
-            self.emit('handshake', message);
+        if (message.messageType === Message.MESSAGE_TYPE.PING) {
+            self.emit('ping', message);
             return;
         }
 
@@ -70,21 +70,20 @@ function ServerBridge(nativeExport, scheme) {
         }
     };
 
-    var handShakeMessage = new Message(CHANNEL_ID, {
-        messageType: Message.MESSAGE_TYPE.HANDSHAKE,
-        //cmd: 'handshake',
+    var pingMessage = new Message(CHANNEL_ID, {
+        messageType: Message.MESSAGE_TYPE.PING,
         inputData: {
             platform: 'android',
             logid: 'HKJFHUIRW',
             version: '1.0.0',
             switch: 'true'
         },
-        callbackId: 'mock_handshake_id'
+        callbackId: 'mock_ping_id'
     });
 
-    this.handshake = function () {
-        console.info(CHANNEL_ID, 'mock send handShakeMessage');
-        send(handShakeMessage);
+    this.ping = function () {
+        console.info(CHANNEL_ID, 'mock send ping message');
+        send(pingMessage);
     };
 
     this.createRequestMessage = function (config) {

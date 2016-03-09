@@ -2,28 +2,11 @@
  * Copyright (C) 2015 yanni4night.com
  * bridge.js
  *
- * Workflow:
- *
- *                      |--Bridge--|
- *                    |--          --|
- *                   |-              -|
- *                   |                |                  
- * NBusiness      Native           Webview       WBusiness
- *     |             | ==handshake==> |             |
- *     |             | <==response==  |             |
- *     | <==notify== |                |             |
- *     |             | ==handback==>  |             |
- *     |             |                | ==notify==> |
- *     |             |                |             |
- *     | --------------bridge connected------------ |
- *
- * "WBusiness" but not "NBusiness" can request IMMEDIATELY
- * When notified the bridge is connected.
- * 
  * changelog
  * 2015-11-18[16:16:12]:revised
  * 2016-02-29[13:56:58]:support duplicated handshake
- * 2016-02-29[13:56:58]:remove handshake
+ * 2016-02-29[13:56:58]:remove handshake initializing
+ * 2016-03-09[15:10:35]:rename handshake to ping
  *
  * @author yanni4night@gmail.com
  * @version 1.3.0
