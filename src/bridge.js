@@ -7,9 +7,10 @@
  * 2016-02-29[13:56:58]:support duplicated handshake
  * 2016-02-29[13:56:58]:remove handshake initializing
  * 2016-03-09[15:10:35]:rename handshake to ping
+ * 2016-03-14[17:30:47]:remove quese limit
  *
  * @author yanni4night@gmail.com
- * @version 1.3.0
+ * @version 1.4.0
  * @since 1.0.0
  */
 import {DomEvent}  from './dom-event';
@@ -52,7 +53,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     var bridgeReadyTriggered = false;
 
-    const QUEUE_LIMIT_TO_NATIVE = 5;
+    // const QUEUE_LIMIT_TO_NATIVE = 5;
 
     // Indicate this bridge
     const channelId = 'channel:' + nativeExport;
@@ -102,13 +103,15 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     /**
      * If can upload a message.
+     *
+     * Always true.
      * 
      * @return {boolean}
-     * @version 1.0.0
+     * @version 1.0.1
      * @since 1.0.0
      */
     const canUpload = () => {
-        return messageQueueToNative.size() < QUEUE_LIMIT_TO_NATIVE;
+        return true;// messageQueueToNative.size() < QUEUE_LIMIT_TO_NATIVE;
     };
 
     // native -> webview
@@ -166,30 +169,29 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     function export2Webview() {
         var webviewExportExtension;
 
-        if (!window[webviewExport]) {
-            window[webviewExport] = {
-                call: function (cmdKey, methodKey, args, timeout) {
-                    return new Promise((resolve, reject) => {
-                        if (!canUpload()) {
-                            reject(new Error('Too often'));
-                        } else {
-                            let msg = new RequestMessage(channelId, {
-                                cmd: cmdKey,
-                                method: methodKey,
-                                inputData: extend(true, {}, args)
-                            }, timeout).on('data', (evt, data) => {
-                                resolve(data);
-                            }).on('error', (evt, err) => {
-                                reject(err);
-                            });
+        window[webviewExport] = {
+            call: function (cmdKey, methodKey, args, timeout) {
+                return new Promise((resolve, reject) => {
+                    if (!canUpload()) {
+                        reject(new Error('Too often'));
+                    } else {
+                        let msg = new RequestMessage(channelId, {
+                            cmd: cmdKey,
+                            method: methodKey,
+                            inputData: extend(true, {}, args)
+                        }, timeout).on('data', (evt, data) => {
+                            resolve(data);
+                        }).on('error', (evt, err) => {
+                            reject(err);
+                        });
 
-                            upload(msg);
-                        }
+                        upload(msg);
+                    }
 
-                    });
-                }
-            };
-        }
+                });
+            }
+        };
+        
 
         // What in webviewExport depends on state
         if (READY_STATE_ENUM.COMPLETE === readyState) {
