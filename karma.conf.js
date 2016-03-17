@@ -15,6 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'server.dist.js',
+      'bridge.dist.js',
       'test.dist.js'
     ],
 

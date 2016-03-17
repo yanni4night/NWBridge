@@ -10,7 +10,6 @@
  * @since 1.0.0
  */
 
-var ServerBridge = require('./mock').ServerBridge;
 var assert = require('assert');
 var PriorityQueue = require('../dist/queue').PriorityQueue;
 var Queue = require('../dist/queue').Queue;
@@ -26,6 +25,7 @@ window.HYBRID_INITIAL_DATA = {
     version: '1.0.0',
     logid: 'NUSIDY(*GFD'
 };
+var ServerBridge = window.ServerBridge;
 
 describe('Queue', function () {
     describe('#push()', function () {

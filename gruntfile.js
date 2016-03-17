@@ -60,12 +60,12 @@ module.exports = function (grunt) {
                 dest: 'bridge.dist.js'
             },
             test: {
-                src: ['test/test.js'],
+                src: ['test/case.js'],
                 dest: 'test.dist.js'
             },
-            browser: {
-                src: ['test/browser.js'],
-                dest: 'browser.dist.js'
+            server: {
+                src: ['test/server.js'],
+                dest: 'server.dist.js'
             }
         },
         copy: {

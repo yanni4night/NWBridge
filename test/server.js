@@ -1,16 +1,16 @@
 /**
  * Copyright (C) 2015 yanni4night.com
- * mock.js
+ * server.js
  *
  * changelog
  * 2015-11-20[13:02:26]:revised
+ * 2016-03-17[13:18:43]:rename to server
  *
  * @author yanni4night@gmail.com
  * @version 1.0.0
  * @since 1.0.0
  */
 
-require('../dist/bridge');
 var Message = require('../dist/message').Message;
 var ResponseMessage = require('../dist/message').ResponseMessage;
 var RequestMessage = require('../dist/message').RequestMessage;
@@ -82,13 +82,22 @@ function ServerBridge(nativeExport, scheme) {
     });
 
     this.ping = function () {
-        console.info(CHANNEL_ID, 'mock send ping message');
         send(pingMessage);
     };
 
     this.createRequestMessage = function (config) {
         return new RequestMessage(CHANNEL_ID, config);
     };
+
+    this.register = function (cmd, method, func) {
+        supports[cmd] = supports[cmd] || {};
+        supports[cmd][method] = func;
+    };
 }
 
+extend(ServerBridge, {
+    Message: Message,
+    ResponseMessage: ResponseMessage,
+    RequestMessage: RequestMessage
+});
 exports.ServerBridge = window.ServerBridge = ServerBridge;

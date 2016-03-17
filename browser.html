@@ -30,6 +30,12 @@
     </body>
     <script>
 
+    window.HYBRID_INITIAL_DATA = {
+    platform: 'android',
+    version: '1.0.0',
+    logid: 'NUSIDY(*GFD'
+};
+
     $('#version').addEventListener('click',function(){
         if(state === 'complete'){
             JsBridge.system.version().then(function(){
@@ -41,6 +47,10 @@
     },false);
 
     </script>
+    <script src="server.dist.js"></script>
     <script src="bridge.dist.js"></script>
-    <script src="browser.dist.js"></script>
+    <script>
+        new ServerBridge('__js_bridge', 'scheme://');
+        new NWBridge('__js_bridge', 'JsBridge','scheme://');
+    </script>
 </html>
