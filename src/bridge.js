@@ -60,9 +60,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     var readyState = READY_STATE_ENUM.PENDING;
 
-    if (window[nativeExport]) {
+/*    if (window[nativeExport]) {
         throw new Error('"' + nativeExport + '" already in use');
-    }
+    }*/
 
     /**
      * Notify document that bridge is ready.
