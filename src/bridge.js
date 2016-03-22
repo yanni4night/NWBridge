@@ -153,7 +153,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          * @version 1.0.0
          * @since 1.0.0
          */
-        send: function (messageStr) {
+        send: (messageStr) => {
             Logger.log('RECEIVE FROM NATIVE:', messageStr);
             const message = Message.fromMetaString(messageStr, channelId);
             if (!message.isInvalid()) {
@@ -167,10 +167,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     // Export to webview
     function export2Webview() {
-        var webviewExportExtension;
+        let webviewExportExtension;
 
         window[webviewExport] = {
-            call: function (cmdKey, methodKey, args, timeout) {
+            call: (cmdKey, methodKey, args, timeout) => {
                 return new Promise((resolve, reject) => {
                     if (!canUpload()) {
                         reject(new Error('Too often'));
@@ -203,8 +203,8 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                  * @todo test
                  * @return {this}
                  */
-                register: function () {
-                    var args = Array.prototype.slice.call(arguments);
+                register: (...argus) => {
+                    var args = Array.prototype.slice.call(argus);
                     args.unshift(channelId);
                     Api.register.apply(Api, args);
                     return window[webviewExport];

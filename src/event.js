@@ -12,7 +12,7 @@
 
 export function Event() {
 
-    var listeners = {};
+    const listeners = {};
 
     /**
      * Bind event,multiple events split by space supported.

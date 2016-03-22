@@ -17,7 +17,7 @@ const defaultLog = console.log || (() => {});
 export const Logger = {};
 
 keys.forEach((key) => {
-    Logger[key] = function () {
-        (console[key] || defaultLog).apply(console, arguments);
+    Logger[key] = (...args) => {
+        (console[key] || defaultLog).apply(console, args);
     };
 });
