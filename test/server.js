@@ -22,7 +22,7 @@ function ServerBridge(nativeExport, scheme) {
 
     var self = this;
 
-    var CHANNEL_ID = 'server' + nativeExport;
+    var CHANNEL_ID = 'server' + nativeExport + Date.now().toString(36).toUpperCase();
 
     var supports = {};
 
@@ -75,8 +75,7 @@ function ServerBridge(nativeExport, scheme) {
         inputData: {
             platform: 'android',
             logid: 'HKJFHUIRW',
-            version: '1.0.0',
-            switch: 'true'
+            version: '1.0.0'
         },
         callbackId: 'mock_ping_id'
     });

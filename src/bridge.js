@@ -57,11 +57,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     const timestamp = Date.now().toString(36).toUpperCase();
 
     // Indicate this bridge
-    const channelId = `channel[${timestamp}]:${nativeExport}`;
+    const channelId = `CHANNEL/${timestamp}/${nativeExport}`;
 
     var readyState = READY_STATE_ENUM.PENDING;
 
-    const ucFirst = str => str.replace(/^([A-Z])/, n => n.toLowerCase());
+    const lcFirst = str => str.replace(/^([A-Z])/, n => n.toLowerCase());
 
     /**
      * Notify document that bridge is ready.
@@ -74,8 +74,6 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     const bridgeReady = () => {
         const evtData = {};
 
-        const ucWebviewExport = ucFirst(webviewExport);
-
         if (bridgeReadyTriggered) {
             return;
         }
@@ -83,9 +81,9 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         Logger.log(`Bridge ready[${channelId}]:${readyState}` );
 
         // Like "JsBridge" to "jsBridge"
-        evtData[ucWebviewExport] = window[webviewExport];
+        evtData[lcFirst(webviewExport)] = window[webviewExport];
         // Like "JsBridgeReady"
-        DomEvent.trigger(`${ucWebviewExport}Ready`, evtData);
+        DomEvent.trigger(`${webviewExport}Ready`, evtData);
         bridgeReadyTriggered = true;
     };
 

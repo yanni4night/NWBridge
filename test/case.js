@@ -23,7 +23,7 @@ var Message = require('../dist/message').Message;
 window.HYBRID_INITIAL_DATA = {
     platform: 'android',
     version: '1.0.0',
-    logid: 'NUSIDY(*GFD'
+    logid: 'log-' + Date.now()
 };
 var ServerBridge = window.ServerBridge;
 

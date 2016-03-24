@@ -11,42 +11,21 @@
  */
 
 import {extend} from './extend';
+import {Logger} from './logger';
 
 const defaultApis = {
     location: {
-        href: () => {
-            return location.href;
-        },
-        host: () => {
-            return location.host;
-        },
-        hostname: () => {
-            return location.hostname;
-        },
-        pathname: () => {
-            return location.pathname;
-        },
-        port: () => {
-            return location.port;
-        },
-        origin: () => {
-            return location.origin;
-        },
-        search: () => {
-            return location.search;
-        },
-        hash: () => {
-            return location.hash;
-        },
-        reload: function () {
-            return location.reload();
-        },
-        assign: function (newUrl) {
-            return location.assign(newUrl);
-        },
-        replace: function (newUrl) {
-            return location.replace(newUrl);
-        }
+        href: () => location.href,
+        host: () => location.host,
+        hostname: () => location.hostname,
+        pathname: () => location.pathname,
+        port: () => location.port,
+        origin: () => location.origin,
+        search: () => location.search,
+        hash: () => location.hash,
+        reload: () => location.reload(),
+        assign: newUrl => location.assign(newUrl),
+        replace: newUrl => location.replace(newUrl)
     },
     localStorage: {
         enabled: () => {
@@ -61,28 +40,18 @@ const defaultApis = {
                 return false;
             }
         },
-        setItem: function (key, value) {
-            localStorage.setItem(key, value);
-        },
-        getItem: function (key) {
-            localStorage.getItem(key);
-        },
-        removeItem: function (key) {
-            localStorage.removeItem(key);
-        }
+        setItem: (key, value) => localStorage.setItem(key, value),
+        getItem: key => localStorage.getItem(key),
+        removeItem: (key) => localStorage.removeItem(key)
     },
     cookie: {
-        enabled: () => {
-            return navigator.cookieEnabled;
-        },
+        enabled: () => navigator.cookieEnabled,
         setItem: () => {},
         getItem: () => {},
         removeItem: () => {}
     },
     navigator: {
-        getUserAgent: () => {
-            return navigator.userAgent;
-        }
+        getUserAgent: () => navigator.userAgent
     }
 };
 
@@ -98,7 +67,7 @@ export function Api(channelId, cmd, method, data) {
         return apis[channelId][cmd] && 'function' === typeof apis[channelId][cmd][method];
     };
 
-    this.invoke = (cb) => {
+    this.invoke = cb => {
         var ret;
         if (!this.exists()) {
             throw new Error(channelId + ':"' + cmd + '.' + method + '" does not exist');
@@ -141,4 +110,5 @@ Api.register = function (channelId, cmd, method, func, async) {
 
     newApi.__async = async;
     apis[channelId][cmd][method] = newApi;
+    Logger.log(`APIS AFTER REGISTER[${channelId}]:` + JSON.stringify(apis));
 };

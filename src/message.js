@@ -37,10 +37,10 @@ export function Message(channelId, metaData) {
         callbackId: undefined,
         inputData: undefined,
         outputData: undefined
-    }, {
+    }, metaData, {
         channelId: channelId,
         priority: 0
-    }, metaData, new Event());
+    }, new Event());
 }
 
 extend(Message.prototype, {
