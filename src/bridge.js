@@ -41,7 +41,7 @@ const READY_STATE_ENUM = {
  */
 window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
-    const VERSION = '1.3.0';
+    const VERSION = '1.5.0';
 
     const messageQueueFromNative = new PriorityQueue({
         priorityKey: 'priority'
@@ -53,16 +53,15 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
 
     var bridgeReadyTriggered = false;
 
-    // const QUEUE_LIMIT_TO_NATIVE = 5;
+    // Record unix stamp when bridge created
+    const timestamp = Date.now().toString(36).toUpperCase();
 
     // Indicate this bridge
-    const channelId = 'channel:' + nativeExport;
+    const channelId = `channel[${timestamp}]:${nativeExport}`;
 
     var readyState = READY_STATE_ENUM.PENDING;
 
-/*    if (window[nativeExport]) {
-        throw new Error('"' + nativeExport + '" already in use');
-    }*/
+    const ucFirst = str => str.replace(/^([A-Z])/, n => n.toLowerCase());
 
     /**
      * Notify document that bridge is ready.
@@ -75,18 +74,18 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     const bridgeReady = () => {
         const evtData = {};
 
+        const ucWebviewExport = ucFirst(webviewExport);
+
         if (bridgeReadyTriggered) {
             return;
         }
 
-        Logger.log('Bridge ready:', readyState);
+        Logger.log(`Bridge ready[${channelId}]:${readyState}` );
 
         // Like "JsBridge" to "jsBridge"
-        evtData[webviewExport.replace(/^([A-Z])/, function (n) {
-            return n.toLowerCase();
-        })] = window[webviewExport];
+        evtData[ucWebviewExport] = window[webviewExport];
         // Like "JsBridgeReady"
-        DomEvent.trigger(webviewExport + 'Ready', evtData);
+        DomEvent.trigger(`${ucWebviewExport}Ready`, evtData);
         bridgeReadyTriggered = true;
     };
 
@@ -97,25 +96,11 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
      * @version 1.0.0
      * @since 1.0.0
      */
-    const upload = (message) => {
-        messageQueueToNative.push(message);
-    };
-
-    /**
-     * If can upload a message.
-     *
-     * Always true.
-     * 
-     * @return {boolean}
-     * @version 1.0.1
-     * @since 1.0.0
-     */
-    const canUpload = () => {
-        return true;// messageQueueToNative.size() < QUEUE_LIMIT_TO_NATIVE;
-    };
+    const upload = message => messageQueueToNative.push(message);
 
     // native -> webview
-    messageQueueFromNative.on('push', () => {
+    messageQueueFromNative.on('push', (e, msg) => {
+        Logger.log('PUSH TO QUEUE FROM NATIVE:' + msg.serialize());
         // Release native thread
         asap(() => {
             var message;
@@ -124,16 +109,18 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 return;
             }
 
-            message.on('response', function (evt, respMsg) {
-                upload(respMsg);
-            }).on('error', (evt, err) => {
-                Logger.error(err.message);
-            }).flow();
+            Logger.log('POP FROM QUEUE TO WEBVIEW:' + message.serialize());
+
+            message.on('response', (evt, respMsg) => upload(respMsg))
+                .on('error', (evt, err) => Logger.error(err.message))
+                .flow();
         });
     });
 
     // webview -> native
-    messageQueueToNative.on('push', () => {
+    messageQueueToNative.on('push', (e, msg) => {
+        Logger.log('PUSH TO QUEUE FROM WEBVIEW:' + msg.serialize());
+        
         const message = messageQueueToNative.pop();
 
         if (message) {
@@ -154,12 +141,12 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
          * @since 1.0.0
          */
         send: (messageStr) => {
-            Logger.log('RECEIVE FROM NATIVE:', messageStr);
+            Logger.log(`RECEIVE FROM NATIVE:${messageStr}`);
             const message = Message.fromMetaString(messageStr, channelId);
             if (!message.isInvalid()) {
                 messageQueueFromNative.push(message);
             } else {
-                Logger.warn('[INVALID]:', messageStr);
+                Logger.warn(`INVALID FMT:${messageStr}`);
             }
             return messageStr || '[DEFAULT]';
         }
@@ -172,22 +159,17 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         window[webviewExport] = {
             call: (cmdKey, methodKey, args, timeout) => {
                 return new Promise((resolve, reject) => {
-                    if (!canUpload()) {
-                        reject(new Error('Too often'));
-                    } else {
-                        let msg = new RequestMessage(channelId, {
-                            cmd: cmdKey,
-                            method: methodKey,
-                            inputData: extend(true, {}, args)
-                        }, timeout).on('data', (evt, data) => {
-                            resolve(data);
-                        }).on('error', (evt, err) => {
-                            reject(err);
-                        });
+                    let msg = new RequestMessage(channelId, {
+                        cmd: cmdKey,
+                        method: methodKey,
+                        inputData: extend(true, {}, args)
+                    }, timeout).on('data', (evt, data) => {
+                        resolve(data);
+                    }).on('error', (evt, err) => {
+                        reject(err);
+                    });
 
-                        upload(msg);
-                    }
-
+                    upload(msg);
                 });
             }
         };

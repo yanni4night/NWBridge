@@ -70,7 +70,8 @@ extend(Message.prototype, {
             method: this.method,
             inputData: this.inputData,
             outputData: this.outputData,
-            callbackId: this.callbackId
+            callbackId: this.callbackId,
+            channelId: this.channelId
         };
     },
 
@@ -167,7 +168,6 @@ extend(Message.prototype, {
                         data: ret || {}
                     }
                 }));
-
             }
 
             break;
