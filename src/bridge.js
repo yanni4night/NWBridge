@@ -100,30 +100,39 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     messageQueueFromNative.on('push', (e, msg) => {
         Logger.log('PUSH TO QUEUE FROM NATIVE:' + msg.serialize());
         // Release native thread
+        // This could be blocked sometimes
         asap(() => {
-            var message;
+            // Pop all the messages
+            while (1) {
+                let message = messageQueueFromNative.pop();
+                
+                if (message) {
+                    Logger.log('POP FROM QUEUE TO WEBVIEW:' + message.serialize());
 
-            if (undefined === (message = messageQueueFromNative.pop())) {
-                return;
+                    message.on('response', (evt, respMsg) => upload(respMsg))
+                        .on('error', (evt, err) => Logger.error(err.message))
+                        .flow();
+                } else {
+                    break;
+                }
             }
-
-            Logger.log('POP FROM QUEUE TO WEBVIEW:' + message.serialize());
-
-            message.on('response', (evt, respMsg) => upload(respMsg))
-                .on('error', (evt, err) => Logger.error(err.message))
-                .flow();
         });
     });
 
     // webview -> native
     messageQueueToNative.on('push', (e, msg) => {
-        Logger.log('PUSH TO QUEUE FROM WEBVIEW:' + msg.serialize());
-        
-        const message = messageQueueToNative.pop();
+            Logger.log('PUSH TO QUEUE FROM WEBVIEW:' + msg.serialize());
+        while (1) {
+            let message = messageQueueToNative.pop();
 
-        if (message) {
-            radio.send(message);
+            if (message) {
+                radio.send(message);
+            } else {
+                break;
+            }
         }
+
+        
     });
 
     // Export to native always
