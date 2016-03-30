@@ -1,12 +1,13 @@
 {
   "name": "nwbridge",
   "version": "1.5.0",
-  "description": "native&webview bridge",
+  "description": "Native/Webview bridge for Hybrid",
   "main": "bridge.dist.min.js",
   "scripts": {
     "test": "karma start",
     "dist": "grunt --pub=dist",
-    "dev": "grunt"
+    "dev": "grunt",
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",
