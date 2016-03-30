@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>NWBridge by Yanni4night</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src='javascripts/jquery.js'></script>
+    <script src='javascripts/coffee-script.js'></script>
+    <script src='javascripts/jumly.min.js'></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>NWBridge</h1>
+        <p>Connecting <em>native</em> and <em>webview</em></p>
+        <p class="view"><a href="http://github.com/yanni4night/NWBridge">View the Project on GitHub <small>yanni4night/NWBridge</small></a></p>
+        <ul>
+          <li><a href="https://github.com/yanni4night/NWBridge/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/yanni4night/NWBridge/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="http://github.com/yanni4night/NWBridge">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Library for Hybrid</h1>
+        
+        <h2>为什么需要 JavaScript Lib？</h2>
+        
+        <p><b>Android</b> 可以直接向 Webview 中注入 JavaScript 对象，但是该对象仅直接纯函数调用，同时在 <cite>4.2</cite> 版本以下存在<a href="http://stackoverflow.com/questions/6415882/android-javascriptinterface-security">安全漏洞</a>。</p>
+
+        <p><b>iOS</b> 则无法注入任何 JavaScript 对象。</p>
+
+        <p>于是面向业务需要一套 <b>SDK</b> 能够：</p>
+        <ul>
+          <li>安全地实现与 Native 的双向通信；</li>
+          <li>屏蔽 Android 与 iOS 的差异；</li>
+          <li>提供友好的 API 输出</li>
+        </ul>
+
+        <h2>为什么不使用 <a href="https://github.com/marcuswestin/WebViewJavascriptBridge">WebViewJavascriptBridge</a>？</h2>
+
+        <ul>
+          <li>仅针对 <b>iOS</b>；</li>
+          <li>通信数据格式太 <b>RAW</b>；</li>
+          <li>接口不友好；</li>
+          <li>未考虑一些意外情况</li>
+        </ul>
+        <h2>通信原理（Principle of Communication）</h2>
+        
+        <p><b>Android</b> 端使用 <em>prompt</em> 方式。这是一个不常用的 BOM 方法，可以被 Native 代码选择性捕获。其唯一参数为字符串类型，用以承载通信数据。</p>
+
+        <pre><code>window.prompt('{"message": "I am Yanni4night"}');</code></pre>
+
+        <p><b>iOS</b> 端无法通过调用任何方法来直接与 Native 端通信，但可以通过 <i>Frame</i> 元素的请求来被 Native 端选择性捕获。可以通过 Frame 的 URL 携带通信数据。</p>
+
+        <pre><code>var iframe = document.createElement('iframe');
+iframe.src = "scheme://data?p=%7B%22message%22%3A%22I%20am%20Yanni4night%22%7D";</code></pre>
+
+        <p>为规避 URL 可能存在的长度限制，一般仅利用它通知 Native，再由 Native 来抓取数据。</p>
+  
+        <h2>消息(Message)</h2>
+        <p>消息是由消息类型、请求数据、响应数据、callback ID等构成的纯 JavaScript 对象。</p>
+<pre>
+{
+  messageType:
+  inputData:
+  outputData:
+    errNo:
+    errMsg:
+    data:
+  callbackId:
+}
+</pre>
+        <p>消息的流转全部通过一个发送队列和一个接收队列。</p>
+        <p>这里仿照 TCP 的 ACK 包，要求每一个请求消息都必须有 callback 回复确认。</p>
+        <h2>时序图(Sequence)</h2>
+        <h3>Native 向 Webview 发送请求</h3>
+<script type='text/jumly+sequence'>
+@found "Native", ->
+  @message "evaluate", "JsBridge", ->
+    @message "setTimeout", ->
+      @message "push the message to Q", ->
+        @message "pop messages from Q", ->
+          @message "Parse Message", ->
+            @message "Promise", "Webview", ->
+              @message "callback", "JsBridge", ->
+                @message "push response to Q", ->
+                  @message "pop responses to Q", ->
+                    @message "send to Native", "Native"
+            
+</script>
+      <h3>Webview 向 Native 发送请求（Android）</h3>
+<script type='text/jumly+sequence'>
+@found "Webview", ->
+  @message "call", "JsBridge", ->
+    @message "push the message to Q", ->
+      @message "pop messages from Q", ->
+        @message "window.prompt(Message)", "Native", ->
+          @message "callback", "JsBridge", ->
+            @message "push response to Q", ->
+              @message "pop responses to Q", ->
+                @message "send to Webview", "Webview"
+</script>
+      <h3>Webview 向 Native 发送请求（iOS）</h3>
+<script type='text/jumly+sequence'>
+@found "Webview", ->
+  @message "call", "JsBridge", ->
+    @message "push the message to Q", ->
+      @message "pop messages from Q", ->
+        @message "iframe.src=...", "Native", ->
+          @message "fetch data", "JsBridge", ->
+          @message "callback", "JsBridge", ->
+            @message "push response to Q", ->
+              @message "pop responses to Q", ->
+                @message "send to Webview", "Webview"
+</script>
+      <h2>模型(Model)</h2>
+      <h3>指令(command/cmd)</h3>
+      <p>API 的命名空间，Native/Webview 意义相同，不公用。</p>
+      <h3>方法(method)</h3>
+      <p>API 的方法名，Native/Webview 意义相同，不公用。</p>
+      <h3>异步回调</h3>
+      <p>允许被调用方以异步的方式响应请求，这可能会受到调用方超时时间的限制。</p>
+      <h2>用法(Usage)</h2>
+      <p>调用 <i>NWBridge</i> 构造函数。</p>
+<pre><code>new NWBridge('__tb_js_bridge', 'JsBridge', 'schema://')</code></pre>
+<p>上面的代码会在全局挂在两个变量，<i>__tb_js_bridge</i> 和 <i>JsBridge</i>，相同变量名重复构造无效。</p>
+      <h2>应用开发接口(API)</h2>
+      <p>以下所有 API 都挂在同一变量下，允许配置，为简便起见，这里以 <i>JsBridge</i> 为例。注意 JsBridge 对象不一定存在。</p>
+      <h3>readyState 属性</h3>
+      <p>该属性指示访问 Native 的能力状态，可能有三个取值：<i>pending</i>、<i>complete</b>、<i>error</i>。<strong>只有当该值为 <em>complete</em> 时以下方法才存在</strong>。</p>
+      <pre><code>alert(JsBridge.readyState)</code></pre>
+      <h3>call(command, method, payload)</h3>
+      <p>访问 Native 的预定义方法，返回一个 <strong>Promise</strong> 对象。</p>
+<pre><code>JsBridge.call('dialog', 'confirm', {msg: 'R u sure?'})
+  .then(function (yes) {});</code></pre>
+      <h3>register(command, method, function, isAsync)</h3>
+      <p>注册一个在 Webview 定义的供 Native 调用的 API。</p>
+<pre><code>JsBridge.register('location', 'search',
+  function(){
+    return location.search;
+  }, false);</code></pre>
+      <p>如果是异步的：</p>
+<pre><code>JsBridge.register('location', 'search',
+  function(cb){
+    cb(location.search);
+  }, true);</code></pre>
+      <h2>FAQ</h2>
+      <h3>1. JsBridge 中的 <i>setTimeout</i> 是做什么的？</h3>
+      <p>Native 直接访问 JavaScript，会被 Webcore 的单线程 hang 住，为了不影响客户端主线程的渲染，这里使用 setTimeout 或 setImmediate 将后续逻辑发到下一个执行周期中。</p>
+      <p>注意这个定时器在某些情况下可能被取消，因此只要没被取消，应尽可能地处理数据，避免“失活”。</p>
+      <h3>2. 如果得到 JsBridge 对象准备好的通知？</h3>
+      <p>使用 document 事件：</p>
+<pre><code>document.addEventListener('JsBridgeReady', function(e){
+  e.jsBridge.readyState
+}.false);</code></pre>
+      <p>在此时间之前，JsBridge 对象不存在，防止过早发送消息导致业务失败。</p>
+      <h3>3. 收到/产生一个消息就处理/发送一个消息，为什么还要使用队列？</h3>
+      <p>发送逻辑上允许 iOS 同时有多个数据被发送，因此要有发送队列。</p>
+      <p>因为 setTimeout 可能被取消的缘故，接收也应该是队列。</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="http://github.com/yanni4night">Yanni Nightingale</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+</html>
