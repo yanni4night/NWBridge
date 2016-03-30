@@ -465,6 +465,9 @@ describe('NWBridge', function () {
         it('should get version ', function () {
             document.addEventListener('KKjsBridgeReady', function () {
                 assert.ok(!!window.KKjsBridge.version);
+                var old = window.KKjsBridge.version;
+                window.KKjsBridge.version = 'x.x.x';
+                assert.deepEqual(old, window.KKjsBridge.version);
             }, false);
 
             new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://');

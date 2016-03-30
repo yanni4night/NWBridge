@@ -219,7 +219,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
         if (Object.defineProperty) {
             Object.defineProperty(window[webviewExport], 'version', {
                 value: VERSION,
-                writable: true,
+                writable: false,
                 enumerable: false,
                 configurable: false
             });
