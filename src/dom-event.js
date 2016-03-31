@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 yanni4night.com
+ * Copyright (C) 2015~2016 yanni4night.com
  * dom-event.js
  *
  * changelog
