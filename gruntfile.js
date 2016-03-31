@@ -1,12 +1,13 @@
 /**
- * Copyright (C) 2015 yanni4night.com
+ * Copyright (C) 2015~2016 yanni4night.com
  * gruntfile.js
  *
  * changelog
  * 2015-11-19[18:55:28]:revised
+ * 2016-03-31[12:47:18]:eslint instead of jshint
  *
  * @author yanni4night@gmail.com
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 
@@ -47,9 +48,9 @@ module.exports = function (grunt) {
                 dest: 'dist'
             }
         },
-        jshint: {
+        eslint: {
             options: {
-                jshintrc: '.jshintrc'
+                configFile: '.eslintrc'
             },
             src: ['src/*.js', '!src/promise.js', '!src/fsm.js', '!src/extend.js'],
             test: ['test/*.js']
@@ -97,6 +98,6 @@ module.exports = function (grunt) {
             }
         }
     });
-    var tasks = ['clean', 'jshint', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
+    var tasks = ['clean', 'eslint', 'babel:es2015'].concat(doDist ? [] : ['copy']).concat(['browserify', 'uglify']);
     grunt.registerTask('default', tasks);
 };
