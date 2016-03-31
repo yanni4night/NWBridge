@@ -129,7 +129,7 @@ iframe.src = "scheme://data?p=%7B%22message%22%3A%22I%20am%20Yanni4night%22%7D";
       <p>允许被调用方以异步的方式响应请求，这可能会受到调用方超时时间的限制。</p>
       <h2>用法(Usage)</h2>
       <p>调用 <i>NWBridge</i> 构造函数。</p>
-<pre><code>new NWBridge('__tb_js_bridge', 'JsBridge', 'schema://')</code></pre>
+<pre><code>new NWBridge('__tb_js_bridge', 'JsBridge', 'schema://', hybridInitialData)</code></pre>
 <p>上面的代码会在全局挂在两个变量，<i>__tb_js_bridge</i> 和 <i>JsBridge</i>，相同变量名重复构造无效。</p>
       <h2>应用开发接口(API)</h2>
       <p>以下所有 API 都挂在同一变量下，允许配置，为简便起见，这里以 <i>JsBridge</i> 为例。注意 JsBridge 对象不一定存在。</p>
