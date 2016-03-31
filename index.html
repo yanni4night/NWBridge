@@ -136,9 +136,9 @@ iframe.src = "scheme://data?p=%7B%22message%22%3A%22I%20am%20Yanni4night%22%7D";
       <h3>readyState 属性</h3>
       <p>该属性指示访问 Native 的能力状态，可能有三个取值：<i>pending</i>、<i>complete</b>、<i>error</i>。<strong>只有当该值为 <em>complete</em> 时以下方法才存在</strong>。</p>
       <pre><code>alert(JsBridge.readyState)</code></pre>
-      <h3>call(command, method, payload)</h3>
+      <h3>call(command, method, payload, timeout)</h3>
       <p>访问 Native 的预定义方法，返回一个 <strong>Promise</strong> 对象。</p>
-<pre><code>JsBridge.call('dialog', 'confirm', {msg: 'R u sure?'})
+<pre><code>JsBridge.call('dialog', 'confirm', {msg: 'R u sure?'}, 3000)
   .then(function (yes) {});</code></pre>
       <h3>register(command, method, function, isAsync)</h3>
       <p>注册一个在 Webview 定义的供 Native 调用的 API。</p>
