@@ -5,8 +5,8 @@
   "main": "bridge.dist.min.js",
   "scripts": {
     "test": "karma start",
-    "dist": "grunt --pub=dist",
-    "dev": "grunt",
+    "dist": "NODE_ENV=release ./node_modules/.bin/webpack",
+    "dev": "NODE_ENV=development ./node_modules/.bin/webpack",
     "prepublish": "npm run dist"
   },
   "repository": {
@@ -20,6 +20,11 @@
   "author": "yanni4night@gmail.com",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.7.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-check-es2015-constants": "^6.7.2",
+    "babel-plugin-transform-object-assign": "^6.5.0",
+    "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "babel-preset-es2015": "^6.1.18",
     "dateformat": "^1.0.12",
     "grunt": "^0.4.5",
@@ -34,6 +39,7 @@
     "karma-mocha": "^0.2.2",
     "load-grunt-tasks": "^3.3.0",
     "mocha": "^2.4.5",
-    "time-grunt": "^1.2.2"
+    "time-grunt": "^1.2.2",
+    "webpack": "^1.12.14"
   }
 }

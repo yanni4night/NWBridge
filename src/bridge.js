@@ -9,6 +9,7 @@
  * 2016-03-09[15:10:35]:rename handshake to ping
  * 2016-03-14[17:30:47]:remove quese limit
  * 2016-03-31[12:32:01]:set hybridInitialData as a parameter
+ * 2016-03-31[18:27:10]:exports NWBridge
  *
  * @author yanni4night@gmail.com
  * @version 1.6.0
@@ -38,7 +39,7 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-window.NWBridge = function (nativeExport, webviewExport, scheme, hybridInitialData = {}) {
+export const NWBridge = (nativeExport, webviewExport, scheme, hybridInitialData = {}) => {
 
     const VERSION = '1.6.0';
 

@@ -16,8 +16,35 @@ const defaultLog = console.log || (() => {});
 
 export const Logger = {};
 
-keys.forEach((key) => {
-    Logger[key] = (...args) => {
-        (console[key] || defaultLog).apply(console, args);
-    };
+const domId = 'js-bridge-log';
+
+keys.forEach(key => {
+    if ('development' === process.env.NODE_ENV) {
+        Logger[key] = (...args) => {
+            let father = document.querySelector('#' + domId);
+            if (!father) {
+                father = document.createElement('ol');
+                father.id = domId;
+                if (document.body) {
+                    document.body.insertBefore(father, document.body.firstChild);
+                }
+
+                var style = document.createElement('style');
+                style.type = 'text/css';
+                style.innerHTML =
+                    '#js-bridge-log li {margin-top: 10px} #js-bridge-log .warn{color: #E27B44} #js-bridge-log .error{color: red} #js-bridge-log .log{color:green} #js-bridge-log .info{color: blue}';
+                document.head.appendChild(style);
+            }
+            let p = document.createElement('li');
+            p.className = key;
+            p.innerHTML = '<font color=#666>[' + new Date().toISOString() + ']</font> ' + Array.prototype.join
+                .call(
+                    args, '');
+            father.appendChild(p);
+        };
+    } else {
+        Logger[key] = (...args) => {
+            (console[key] || defaultLog).apply(console, args);
+        };
+    }
 });
