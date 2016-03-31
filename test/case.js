@@ -20,7 +20,7 @@ var XPromise = require('../dist/promise').Promise;
 var XEvent = require('../dist/event').Event;
 var Message = require('../dist/message').Message;
 
-window.HYBRID_INITIAL_DATA = {
+var HYBRID_INITIAL_DATA = {
     platform: 'android',
     version: '1.0.0',
     logid: 'log-' + Date.now()
@@ -363,7 +363,7 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://');
+            new window.NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -393,7 +393,7 @@ describe('Api', function () {
                 }));
             }, false);
             new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge',
-                'kkcrascheme://');
+                'kkcrascheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -425,7 +425,7 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://');
+            new window.NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -453,7 +453,7 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://');
+            new window.NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -470,7 +470,7 @@ describe('NWBridge', function () {
                 assert.deepEqual(old, window.KKjsBridge.version);
             }, false);
 
-            new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://');
+            new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_0108p09_bridge', 'kkscheme://');
             serverBridge.ping();
@@ -481,7 +481,7 @@ describe('NWBridge', function () {
         this.timeout(5e3);
         it('can cache messages before ping', function (done) {
 
-            new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://');
+            new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_098_bridge', 'pscheme://');
 
@@ -526,7 +526,7 @@ describe('NWBridge', function () {
         it('should handle duplicated ping', function (done) {
             var fired = false;
             new window.NWBridge('__js_09x12x530_bridge', 'C12530jsBridge',
-                '12530scheme://');
+                '12530scheme://', HYBRID_INITIAL_DATA);
             var serverBridge = new ServerBridge('__js_09x12x530_bridge',
                 '12530scheme://');
             serverBridge.on('ping', function () {
@@ -550,7 +550,7 @@ describe('NWBridge', function () {
                 });
             });
 
-            new window.NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://');
+            new window.NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_09x1230_bridge', '12scheme://');
 
@@ -594,7 +594,7 @@ describe('NWBridge', function () {
 
             }, false);
 
-            new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://');
+            new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_09x02_bridge', 'cscheme://');
             serverBridge.send(new Message('__t_201uh7', {

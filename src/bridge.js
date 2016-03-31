@@ -8,9 +8,10 @@
  * 2016-02-29[13:56:58]:remove handshake initializing
  * 2016-03-09[15:10:35]:rename handshake to ping
  * 2016-03-14[17:30:47]:remove quese limit
+ * 2016-03-31[12:32:01]:set hybridInitialData as a parameter
  *
  * @author yanni4night@gmail.com
- * @version 1.4.0
+ * @version 1.6.0
  * @since 1.0.0
  */
 import {DomEvent}  from './dom-event';
@@ -22,8 +23,6 @@ import {Api}  from './api';
 import {Promise}  from './promise';
 import {Logger}  from './logger';
 import {asap}  from './asap';
-
-/* HYBRID_INITIAL_DATA */
 
 const READY_STATE_ENUM = {
     PENDING: 'pending',
@@ -39,9 +38,9 @@ const READY_STATE_ENUM = {
  * @since 1.0.0
  * @version 1.0.0
  */
-window.NWBridge = function (nativeExport, webviewExport, scheme) {
+window.NWBridge = function (nativeExport, webviewExport, scheme, hybridInitialData = {}) {
 
-    const VERSION = '1.5.0';
+    const VERSION = '1.6.0';
 
     const messageQueueFromNative = new PriorityQueue({
         priorityKey: 'priority'
@@ -200,10 +199,10 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
                 },
                 system: {
                     version: () => {
-                        return Promise.resolve(window.HYBRID_INITIAL_DATA.version);
+                        return Promise.resolve(hybridInitialData.version);
                     },
                     platform: () => {
-                        return Promise.resolve(window.HYBRID_INITIAL_DATA.platform);
+                        return Promise.resolve(hybridInitialData.platform);
                     }
                 }
             };
@@ -229,7 +228,7 @@ window.NWBridge = function (nativeExport, webviewExport, scheme) {
     }
 
     try {
-        radio = new Radio(window.HYBRID_INITIAL_DATA.platform, scheme);
+        radio = new Radio(hybridInitialData.platform, scheme);
         extend(window[nativeExport], radio.extension);
         readyState = READY_STATE_ENUM.COMPLETE;
     } catch (e) {
