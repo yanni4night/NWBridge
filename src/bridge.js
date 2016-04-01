@@ -41,7 +41,7 @@ const READY_STATE_ENUM = {
  */
 export const NWBridge = (nativeExport, webviewExport, scheme, hybridInitialData = {}) => {
 
-    const VERSION = '1.6.0';
+    const VERSION = __VERSION__;
 
     const messageQueueFromNative = new PriorityQueue({
         priorityKey: 'priority'
