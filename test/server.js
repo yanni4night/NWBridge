@@ -11,35 +11,33 @@
  * @since 1.0.0
  */
 
-var Message = require('../dist/message').Message;
-var ResponseMessage = require('../dist/message').ResponseMessage;
-var RequestMessage = require('../dist/message').RequestMessage;
-var extend = require('../dist/extend').extend;
-var XEvent = require('../dist/event').Event;
+import {Message} from '../src/message';
+import {ResponseMessage} from '../src/message';
+import {RequestMessage} from '../src/message';
+import {extend} from '../src/extend';
+import {Event as XEvent} from '../src/event';
 
 
-function ServerBridge(nativeExport, scheme) {
+export function ServerBridge(nativeExport, scheme) {
 
-    var self = this;
+    const self = this;
 
-    var CHANNEL_ID = 'server' + nativeExport + Date.now().toString(36).toUpperCase();
+    const CHANNEL_ID = 'server' + nativeExport + Date.now().toString(36).toUpperCase();
 
-    var supports = {};
+    const supports = {};
 
-    var send = this.send = function (msgObj) {
-        window[nativeExport].send(msgObj.serialize());
-    };
+    const send = this.send = msgObj => window[nativeExport].send(msgObj.serialize());
 
     extend(this, new XEvent());
 
-    var oldPrompt = window.prompt;
+    const oldPrompt = window.prompt;
 
-    window.prompt = function (messageStr) {
+    window.prompt = messageStr => {
         if (messageStr.indexOf(scheme)) {
-            return oldPrompt.apply(window, arguments);
+            return oldPrompt.call(window, messageStr);
         }
 
-        var message = Message.fromMetaString(messageStr.replace(scheme, ''), CHANNEL_ID);
+        const message = Message.fromMetaString(messageStr.replace(scheme, ''), CHANNEL_ID);
 
         if (message.messageType === Message.MESSAGE_TYPE.PING) {
             self.emit('ping', message);
@@ -70,7 +68,7 @@ function ServerBridge(nativeExport, scheme) {
         }
     };
 
-    var pingMessage = new Message(CHANNEL_ID, {
+    let pingMessage = new Message(CHANNEL_ID, {
         messageType: Message.MESSAGE_TYPE.PING,
         inputData: {
             platform: 'android',
@@ -99,4 +97,3 @@ extend(ServerBridge, {
     ResponseMessage: ResponseMessage,
     RequestMessage: RequestMessage
 });
-exports.ServerBridge = window.ServerBridge = ServerBridge;

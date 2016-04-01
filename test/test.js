@@ -10,22 +10,26 @@
  * @since 1.0.0
  */
 
-var assert = require('assert');
-var PriorityQueue = require('../dist/queue').PriorityQueue;
-var Queue = require('../dist/queue').Queue;
-var Callback = require('../dist/callback').Callback;
-var DomEvent = require('../dist/dom-event').DomEvent;
-var Radio = require('../dist/radio').Radio;
-var XPromise = require('../dist/promise').Promise;
-var XEvent = require('../dist/event').Event;
-var Message = require('../dist/message').Message;
+import assert from 'assert';
+import {PriorityQueue} from '../src/queue';
+import {Queue} from '../src/queue';
+import {Callback} from '../src/callback';
+import {DomEvent} from '../src/dom-event';
+import {Radio} from '../src/radio';
+import {Promise as XPromise} from '../src/promise';
+import {Event as XEvent} from '../src/event';
+import {Message} from '../src/message';
 
-var HYBRID_INITIAL_DATA = {
+const pkg = __PKG__;
+//JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'));
+
+const HYBRID_INITIAL_DATA = {
     platform: 'android',
     version: '1.0.0',
     logid: 'log-' + Date.now()
 };
-var ServerBridge = window.ServerBridge;
+
+const ServerBridge = window.ServerBridge;
 
 describe('Queue', function () {
     describe('#push()', function () {
@@ -464,10 +468,11 @@ describe('NWBridge', function () {
     describe('version', function () {
         it('should get version ', function () {
             document.addEventListener('KKjsBridgeReady', function () {
-                assert.ok(!!window.KKjsBridge.version);
+                assert.deepEqual(pkg.version, window.KKjsBridge.version);
                 var old = window.KKjsBridge.version;
-                window.KKjsBridge.version = 'x.x.x';
-                assert.deepEqual(old, window.KKjsBridge.version);
+                assert.throws(()=>{
+                    window.KKjsBridge.version = 'x.x.x';
+                });
             }, false);
 
             new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://', HYBRID_INITIAL_DATA);

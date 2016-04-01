@@ -10,7 +10,7 @@
   * @since 1.0.0
   * @see https://github.com/then/promise/blob/master/src/core.js
   */
- 
+/* eslint-disable */
 import {asap} from './asap';
  
 function noop() {}
