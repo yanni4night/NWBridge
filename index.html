@@ -127,12 +127,20 @@ iframe.src = "scheme://data?p=%7B%22message%22%3A%22I%20am%20Yanni4night%22%7D";
       <p>API 的方法名，Native/Webview 意义相同，不公用。</p>
       <h3>异步回调</h3>
       <p>允许被调用方以异步的方式响应请求，这可能会受到调用方超时时间的限制。</p>
+      <h2>安装(Install)</h2>
+      <p>直接源码构建：</p>
+      <pre><code>$ npm install
+$ make</code></pre>
+      <p>或者通过 NPM：</p>
+      <pre><code>npm install --save nwbridge</code></pre>
       <h2>用法(Usage)</h2>
       <p>调用 <i>NWBridge</i> 构造函数。</p>
 <pre><code>new NWBridge('__tb_js_bridge', 'JsBridge', 'schema://', hybridInitialData)</code></pre>
 <p>上面的代码会在全局挂在两个变量，<i>__tb_js_bridge</i> 和 <i>JsBridge</i>，相同变量名重复构造无效。</p>
-      <h2>应用开发接口(API)</h2>
-      <p>以下所有 API 都挂在同一变量下，允许配置，为简便起见，这里以 <i>JsBridge</i> 为例。注意 JsBridge 对象不一定存在。</p>
+     <p>如果你是通过 NPM 安装，那么你可能需要：</p>
+     <pre><code>import NWBridge from 'nwbridge'</code></pre>
+      <h2>应用开发接口(Webview API)</h2>
+      <p>以下所有 API 都挂在同一变量下，命名允许配置，由 Webview 业务端代码（Js）调用。为简便起见，这里以 <i>JsBridge</i> 为例。注意 JsBridge 对象不一定存在。</p>
       <h3>readyState 属性</h3>
       <p>该属性指示访问 Native 的能力状态，可能有三个取值：<i>pending</i>、<i>complete</b>、<i>error</i>。<strong>只有当该值为 <em>complete</em> 时以下方法才存在</strong>。</p>
       <pre><code>alert(JsBridge.readyState)</code></pre>
@@ -142,15 +150,24 @@ iframe.src = "scheme://data?p=%7B%22message%22%3A%22I%20am%20Yanni4night%22%7D";
   .then(function (yes) {});</code></pre>
       <h3>register(command, method, function, isAsync)</h3>
       <p>注册一个在 Webview 定义的供 Native 调用的 API。</p>
-<pre><code>JsBridge.register('location', 'search',
+      <pre><code>JsBridge.register('location', 'search',
   function(){
     return location.search;
   }, false);</code></pre>
       <p>如果是异步的：</p>
-<pre><code>JsBridge.register('location', 'search',
+      <pre><code>JsBridge.register('location', 'search',
   function(cb){
     cb(location.search);
   }, true);</code></pre>
+      <h2>应用开发接口(Native API)</h2>
+      <p>以下所有 API 都挂在同一变量下，命名允许配置，由 Native 代码（Java/Object-C）调用。为简便起见，这里以 <i>__js_bridge</i> 为例。</p>
+      <h3>send(message)</h3>
+      <p>向 Webview 发送消息，参数必须是合法 JSON 语法的字符串形式，必须符合上面 Message 的格式，如：</p>
+      <pre><code>__js_bridge.send('{"messageType": "request"}')</code></pre>
+      <h3>fetch()</h3>
+      <p><b>iOS</b> 端用来从 Webview 主动抓取数据的方法，不存在于 
+      <b>Android</b> 端。返回值为字符串类型，为合法的 JSON 数组类型，数组中每个成员为上面的 Message 格式。</p>
+     <pre><code>__js_bridge.fetch()</code></pre>
       <h2>FAQ</h2>
       <h3>1. JsBridge 中的 <i>setTimeout</i> 是做什么的？</h3>
       <p>Native 直接访问 JavaScript，会被 Webcore 的单线程 hang 住，为了不影响客户端主线程的渲染，这里使用 setTimeout 或 setImmediate 将后续逻辑发到下一个执行周期中。</p>
