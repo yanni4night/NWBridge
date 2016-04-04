@@ -490,8 +490,8 @@ describe('NWBridge', function () {
 
             var serverBridge = new ServerBridge('__js_098_bridge', 'pscheme://');
 
-            Promise.all([
-                new Promise(function (resolve) {
+            XPromise.all([
+                new XPromise(function (resolve) {
                     serverBridge.on('response', function (evt, message) {
                         if ('location' === message.cmd && 'href' ===
                             message.method) {
@@ -499,7 +499,7 @@ describe('NWBridge', function () {
                         }
                     });
                 }),
-                new Promise(function (resolve) {
+                new XPromise(function (resolve) {
                     serverBridge.on('response', function (evt, message) {
                         if ('location' === message.cmd && 'hash' ===
                             message.method) {
