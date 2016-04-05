@@ -1,6 +1,6 @@
 {
   "name": "nwbridge",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Native/Webview bridge for Hybrid",
   "main": "bridge.dist.js",
   "scripts": {
