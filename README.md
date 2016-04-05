@@ -37,8 +37,8 @@ See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 [npm-url]: https://npmjs.org/package/nwbridge
 [downloads-image]: http://img.shields.io/npm/dm/nwbridge.svg
 [npm-image]: http://img.shields.io/npm/v/nwbridge.svg
-[travis-url]: https://travis-ci.org/yanni4night/nwbridge
-[travis-image]: http://img.shields.io/travis/yanni4night/nwbridge.svg
+[travis-url]: https://travis-ci.org/yanni4night/NWBridge?branch=master
+[travis-image]: https://travis-ci.org/yanni4night/NWBridge.svg?branch=master
 [david-dm-url]:https://david-dm.org/yanni4night/nwbridge
 [david-dm-image]:https://david-dm.org/yanni4night/nwbridge.svg
 [david-dm-dev-url]:https://david-dm.org/yanni4night/nwbridge#info=devDependencies
