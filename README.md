@@ -1,5 +1,7 @@
 # NWBridge
 
+[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency status][david-dm-image]][david-dm-url] [![Dev Dependency status][david-dm-dev-image]][david-dm-dev-url]
+
 JavaScript "bridge" for connecting Native and Webview on iOS/Android.
 
 # Build
@@ -31,3 +33,13 @@ See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 
 # Author
  - <yanni4night@gmail.com>
+
+[npm-url]: https://npmjs.org/package/nwbridge
+[downloads-image]: http://img.shields.io/npm/dm/nwbridge.svg
+[npm-image]: http://img.shields.io/npm/v/nwbridge.svg
+[travis-url]: https://travis-ci.org/yanni4night/nwbridge
+[travis-image]: http://img.shields.io/travis/yanni4night/nwbridge.svg
+[david-dm-url]:https://david-dm.org/yanni4night/nwbridge
+[david-dm-image]:https://david-dm.org/yanni4night/nwbridge.svg
+[david-dm-dev-url]:https://david-dm.org/yanni4night/nwbridge#info=devDependencies
+[david-dm-dev-image]:https://david-dm.org/yanni4night/nwbridge/dev-status.svg
