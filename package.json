@@ -4,7 +4,7 @@
   "description": "Native/Webview bridge for Hybrid",
   "main": "bridge.dist.js",
   "scripts": {
-    "test": "karma start",
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
     "dist": "NODE_ENV=release ./node_modules/.bin/webpack",
     "dev": "NODE_ENV=development ./node_modules/.bin/webpack",
     "prepublish": "npm run dist"
