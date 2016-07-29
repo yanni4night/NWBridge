@@ -28,6 +28,7 @@ module.exports = panto => {
     panto.loadTransformer('aspect');
     panto.loadTransformer('uglify');
     panto.loadTransformer('replace');
+    panto.loadTransformer('banner');
 
     panto.setOptions({
         output: 'dist'
@@ -43,6 +44,12 @@ module.exports = panto => {
         ]
     };
 
+    const BANNER_OPTIONS = {
+        banner:'/*! bridge.js ' + env + ' v' + pkg.version +
+            ' Build ' + timestamp + ' | (C) 2015~' + endYear +
+            ' yanni4night.com | github.com/yanni4night/NWBridge | MIT */\n'
+    };
+
     const source = panto.$('{src,test}/*.js').tag('src js').read().replace(REPLACE_OPTIONS).babel({
         extend: __dirname + '/.babelrc'
     });
@@ -55,7 +62,7 @@ module.exports = panto => {
                 NODE_ENV: env
             }
         }
-    }).uglify(UGLIFY_OPTIONS).write();
+    }).uglify(UGLIFY_OPTIONS).banner(BANNER_OPTIONS).write();
 
     source.browserify({
         entry: 'test/karma.js',
