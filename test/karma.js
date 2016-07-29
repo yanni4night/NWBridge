@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2015~2016 yanni4night.com
- * test.js
+ * karma.js
  *
  * changelog
  * 2015-11-20[12:56:17]:revised
@@ -11,15 +11,36 @@
  */
 
 import assert from 'assert';
-import {PriorityQueue} from '../src/queue';
-import {Queue} from '../src/queue';
-import {Callback} from '../src/callback';
-import {DomEvent} from '../src/dom-event';
-import {Radio} from '../src/radio';
-import {Promise as XPromise} from '../src/promise';
-import {Event as XEvent} from '../src/event';
-import {Message} from '../src/message';
-
+import {
+    PriorityQueue
+} from '../src/queue';
+import {
+    Queue
+} from '../src/queue';
+import {
+    Callback
+} from '../src/callback';
+import {
+    DomEvent
+} from '../src/dom-event';
+import {
+    Radio
+} from '../src/radio';
+import {
+    Promise as XPromise
+} from '../src/promise';
+import {
+    Event as XEvent
+} from '../src/event';
+import {
+    Message
+} from '../src/message';
+import {
+    ServerBridge
+} from './server';
+import {
+    NWBridge
+} from '../src/bridge';
 const pkg = __PKG__;
 //JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'));
 
@@ -28,8 +49,6 @@ const HYBRID_INITIAL_DATA = {
     version: '1.0.0',
     logid: 'log-' + Date.now()
 };
-
-const ServerBridge = window.ServerBridge;
 
 describe('Queue', function () {
     describe('#push()', function () {
@@ -367,7 +386,7 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_0108p09h_sync_bridge', 'KK0sjsBridge', 'kk0sscheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -396,7 +415,7 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge',
+            new NWBridge('__js_0108p09h_sync_crash_bridge', 'KKcrajsBridge',
                 'kkcrascheme://', HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
@@ -429,7 +448,8 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_0108p09h_bridge', 'KK0jsBridge', 'kk0scheme://',
+                HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -457,7 +477,8 @@ describe('Api', function () {
                     callbackId: Math.random()
                 }));
             }, false);
-            new window.NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_0108p09h1_bridge', 'KK01jsBridge', 'kk01scheme://',
+                HYBRID_INITIAL_DATA);
             serverBridge.ping();
         });
     });
@@ -468,14 +489,15 @@ describe('NWBridge', function () {
     describe('version', function () {
         it('should get version ', function () {
             document.addEventListener('KKjsBridgeReady', function () {
-                assert.deepEqual(pkg.version, window.KKjsBridge.version);
+                assert.deepEqual(pkg.version, window.KKjsBridge.version, 'equals ' +
+                    pkg.version);
                 var old = window.KKjsBridge.version;
-                assert.throws(()=>{
-                    window.KKjsBridge.version = 'x.x.x';
-                });
+                window.KKjsBridge.version = 'x.x.x';
+                assert.deepEqual(window.KKjsBridge.version, old);
             }, false);
 
-            new window.NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_0108p09_bridge', 'KKjsBridge', 'kkscheme://',
+                HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_0108p09_bridge', 'kkscheme://');
             serverBridge.ping();
@@ -486,7 +508,7 @@ describe('NWBridge', function () {
         this.timeout(5e3);
         it('can cache messages before ping', function (done) {
 
-            new window.NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_098_bridge', 'PjsBridge', 'pscheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_098_bridge', 'pscheme://');
 
@@ -530,7 +552,7 @@ describe('NWBridge', function () {
     describe('#duplicated ping', function () {
         it('should handle duplicated ping', function (done) {
             var fired = false;
-            new window.NWBridge('__js_09x12x530_bridge', 'C12530jsBridge',
+            new NWBridge('__js_09x12x530_bridge', 'C12530jsBridge',
                 '12530scheme://', HYBRID_INITIAL_DATA);
             var serverBridge = new ServerBridge('__js_09x12x530_bridge',
                 '12530scheme://');
@@ -555,7 +577,8 @@ describe('NWBridge', function () {
                 });
             });
 
-            new window.NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_09x1230_bridge', 'C12jsBridge', '12scheme://',
+                HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_09x1230_bridge', '12scheme://');
 
@@ -599,7 +622,7 @@ describe('NWBridge', function () {
 
             }, false);
 
-            new window.NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://', HYBRID_INITIAL_DATA);
+            new NWBridge('__js_09x02_bridge', 'CjsBridge', 'cscheme://', HYBRID_INITIAL_DATA);
 
             var serverBridge = new ServerBridge('__js_09x02_bridge', 'cscheme://');
             serverBridge.send(new Message('__t_201uh7', {

@@ -1,6 +1,6 @@
 # NWBridge
 
-[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency status][david-dm-image]][david-dm-url] [![Dev Dependency status][david-dm-dev-image]][david-dm-dev-url]
+[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency status][david-dm-image]][david-dm-url] [![Dev Dependency status][david-dm-dev-image]][david-dm-dev-url] [![Build with Panto][build-image]][build-url]
 
 JavaScript "bridge" for connecting Native and Webview on iOS/Android.
 
@@ -43,3 +43,5 @@ See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 [david-dm-image]:https://david-dm.org/yanni4night/nwbridge.svg
 [david-dm-dev-url]:https://david-dm.org/yanni4night/nwbridge#info=devDependencies
 [david-dm-dev-image]:https://david-dm.org/yanni4night/nwbridge/dev-status.svg
+[build-image]:https://img.shields.io/badge/build%20with-panto-yellowgreen.svg
+[build-url]:http://pantojs.xyz/

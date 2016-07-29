@@ -1,12 +1,13 @@
 {
   "name": "nwbridge",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Native/Webview bridge for Hybrid",
-  "main": "bridge.dist.js",
+  "main": "src/bridge.js",
+  "browser": "dist/bridge.dist.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
-    "dist": "NODE_ENV=release ./node_modules/.bin/webpack",
-    "dev": "NODE_ENV=development ./node_modules/.bin/webpack",
+    "dist": "eslint src && NODE_ENV=production panto",
+    "dev": "eslint src && NODE_ENV=development panto",
     "prepublish": "npm run dist"
   },
   "repository": {
@@ -17,25 +18,32 @@
     "webview",
     "native",
     "bridge",
+    "nwbridge",
     "hybrid"
   ],
   "author": "yanni4night@gmail.com",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.7.4",
-    "babel-loader": "^6.2.4",
     "babel-plugin-check-es2015-constants": "^6.7.2",
     "babel-plugin-transform-object-assign": "^6.5.0",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "babel-preset-es2015": "^6.1.18",
     "dateformat": "^1.0.12",
-    "eslint": "^2.5.3",
-    "eslint-loader": "^1.3.0",
-    "karma": "^0.13.22",
-    "karma-mocha": "^0.2.2",
+    "eslint": "^3.1.1",
+    "karma": "^1.1.2",
+    "karma-mocha": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.0",
     "mocha": "^2.4.5",
-    "phantomjs-prebuilt": "^2.1.7",
-    "webpack": "^1.12.14"
+    "panto": "0.0.28",
+    "panto-transformer-aspect": "^0.1.1",
+    "panto-transformer-babel": "^0.1.4",
+    "panto-transformer-banner": "^0.1.0",
+    "panto-transformer-browserify": "^0.1.2",
+    "panto-transformer-read": "^0.3.2",
+    "panto-transformer-replace": "^0.1.0",
+    "panto-transformer-uglify": "^0.1.2",
+    "panto-transformer-write": "^0.3.2",
+    "phantomjs-prebuilt": "^2.1.7"
   }
 }
