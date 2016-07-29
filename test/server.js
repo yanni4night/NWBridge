@@ -18,7 +18,7 @@ import {extend} from '../src/extend';
 import {Event as XEvent} from '../src/event';
 
 
-export function ServerBridge(nativeExport, scheme) {
+export const ServerBridge = function (nativeExport, scheme) {
 
     const self = this;
 
