@@ -21,14 +21,8 @@ const startYear = 2015;
 const endYear = now.getFullYear()
 
 module.exports = panto => {
-    panto.loadTransformer('read');
-    panto.loadTransformer('write');
-    panto.loadTransformer('babel');
-    panto.loadTransformer('browserify');
-    panto.loadTransformer('aspect');
-    panto.loadTransformer('uglify');
-    panto.loadTransformer('replace');
-    panto.loadTransformer('banner');
+
+    require('load-panto-transformers')(panto);
 
     panto.setOptions({
         output: 'dist'

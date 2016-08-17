@@ -31,6 +31,10 @@ Then, _two_ global object will be created: `window.JsBridge` and `window.__js_br
 
 See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 
+# Build
+
+Built with [panto](http://pantojs.xyz/), just dog-fooding.
+
 # Author
  - <yanni4night@gmail.com>
 
