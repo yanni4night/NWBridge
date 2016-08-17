@@ -11,38 +11,17 @@
  */
 
 import assert from 'assert';
-import {
-    PriorityQueue
-} from '../src/queue';
-import {
-    Queue
-} from '../src/queue';
-import {
-    Callback
-} from '../src/callback';
-import {
-    DomEvent
-} from '../src/dom-event';
-import {
-    Radio
-} from '../src/radio';
-import {
-    Promise as XPromise
-} from '../src/promise';
-import {
-    Event as XEvent
-} from '../src/event';
-import {
-    Message
-} from '../src/message';
-import {
-    ServerBridge
-} from './server';
-import {
-    NWBridge
-} from '../src/bridge';
+import {PriorityQueue} from '../src/queue';
+import {Queue} from '../src/queue';
+import {Callback} from '../src/callback';
+import {DomEvent} from '../src/dom-event';
+import {Radio} from '../src/radio';
+import {Promise as XPromise} from '../src/promise';
+import {Event as XEvent} from '../src/event';
+import {Message} from '../src/message';
+import {ServerBridge} from './server';
+import {NWBridge} from '../src/bridge';
 const pkg = __PKG__;
-//JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'));
 
 const HYBRID_INITIAL_DATA = {
     platform: 'android',
