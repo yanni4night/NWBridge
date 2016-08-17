@@ -33,7 +33,7 @@ See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 
 # Build
 
-Built with [panto](http://pantojs.xyz/), just dog-fooding.
+Built with [panto](http://pantojs.xyz/), just dog-fooding. You can use [Webpack](webpack.github.io) too.
 
 # Author
  - <yanni4night@gmail.com>
