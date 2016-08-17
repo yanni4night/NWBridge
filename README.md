@@ -41,7 +41,7 @@ See [documentation](http://yanni4night.github.io/NWBridge/) for more details.
 [travis-image]: https://travis-ci.org/yanni4night/NWBridge.svg?branch=master
 [david-dm-url]:https://david-dm.org/yanni4night/nwbridge
 [david-dm-image]:https://david-dm.org/yanni4night/nwbridge.svg
-[david-dm-dev-url]:https://david-dm.org/yanni4night/nwbridge#info=devDependencies
+[david-dm-dev-url]:https://david-dm.org/yanni4night/nwbridge#type=dev
 [david-dm-dev-image]:https://david-dm.org/yanni4night/nwbridge/dev-status.svg
 [build-image]:https://img.shields.io/badge/build%20with-panto-yellowgreen.svg
 [build-url]:http://pantojs.xyz/
