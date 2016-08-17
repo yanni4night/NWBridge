@@ -12,7 +12,7 @@
 'use strict';
 const dateFormat = require('dateformat');
 const env = process.env.NODE_ENV;
-const pkg = JSON.parse(require('fs').readFileSync('package.json', 'utf-8'));
+const pkg = require('./package.json');
 
 const now = new Date();
 const timestamp = dateFormat(now, 'yyyy-mm-dd HH:MM:ss Z');
