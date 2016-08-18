@@ -35,7 +35,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "load-panto-transformers": "^0.1.0",
     "mocha": "^3.0.2",
-    "panto": "0.0.30",
+    "panto": "0.0.31",
     "panto-transformer-aspect": "^0.1.1",
     "panto-transformer-babel": "^0.1.4",
     "panto-transformer-banner": "^0.1.0",
@@ -44,6 +44,7 @@
     "panto-transformer-replace": "^0.1.0",
     "panto-transformer-uglify": "^0.1.2",
     "panto-transformer-write": "^0.3.2",
-    "phantomjs-prebuilt": "^2.1.7"
+    "phantomjs-prebuilt": "^2.1.7",
+    "time-panto": "^0.1.0"
   }
 }

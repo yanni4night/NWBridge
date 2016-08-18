@@ -23,6 +23,7 @@ const endYear = now.getFullYear()
 module.exports = panto => {
 
     require('load-panto-transformers')(panto);
+    require('time-panto')(panto);
 
     panto.setOptions({
         output: 'dist'
